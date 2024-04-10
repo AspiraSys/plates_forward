@@ -95,7 +95,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarScreen(
+      appBar: const AppBarScreen(
         title: 'Account Details',
         subScreen: true,
         isProfile: true,

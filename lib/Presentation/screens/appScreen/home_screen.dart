@@ -1,13 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
+import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 // import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
+// import 'pac'
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,9 +27,36 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController orderController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // listenToData(); // Call the function here
+  }
+
+  @override
   void dispose() {
     super.dispose();
     orderController.dispose();
+  }
+
+  // void listenToData() {
+  //   // String? userId = FirebaseAuth.instance.currentUser?.uid;
+  //   FirebaseFirestore.instance
+  //       .collection('parameterData')
+  //       .snapshots():
+  //      {
+  //     for (var doc in snapshot.docs) {
+  //       Map<String, dynamic> data = doc.data();
+  //       print('Data: $data');
+  //     }
+  //   };
+  // }
+
+  // Default stream Builder
+  static CollectionReference<Object?> fetchStream(String collection) {
+    final CollectionReference collections =
+        FirebaseFirestore.instance.collection(collection);
+
+    return collections;
   }
 
   @override
@@ -115,9 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ];
 
-      void handleOrder() {
-        Navigator.of(context).pop();
-      }
+    void handleOrder() {
+      Navigator.of(context).pop();
+    }
 
     return Scaffold(
       appBar: const AppBarScreen(title: 'Impact'),
@@ -412,12 +444,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.8, 
+                                                  0.8,
                                               padding: const EdgeInsets.all(20),
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(8),
-                                                color: AppColor.navBackgroundColor,
+                                                color:
+                                                    AppColor.navBackgroundColor,
                                               ),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
@@ -435,9 +468,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ),
                                                   const SizedBox(height: 20),
                                                   const Padding(
-                                                    padding: EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20),
                                                     child: InputBox(
                                                       labelText:
                                                           'Enter Receipt Number / order Number',
@@ -479,7 +512,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                 ),
-
                               )
                             ],
                           ),
@@ -503,177 +535,278 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       ],
                     ),
-                    SingleChildScrollView(
-                        child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: Column(
-                            children: [
-                              for (var communityData in communityImpactApi)
-                                Container(
+                    StreamBuilder(
+                        stream: fetchStream('parameterData').snapshots(),
+                        builder:
+                            (context, AsyncSnapshot<QuerySnapshot> snapShot) {
+                          if (!snapShot.hasData) {
+                            return Container(
+                              color: AppColor.whiteColor,
+                              child: const Center(
+                                child: CircularProgress(),
+                              ),
+                            );
+                          } else {
+                            // final DocumentSnapshot documentSnapshot =
+                            //     snapShot.data!.docs[0];
+                            return SingleChildScrollView(
+                                child: Column(
+                              children: [
+                                Padding(
                                   padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom: BorderSide(
-                                            width: 1,
-                                            color: AppColor.greyColor)),
-                                  ),
-                                  child: Row(
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: Column(
                                     children: [
-                                      Image.asset(
-                                        communityData["icon"],
-                                        width: 50,
-                                        height: 50,
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 20),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              communityData["count"],
-                                              style: const TextStyle(
-                                                  fontSize: 32,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColor.primaryColor),
-                                            ),
-                                            Text(
-                                              communityData['message'],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 35),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              for (int index = 0;
-                                  index < countryImpactApi.length;
-                                  index += 2)
-                                Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 1),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.8,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom:
-                                          index == countryImpactApi.length - 2
-                                              ? BorderSide.none
-                                              : const BorderSide(
-                                                  width: 1,
-                                                  color: AppColor.greyColor,
-                                                ),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 20),
-                                            child: Image.asset(
-                                              countryImpactApi[index]['flag'],
-                                              width: 80,
-                                              height: 46,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 7),
-                                            child: Text(
-                                              countryImpactApi[index]
-                                                  ['country'],
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            countryImpactApi[index]['count'],
-                                            style: const TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.primaryColor,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Container(
-                                          height: 150,
+                                      for (var communityData
+                                          in snapShot.data!.docs)
+                                        // if (communityData['parameterId'] ==
+                                        //         'AUS' || communityData['parameterId'] ==
+                                        //     'UKR' || communityData['parameterId'] ==
+                                        //     'SRL' ) ?  :
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 15),
                                           decoration: const BoxDecoration(
                                             border: Border(
-                                              right: BorderSide(
-                                                width: 1,
-                                                color: AppColor.greyColor,
+                                                bottom: BorderSide(
+                                                    width: 1,
+                                                    color: AppColor.greyColor)),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              // for (var communityDatas
+                                              //     in countryImpactApi)
+                                              Image.network(
+                                                communityData["parameterImage"],
+                                                width: 50,
+                                                height: 50,
                                               ),
-                                            ),
-                                          )),
-                                      if (index + 1 < countryImpactApi.length)
-                                        Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 20),
-                                              child: Image.asset(
-                                                countryImpactApi[index + 1]
-                                                    ['flag'],
-                                                width: 80,
-                                                height: 46,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 7),
-                                              child: Text(
-                                                countryImpactApi[index + 1]
-                                                    ['country'],
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      communityData[
+                                                              "parameterValue"]
+                                                          .toString(),
+                                                      style: const TextStyle(
+                                                          fontSize: 32,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          color: AppColor
+                                                              .primaryColor),
+                                                    ),
+                                                    Text(
+                                                      communityData[
+                                                          'parameterName'],
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    )
+                                                  ],
                                                 ),
-                                              ),
-                                            ),
-                                            Text(
-                                              countryImpactApi[index + 1]
-                                                  ['count'],
-                                              style: const TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColor.primaryColor,
-                                              ),
-                                            )
-                                          ],
+                                              )
+                                            ],
+                                          ),
                                         ),
                                     ],
                                   ),
                                 ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ))
+                                StreamBuilder(
+                                    stream: fetchStream('parameterCountryData')
+                                        .snapshots(),
+                                    builder: (context,
+                                        AsyncSnapshot<QuerySnapshot> snapShot) {
+                                      if (!snapShot.hasData) {
+                                        return Container(
+                                          color: AppColor.whiteColor,
+                                          child: const Center(
+                                            child: CircularProgress(),
+                                          ),
+                                        );
+                                      } else {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 35),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              for (int index = 0;
+                                                  index <
+                                                      snapShot
+                                                          .data!.docs.length;
+                                                  index += 2)
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 1),
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.8,
+                                                  decoration: BoxDecoration(
+                                                    border: Border(
+                                                      bottom: index ==
+                                                              snapShot
+                                                                      .data!
+                                                                      .docs
+                                                                      .length -
+                                                                  2
+                                                          ? BorderSide.none
+                                                          : const BorderSide(
+                                                              width: 1,
+                                                              color: AppColor
+                                                                  .greyColor,
+                                                            ),
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    top: 20),
+                                                            child: Image.network(
+                                                              snapShot.data!
+                                                                          .docs[
+                                                                      index]
+                                                                  ['countryFlag'],
+                                                              width: 80,
+                                                              height: 46,
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        7),
+                                                            child: Text(
+                                                              snapShot.data!
+                                                                          .docs[
+                                                                      index]
+                                                                  ['countryName'],
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            snapShot.data!
+                                                                    .docs[
+                                                                index]['parameterValue'].toString(),
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 22,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: AppColor
+                                                                  .primaryColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                          height: 150,
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            border: Border(
+                                                              right: BorderSide(
+                                                                width: 1,
+                                                                color: AppColor
+                                                                    .greyColor,
+                                                              ),
+                                                            ),
+                                                          )),
+                                                      if (index + 1 <
+                                                          snapShot.data!.docs
+                                                              .length)
+                                                        Column(
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 20),
+                                                              child:
+                                                                  Image.network(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index +
+                                                                            1]
+                                                                    ['countryFlag'],
+                                                                width: 80,
+                                                                height: 46,
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          7),
+                                                              child: Text(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index +
+                                                                            1]
+                                                                    ['countryName'],
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              snapShot.data!
+                                                                          .docs[
+                                                                      index + 1]
+                                                                  ['parameterValue'].toString(),
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 22,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColor
+                                                                    .primaryColor,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    })
+                              ],
+                            ));
+                          }
+                        })
                   ],
                 ),
               ),
@@ -686,6 +819,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  
 }

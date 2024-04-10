@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
+import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -42,10 +44,17 @@ class _DonateScreenState extends State<DonateScreen> {
     }
   }
 
+  static CollectionReference<Object?> fetchStream(String collection) {
+    final CollectionReference collections =
+        FirebaseFirestore.instance.collection(collection);
+
+    return collections;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarScreen(title: 'Donate'),
+      appBar: const AppBarScreen(title: 'Donate'),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -145,76 +154,98 @@ class _DonateScreenState extends State<DonateScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10, left: 25),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 18),
-                    child: Row(
-                      children: [
-                        for (int index = 0; index < donateToApi.length; index++)
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: Container(
-                                width: 72,
-                                height: 72,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 2, color: AppColor.primaryColor),
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(6)),
-                                  color: selectedIndex == index
-                                      ? AppColor.primaryColor
-                                      : AppColor.whiteColor,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ColorFiltered(
-                                      colorFilter: ColorFilter.mode(
-                                          selectedIndex == index
-                                              ? AppColor.whiteColor
-                                              : AppColor.primaryColor,
-                                          BlendMode.srcIn),
-                                      child: Image.asset(
-                                        donateToApi[index]['image'],
-                                        width: 40,
-                                        height: 40,
+          StreamBuilder(
+              stream: fetchStream('donateFetch').snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapShot) {
+                if (!snapShot.hasData) {
+                  return Container(
+                    width: 100,
+                    color: AppColor.whiteColor,
+                    child: const Center(
+                      child: CircularProgress(),
+                    ),
+                  );
+                } else {
+                  return  Padding(
+                    padding: const EdgeInsets.only(bottom: 10, left: 25),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18),
+                            child: Row(
+                              children: [
+                                for (int index = 0;
+                                    index < snapShot.data!.docs.length;
+                                    index++)
+                                    
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedIndex = index;
+                                      });
+                                    },
+                                    
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: Container(
+                                        width: 72,
+                                        height: 72,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              width: 2,
+                                              color: AppColor.primaryColor),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(6)),
+                                          color: selectedIndex == index
+                                              ? AppColor.primaryColor
+                                              : AppColor.whiteColor,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            ColorFiltered(
+                                              colorFilter: ColorFilter.mode(
+                                                  selectedIndex == index
+                                                      ? AppColor.whiteColor
+                                                      : AppColor.primaryColor,
+                                                  BlendMode.srcIn),
+                                              child: Image.network(
+                                                snapShot.data!.docs[index]
+                                                    ['venueImage'],
+                                                width: 40,
+                                                height: 40,
+                                              ),
+                                            ),
+                                            Text(
+                                              snapShot.data!.docs[index]
+                                                  ['venueName'],
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: selectedIndex == index
+                                                      ? AppColor.whiteColor
+                                                      : AppColor.primaryColor),
+                                                      textAlign: TextAlign.center,
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      donateToApi[index]['name'],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: selectedIndex == index
-                                              ? AppColor.whiteColor
-                                              : AppColor.primaryColor),
-                                    )
-                                  ],
-                                ),
-                              ),
+                                  ),
+                              ],
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                  );
+                }
+              }),
           const Spacer(),
           Center(
             child: InkWell(
@@ -241,7 +272,9 @@ class _DonateScreenState extends State<DonateScreen> {
           const SizedBox(height: 16),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(activeIcon: 2,),
+      bottomNavigationBar: const BottomNavBar(
+        activeIcon: 2,
+      ),
     );
   }
 }
