@@ -1,16 +1,7 @@
-// import 'dart:js';
-
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'dart:js';
-
-// import 'dart:js';
-
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
@@ -18,6 +9,7 @@ import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_sheet.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
+import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -32,13 +24,23 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late String _profilePictureUrl = '';
+  late String _firstName = '';
+  late String _lastName = '';
   late bool _isLoading = true;
   String imagesUrl = '';
+  final TextEditingController _passwordController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchUserDetails();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _passwordController.dispose();
   }
 
   Future<void> _fetchUserDetails() async {
@@ -52,6 +54,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 .get();
         setState(() {
           _profilePictureUrl = userDetails['profilePicture'];
+          _firstName = userDetails['firstName'];
+          _lastName = userDetails['lastName'];
           _isLoading = false;
         });
       }
@@ -126,50 +130,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 40,
                               height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(
-                                    0.8),
+                                color: Colors.white.withOpacity(0.8),
                                 shape: BoxShape.circle,
                               ),
-                              child: const CircularProgressIndicator(),
+                              child: const CircularProgressIndicator(
+                                color: AppColor.primaryColor,
+                              ),
                             ),
                           )
                         : _profilePictureUrl.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(82),
-                                child: Image.network(
-                                  _profilePictureUrl,
-                                  width: 164,
-                                  height: 164,
-                                  fit: BoxFit.cover,
-                                ),
+                            ? Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(82),
+                                    child: Image.network(
+                                      _profilePictureUrl,
+                                      width: 164,
+                                      height: 164,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(6)),
+                                          color: AppColor.primaryColor),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        color: AppColor.whiteColor,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               )
                             : Container(),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                            color: AppColor.primaryColor),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: AppColor.whiteColor,
-                          size: 20,
-                        ),
-                      ),
-                    ),
                   ],
                 )),
           ),
-          Text(
-            'Jane Doe'.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Text(
+                  _firstName.toString().toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                _lastName.toString().toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
           GestureDetector(
             onTap: () =>
@@ -201,6 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buttonText: 'Confirm Delete',
                       content:
                           'Are you sure you want to delete your account? Once deleted, the action cannot be undone. ',
+                      // delete: true,
+
+                      // passwordDelete: _passwordController,
                       handleAction: _handleDelete(context),
                     );
                   });
@@ -263,7 +292,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  VoidCallback _handleDelete(BuildContext context) {
+    return () async {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Center(
+              child: Column(
+                children: [
+                  const Text(
+                      'Enter your Password to verify and delete the account',
+                      style:
+                          TextStyle(fontSize: 12, color: AppColor.blackColor)),
+                  InputBox(
+                      labelText: 'Password',
+                      inputType: 'password',
+                      inputController: _passwordController),
+                  ButtonBox(
+                      buttonText: 'Delete',
+                      fillColor: true,
+                      onPressed: () => handleConfirmDelete(context))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    };
+  }
 }
+
+Future<void> handleConfirmDelete(BuildContext context) async {}
 
 Future<void> handleLogOut(BuildContext context) async {
   showDialog(
@@ -285,15 +346,6 @@ Future<void> handleLogOut(BuildContext context) async {
       (route) => false,
     );
   } catch (e) {
-    print("Error occurred during logout: $e");
+    print("Error occurred during logout");
   }
-}
-
-VoidCallback _handleDelete(BuildContext context) {
-  return () {
-    if (kDebugMode) {
-      print('delete button clicked');
-    }
-    Navigator.of(context).pushNamed(RoutePaths.loginRoute);
-  };
 }

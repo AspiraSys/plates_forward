@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 
 class InputBox extends StatefulWidget {
@@ -6,6 +7,8 @@ class InputBox extends StatefulWidget {
   final String inputType;
   final dynamic inputController;
   final bool accountDetail;
+  final bool disabled;
+  final bool phone;
 
   const InputBox({
     super.key,
@@ -13,6 +16,8 @@ class InputBox extends StatefulWidget {
     required this.inputType,
     this.inputController,
     this.accountDetail = false,
+    this.disabled = true,
+    this.phone = false
   });
 
   @override
@@ -48,12 +53,21 @@ class _InputBoxState extends State<InputBox> {
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColor.greyColor, width: 2)),
       ),
-      margin: const EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 2),
       child: TextFormField(
+        inputFormatters: widget.phone ? [PhoneNumberFormatter()] : null,
         controller: _controller,
         obscureText: widget.inputType == 'password' ? showPassword : false,
         enableInteractiveSelection: false,
         decoration: InputDecoration(
+          // prefixText: widget.phone ? '+61' : '',
+          // prefixStyle: const TextStyle(
+          //   fontSize: 14,
+          //   fontWeight: FontWeight.w400,
+          //   color: AppColor.blackColor,
+          //   decoration: TextDecoration.none,
+          // ),
+          enabled: widget.disabled,
           suffixIcon: obscureText
               ? GestureDetector(
                   onTap: () {
@@ -96,6 +110,25 @@ class _InputBoxState extends State<InputBox> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class PhoneNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String formattedText = newValue.text;
+
+    if (newValue.text.length == 1) {
+      formattedText = '+61 ${newValue.text}';
+    } else if (newValue.text.length > 1 && !newValue.text.startsWith('+61')) {
+      formattedText = '+61 ${newValue.text.substring(3)}';
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }

@@ -131,8 +131,8 @@ class _MissionScreenState extends State<MissionScreen> {
                     Tab(
                       child: Padding(
                         padding: selectedIndex == 0
-                            ? const EdgeInsets.only(top: 6)
-                            : const EdgeInsets.all(0),
+                               ? const EdgeInsets.only(top: 4)
+                            : const EdgeInsets.only(top: 10),
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(
@@ -154,7 +154,7 @@ class _MissionScreenState extends State<MissionScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(10),
                             child: Text(
-                              'Impact'.toUpperCase(),
+                              'Summary'.toUpperCase(),
                               style: TextStyle(
                                 color: selectedIndex == 0
                                     ? AppColor.primaryColor
@@ -170,8 +170,8 @@ class _MissionScreenState extends State<MissionScreen> {
                     Tab(
                       child: Padding(
                         padding: selectedIndex == 1
-                            ? const EdgeInsets.only(top: 6)
-                            : const EdgeInsets.all(0),
+                            ? const EdgeInsets.only(top: 4)
+                            : const EdgeInsets.only(top: 10),
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(

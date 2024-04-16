@@ -48,7 +48,6 @@ class SignUpScreenState extends State<SignUpScreen>
     if (pickedImage != null) {
       setState(() {
         _pickedImage = File(pickedImage.path);
-        print('path of image $_pickedImage');
       });
       Reference referenceRoot = FirebaseStorage.instance.ref();
       Reference referenceDirProfilePictures =
@@ -89,6 +88,15 @@ class SignUpScreenState extends State<SignUpScreen>
         errorText = 'Please enter at least 8 characters for the password';
       });
       return;
+    } else if (!validatePasswordStructure(_passwordController.text)) {
+      setState(() {
+        errorText = 'Password must contain Uppercase, Special Character';
+      });
+      return;
+    } else if (_mobileNumberController.text.length <= 9) {
+      setState(() {
+        errorText = 'Please enter at 10 digit of mobile number';
+      });
     }
 
     setState(() {
@@ -162,6 +170,13 @@ class SignUpScreenState extends State<SignUpScreen>
     return snapshot.docs.isNotEmpty;
   }
 
+  bool validatePasswordStructure(String value) {
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    RegExp regExp = RegExp(pattern);
+    return regExp.hasMatch(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,11 +187,11 @@ class SignUpScreenState extends State<SignUpScreen>
           children: [
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 48, bottom: 30),
+              padding: const EdgeInsets.only(top: 38, bottom: 20),
               child: Image.asset(
                 ImageAssets.authLogo,
-                width: 157,
-                height: 160,
+                width: 138,
+                height: 140,
                 fit: BoxFit.contain,
               ),
             ),
@@ -192,6 +207,37 @@ class SignUpScreenState extends State<SignUpScreen>
                 ),
               ),
             ),
+            errorText.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 5, left: 10, right: 10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          color: const Color.fromARGB(79, 244, 67, 54)),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.close,
+                            size: 24,
+                            color: Colors.red,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Text(
+                              errorText,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(30),
@@ -201,7 +247,7 @@ class SignUpScreenState extends State<SignUpScreen>
                       onTap: _pickImage,
                       child: Container(
                           alignment: Alignment.center,
-                          margin: const EdgeInsets.only(top: 15),
+                          margin: const EdgeInsets.only(top: 5),
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
@@ -251,40 +297,9 @@ class SignUpScreenState extends State<SignUpScreen>
                             ],
                           )),
                     ),
-                    errorText.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 10),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6),
-                                  color: const Color.fromARGB(79, 244, 67, 54)),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.close,
-                                    size: 24,
-                                    color: Colors.red,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                      errorText,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : const SizedBox(),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 25),
+                      margin: const EdgeInsets.only(top: 20),
                       padding: const EdgeInsets.only(left: 15),
                       child: const Text(
                         "First Name",
@@ -305,7 +320,7 @@ class SignUpScreenState extends State<SignUpScreen>
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 25),
+                      margin: const EdgeInsets.only(top: 15),
                       padding: const EdgeInsets.only(left: 15),
                       child: const Text(
                         "Last Name",
@@ -326,7 +341,7 @@ class SignUpScreenState extends State<SignUpScreen>
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 25),
+                      margin: const EdgeInsets.only(top: 15),
                       padding: const EdgeInsets.only(left: 15),
                       child: const Text(
                         "Email",
@@ -347,7 +362,7 @@ class SignUpScreenState extends State<SignUpScreen>
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 25),
+                      margin: const EdgeInsets.only(top: 15),
                       padding: const EdgeInsets.only(left: 15),
                       child: const Text(
                         "Mobile Number",
@@ -364,11 +379,12 @@ class SignUpScreenState extends State<SignUpScreen>
                         inputController: _mobileNumberController,
                         labelText: 'Enter your mobile name',
                         inputType: 'text',
+                        phone: true,
                       ),
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 25),
+                      margin: const EdgeInsets.only(top: 15),
                       padding: const EdgeInsets.only(left: 15),
                       child: const Text(
                         "Password",

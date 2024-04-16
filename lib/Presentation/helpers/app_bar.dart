@@ -22,8 +22,9 @@ class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+    return Container(
+      padding: const EdgeInsets.only(top: 2, bottom: 3),
+      height: 100,
       child: AppBar(
         title: Padding(
           padding: subScreen
@@ -77,7 +78,7 @@ class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
                       context: context,
                       builder: (BuildContext context) {
                         return BottomSheet(
-                          backgroundColor: AppColor.navBackgroundColor,
+                          backgroundColor: AppColor.whiteColor,
                           onClosing: () {},
                           builder: (BuildContext context) {
                             return SizedBox(

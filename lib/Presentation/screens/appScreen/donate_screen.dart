@@ -16,13 +16,13 @@ class DonateScreen extends StatefulWidget {
 }
 
 class _DonateScreenState extends State<DonateScreen> {
-  List<Map<String, dynamic>> donateToApi = [
-    {'id': '1', 'image': ImageAssets.sydneyIcon, 'name': 'Sydney'},
-    {'id': '2', 'image': ImageAssets.kyivIcon, 'name': 'Kyivl'},
-    {'id': '3', 'image': ImageAssets.coyoacanIcon, 'name': 'Coyoacan'},
-    {'id': '4', 'image': ImageAssets.colomboIcon, 'name': 'Colombo'},
-    {'id': '5', 'image': ImageAssets.kabulIcon, 'name': 'Kabul'},
-  ];
+  // List<Map<String, dynamic>> donateToApi = [
+  //   {'id': '1', 'image': ImageAssets.sydneyIcon, 'name': 'Sydney'},
+  //   {'id': '2', 'image': ImageAssets.kyivIcon, 'name': 'Kyivl'},
+  //   {'id': '3', 'image': ImageAssets.coyoacanIcon, 'name': 'Coyoacan'},
+  //   {'id': '4', 'image': ImageAssets.colomboIcon, 'name': 'Colombo'},
+  //   {'id': '5', 'image': ImageAssets.kabulIcon, 'name': 'Kabul'},
+  // ];
 
   int numberOfMeals = 1;
   int totalCost = 10;
@@ -158,11 +158,15 @@ class _DonateScreenState extends State<DonateScreen> {
               stream: fetchStream('donateFetch').snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapShot) {
                 if (!snapShot.hasData) {
-                  return Container(
-                    width: 100,
-                    color: AppColor.whiteColor,
-                    child: const Center(
-                      child: CircularProgress(),
+                  return Center(
+                    child: Container(
+                      width: 100,
+                      color: AppColor.whiteColor,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColor.primaryColor,
+                        ),
+                      ),
                     ),
                   );
                 } else {

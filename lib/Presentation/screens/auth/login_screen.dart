@@ -78,17 +78,17 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
             children: <Widget>[
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 38, bottom: 50),
+                padding: const EdgeInsets.only(top: 38, bottom: 25),
                 child: Image.asset(
                   ImageAssets.authLogo,
-                  width: 157,
-                  height: 160,
+                  width: 138,
+                  height: 140,
                   fit: BoxFit.contain,
                 ),
               ),
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 40, bottom: 24),
+                padding: const EdgeInsets.only(top: 30, bottom: 24),
                 child: Text(
                   "Sign In".toUpperCase(),
                   style: const TextStyle(
@@ -196,7 +196,7 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
               ),
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 88),
+                padding: const EdgeInsets.only(top: 48),
                 child: const Text(
                   "Don't have an account yet?",
                   style: TextStyle(

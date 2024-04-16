@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
-import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 // import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
@@ -23,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
-
+  bool orderState = false;
   final TextEditingController orderController = TextEditingController();
 
   @override
@@ -61,26 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> communityImpactApi = [
-      {
-        'id': "1",
-        "count": "342, 893",
-        "message": "Meals provided",
-        "icon": ImageAssets.mealIcon,
-      },
-      {
-        'id': "2",
-        "count": "342, 893",
-        "message": "Hours of paid training and employment",
-        "icon": ImageAssets.clockIcon,
-      },
-      {
-        'id': "3",
-        "count": "342, 893",
-        "message": "Marginalised community members employed",
-        "icon": ImageAssets.peopleIcon,
-      },
-    ];
 
     List<Map<String, dynamic>> countryImpactApi = [
       {
@@ -148,6 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     void handleOrder() {
+      setState(() {
+        orderState = false;
+      });
       Navigator.of(context).pop();
     }
 
@@ -180,8 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Tab(
                       child: Padding(
                         padding: selectedIndex == 0
-                            ? const EdgeInsets.only(top: 6)
-                            : const EdgeInsets.all(0),
+                            ? const EdgeInsets.only(top: 4)
+                            : const EdgeInsets.only(top: 10),
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(
@@ -219,8 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Tab(
                       child: Padding(
                         padding: selectedIndex == 1
-                            ? const EdgeInsets.only(top: 6)
-                            : const EdgeInsets.all(0),
+                            ? const EdgeInsets.only(top: 4)
+                            : const EdgeInsets.only(top: 10),
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(
@@ -265,7 +246,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Column(
                       children: [
-                        SizedBox(
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          width: MediaQuery.of(context).size.width * 8,
                           height: MediaQuery.of(context).size.height * 0.38,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -313,11 +296,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               Container(
-                                width: 200,
-                                height: 200,
+                                width: 160,
+                                height: 160,
                                 decoration: const BoxDecoration(
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(100)),
+                                        BorderRadius.all(Radius.circular(80)),
                                     color: AppColor.primaryColor),
                                 child: Column(
                                   mainAxisAlignment:
@@ -417,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'My Actvities',
+                                'My Activities',
                                 style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
@@ -433,6 +416,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         BorderRadius.all(Radius.circular(6))),
                                 child: GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      orderState = true;
+                                    });
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
@@ -478,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       inputController: '',
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 20),
+                                                  const SizedBox(height: 10),
                                                   ButtonBox(
                                                     buttonText: 'Order',
                                                     fillColor: true,
@@ -517,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.3,
+                          height: orderState ? MediaQuery.of(context).size.height * 0.1 : MediaQuery.of(context).size.height * 0.32,
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -540,10 +526,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder:
                             (context, AsyncSnapshot<QuerySnapshot> snapShot) {
                           if (!snapShot.hasData) {
-                            return Container(
-                              color: AppColor.whiteColor,
-                              child: const Center(
-                                child: CircularProgress(),
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColor.primaryColor,
                               ),
                             );
                           } else {
@@ -565,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         //     'SRL' ) ?  :
                                         Container(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 15),
+                                              vertical: 15, horizontal: 20),
                                           decoration: const BoxDecoration(
                                             border: Border(
                                                 bottom: BorderSide(
@@ -593,19 +578,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               "parameterValue"]
                                                           .toString(),
                                                       style: const TextStyle(
-                                                          fontSize: 32,
+                                                          fontSize: 30,
                                                           fontWeight:
                                                               FontWeight.w700,
                                                           color: AppColor
                                                               .primaryColor),
                                                     ),
-                                                    Text(
-                                                      communityData[
-                                                          'parameterName'],
-                                                      style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400),
+                                                    SizedBox(
+                                                      width: MediaQuery.of(context).size.width * .65,
+                                                      child: Text(
+                                                        communityData[
+                                                            'parameterName'],
+                                                        style: const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w400),
+                                                      ),
                                                     )
                                                   ],
                                                 ),
@@ -622,16 +610,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context,
                                         AsyncSnapshot<QuerySnapshot> snapShot) {
                                       if (!snapShot.hasData) {
-                                        return Container(
-                                          color: AppColor.whiteColor,
-                                          child: const Center(
-                                            child: CircularProgress(),
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColor.primaryColor,
                                           ),
                                         );
                                       } else {
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 35),
+                                              vertical: 20),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -679,11 +666,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 const EdgeInsets
                                                                     .only(
                                                                     top: 20),
-                                                            child: Image.network(
+                                                            child:
+                                                                Image.network(
                                                               snapShot.data!
                                                                           .docs[
-                                                                      index]
-                                                                  ['countryFlag'],
+                                                                      index][
+                                                                  'countryFlag'],
                                                               width: 80,
                                                               height: 46,
                                                             ),
@@ -697,8 +685,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             child: Text(
                                                               snapShot.data!
                                                                           .docs[
-                                                                      index]
-                                                                  ['countryName'],
+                                                                      index][
+                                                                  'countryName'],
                                                               style:
                                                                   const TextStyle(
                                                                 fontSize: 16,
@@ -709,9 +697,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ),
                                                           ),
                                                           Text(
-                                                            snapShot.data!
-                                                                    .docs[
-                                                                index]['parameterValue'].toString(),
+                                                            snapShot
+                                                                .data!
+                                                                .docs[index][
+                                                                    'parameterValue']
+                                                                .toString(),
                                                             style:
                                                                 const TextStyle(
                                                               fontSize: 22,
@@ -751,8 +741,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 snapShot.data!
                                                                             .docs[
                                                                         index +
-                                                                            1]
-                                                                    ['countryFlag'],
+                                                                            1][
+                                                                    'countryFlag'],
                                                                 width: 80,
                                                                 height: 46,
                                                               ),
@@ -767,8 +757,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 snapShot.data!
                                                                             .docs[
                                                                         index +
-                                                                            1]
-                                                                    ['countryName'],
+                                                                            1][
+                                                                    'countryName'],
                                                                 style:
                                                                     const TextStyle(
                                                                   fontSize: 16,
@@ -779,10 +769,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                             ),
                                                             Text(
-                                                              snapShot.data!
-                                                                          .docs[
-                                                                      index + 1]
-                                                                  ['parameterValue'].toString(),
+                                                              snapShot
+                                                                  .data!
+                                                                  .docs[index +
+                                                                          1][
+                                                                      'parameterValue']
+                                                                  .toString(),
                                                               style:
                                                                   const TextStyle(
                                                                 fontSize: 22,

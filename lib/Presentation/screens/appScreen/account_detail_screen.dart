@@ -74,7 +74,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
   Future<void> updateUserDetails() async {
     // Get the current user's ID
     String? userId = FirebaseAuth.instance.currentUser?.uid;
-    print('userId of respective user $userId');
+    // print('userId of respective user $userId');
     if (userId != null) {
       // Update user details in Firestore
       int mobileNumber = int.parse(_mobileNumberController.text.trim());
@@ -169,6 +169,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       inputController: _emailController,
                       labelText: 'Enter your email here',
                       inputType: 'text',
+                      disabled: false,
                     ),
                   ),
                   Container(
