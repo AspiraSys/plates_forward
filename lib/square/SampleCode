@@ -1,0 +1,32 @@
+
+   var square = SquareFunction();
+   var code = UUIDGenerate();
+
+ await square.retrieveOrder(orderId: RetrieveOrderRequest(orderId: UrlConstants.orderId));
+                         await square.createPayment(payment: setPaymentData());
+                         await square.createOrder(createOrder: setOrderData());
+
+
+
+  Payment.CreatePaymentRequest setPaymentData() {
+    var data = Payment.CreatePaymentRequest(
+        idempotencyKey: 'f77cba17-273f-44e9-91d1-c81f0b829fb0',
+        sourceId: 'cnon:card-nonce-ok',
+        acceptPartialAuthorization: true,
+        amountMoney: Amount.AmountMoney(amount: 100,currency: 'AUD')
+    );
+    return data;
+  }
+
+  CreateOrderRequest setOrderData() {
+    var data = CreateOrderRequest(
+      idempotencyKey: code.generateCode(),
+      order: Order(customerId: "dfsdfsdf",locationId: "LM3WRF1TK61F6"),
+    );
+    return data;
+  }
+
+
+  -------------------
+  import 'package:plates_forward/square/model/create_payment/create_payment_request.dart' as Payment;
+  import 'package:plates_forward/square/model/create_payment/amount.dart' as Amount;
