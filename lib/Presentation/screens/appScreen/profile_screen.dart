@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String _lastName = '';
   late bool _isLoading = true;
   String imagesUrl = '';
-  final TextEditingController _passwordController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
   // final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     super.dispose();
-    _passwordController.dispose();
+    // _passwordController.dispose();
   }
 
   Future<void> _fetchUserDetails() async {
@@ -298,23 +298,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            content: Center(
-              child: Column(
-                children: [
-                  const Text(
-                      'Enter your Password to verify and delete the account',
-                      style:
-                          TextStyle(fontSize: 12, color: AppColor.blackColor)),
-                  InputBox(
-                      labelText: 'Password',
-                      inputType: 'password',
-                      inputController: _passwordController),
-                  ButtonBox(
-                      buttonText: 'Delete',
+          TextEditingController passwordController = TextEditingController();
+          return Dialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: AppColor.navBackgroundColor,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Please Confirm Your Password',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: InputBox(
+                        labelText: 'Enter password',
+                        inputType: 'password',
+                        inputController: passwordController,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    ButtonBox(
+                      buttonText: 'Confirm Delete',
                       fillColor: true,
-                      onPressed: () => handleConfirmDelete(context))
-                ],
+                      onPressed: () =>
+                          handleConfirmDelete(passwordController.text, context),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -324,7 +348,108 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-Future<void> handleConfirmDelete(BuildContext context) async {}
+VoidCallback _handleDelete(BuildContext context) {
+  return () async {
+    TextEditingController passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: AppColor.navBackgroundColor,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Please Confirm Your Password',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: InputBox(
+                      labelText: 'Enter password',
+                      inputType: 'password',
+                      inputController: passwordController,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  ButtonBox(
+                    buttonText: 'Confirm Delete',
+                    fillColor: true,
+                    onPressed: () =>
+                        handleConfirmDelete(passwordController.text, context),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  };
+}
+
+Future<void> handleConfirmDelete(String password, BuildContext context) async {
+  print('pass $password');
+  // try {
+  //   User? user = FirebaseAuth.instance.currentUser;
+
+  //   if (user != null) {
+  //     // Create a credential from the email and password
+  //     AuthCredential credential = EmailAuthProvider.credential(
+  //       email: user.email!,
+  //       password: password,
+  //     );
+
+  //     // Re-authenticate the user
+  //     await user.reauthenticateWithCredential(credential);
+
+  //     // Delete the user from Firebase Authentication
+  //     await user.delete();
+
+  //     // Delete the user data from the 'signUp' collection in Firestore
+  //     await FirebaseFirestore.instance
+  //         .collection('signUp')
+  //         .doc(user.uid)
+  //         .delete();
+
+  //     // Navigate to the login screen after successful deletion
+  //     Navigator.of(context).pop();
+  //     Navigator.of(context)
+  //         .pushNamed(RoutePaths.loginRoute); // Replace with your login route
+  //   } else {
+  //     // Handle the case where the user is not signed in
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('User not signed in.'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // } catch (e) {
+  //   // Handle the error
+  //   print(e.toString());
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text('Failed to delete account. Please try again.'),
+  //       backgroundColor: Colors.red,
+  //     ),
+  //   );
+  // }
+}
 
 Future<void> handleLogOut(BuildContext context) async {
   showDialog(

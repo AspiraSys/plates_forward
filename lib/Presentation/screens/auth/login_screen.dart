@@ -14,10 +14,10 @@ class LoginScreen extends StatefulWidget {
   LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
+  final TextEditingController _emailController = TextEditingController(text: "omar@yopmail.com");
+  final TextEditingController _passwordController = TextEditingController(text: "omar1234");
 
   String errorText = '';
   bool isLoading = false;
@@ -42,7 +42,7 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
       setState(() {
         isLoading = true;
       });
-      try{
+      try {
         final UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -54,7 +54,7 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
           // ignore: use_build_context_synchronously
           Navigator.of(context).pushNamed(RoutePaths.homeRoute);
         }
-      }catch(e){
+      } catch (e) {
         print('Error signing in: $e');
         setState(() {
           errorText = 'Invalid User Credentials';
@@ -144,7 +144,7 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
               Container(
                 alignment: Alignment.centerLeft,
                 child: InputBox(
-                  inputController: _emailController ,
+                  inputController: _emailController,
                   labelText: 'Enter your email here',
                   inputType: 'text',
                 ),
@@ -218,14 +218,9 @@ class LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin 
                   )),
             ],
           ),
-          if (isLoading)
-          const CircularProgress()
+          if (isLoading) const CircularProgress()
         ]));
   }
-
-  // _handleSignIn() {
-  //   Navigator.of(context).pushNamed(RoutePaths.homeRoute);
-  // }
 
   _handleSignUp() {
     Navigator.of(context).pushNamed(RoutePaths.signupRoute);

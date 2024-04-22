@@ -15,9 +15,7 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-
   void _onItemTapped(int index) {
-
     switch (index) {
       case 0:
         Navigator.of(context).pushNamed(RoutePaths.homeRoute);

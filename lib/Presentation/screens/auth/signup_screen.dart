@@ -93,7 +93,7 @@ class SignUpScreenState extends State<SignUpScreen>
         errorText = 'Password must contain Uppercase, Special Character';
       });
       return;
-    } else if (_mobileNumberController.text.length <= 9) {
+    } else if (_mobileNumberController.text.length == 10) {
       setState(() {
         errorText = 'Please enter at 10 digit of mobile number';
       });
@@ -209,7 +209,8 @@ class SignUpScreenState extends State<SignUpScreen>
             ),
             errorText.isNotEmpty
                 ? Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 5, left: 10, right: 10),
+                    padding: const EdgeInsets.only(
+                        top: 20, bottom: 5, left: 10, right: 10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 15),

@@ -1,16 +1,22 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
-// import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
+// import 'package:plates_forward/http_base/exception.dart';
+import 'package:plates_forward/models/user_activity.dart';
+import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
+import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
+import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
-// import 'pac'
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,9 +30,204 @@ class _HomeScreenState extends State<HomeScreen> {
   bool orderState = false;
   final TextEditingController orderController = TextEditingController();
 
+  String errorText = '';
+  var square = SquareFunction();
+  List<Map<String, dynamic>> venueMasterData = [];
+  List<Map<String, dynamic>> userTransactionData = [];
+
+  Future<List<Object?>> fetchVenueMasterData(
+      String locationId) async {
+    final CollectionReference venueMasterCollection =
+        FirebaseFirestore.instance.collection('venueMaster');
+
+    QuerySnapshot<Object?> querySnapshot =
+        await venueMasterCollection
+            .where('locationId', isEqualTo: locationId)
+            .get();
+
+    return querySnapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+Future<void> checkAndPrintMatchingData() async {
+    final CollectionReference userTransactionCollection =
+        FirebaseFirestore.instance.collection('userTransaction');
+
+    QuerySnapshot<Object?> userTransactionQuerySnapshot =
+        await userTransactionCollection.get();
+
+    List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    print('Fetched userTransactionData:');
+    print(userData);
+
+    if (userData.isNotEmpty) {
+      List<String?> locationIds = userData
+          .map((data) => (data['userActivityData'] as List<dynamic>)
+              .map((activity) => activity['locationId'] as String?)
+              .toList())
+          .expand((i) => i)
+          .toList();
+
+      for (String? locationId in locationIds) {
+        if (locationId != null) {
+         final venueData =
+              await fetchVenueMasterData(locationId);
+
+          print('Matching venueMaster Data for locationId: $locationId');
+          print(venueData);
+
+          venueMasterData.addAll(venueData as Iterable<Map<String, dynamic>>);
+          
+
+          setState(() {}); // Update the UI with the fetched data
+        } else {
+          print('locationId is null');
+        }
+       
+      }
+    } else {
+      print('userData is empty');
+    }
+
+     userTransactionData.addAll(userData as Iterable<Map<String, dynamic>>);
+
+    // print('Matching userTransaction Data for locationId: $locationId');
+    // print(userTransactionData);
+  }
+  // Future<void> checkAndPrintMatchingData() async {
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
+  //       await userTransactionCollection.get();
+
+  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   print('Fetched userTransactionData:');
+  //   // print(userData);
+
+  //   if (userData.isNotEmpty) {
+  //     List<String?> locationIds = userData
+  //         .map((data) => (data['userActivityData'] as List<dynamic>)
+  //             .map((activity) => activity['locationId'] as String?)
+  //             .toList())
+  //         .expand((i) => i)
+  //         .toList();
+
+  //     for (String? locationId in locationIds) {
+  //       if (locationId != null) {
+  //         List<Object?> venueData =
+  //             await fetchVenueMasterData(locationId);
+
+  //         print('Matching venueMaster Data for locationId: $locationId');
+  //         // print(venueData);
+
+  //         venueMasterData .addAll(venueData as Iterable<Map<String, dynamic>>);
+  //         userTransactionData = userData;
+
+  //         print('Matching userTransaction Data for locationId: $locationId');
+  //         // print(userTransactionData);
+
+  //         setState(() {}); // Update the UI with the fetched data
+  //       } else {
+  //         print('locationId is null');
+  //       }
+  //     }
+  //   } else {
+  //     print('userData is empty');
+  //   }
+  // }
+
+
+  // Future<List<Object?>> fetchVenueMasterData(String locationId) async {
+  //   final CollectionReference venueMasterCollection =
+  //       FirebaseFirestore.instance.collection('venueMaster');
+
+  //   QuerySnapshot<Object?> querySnapshot = await venueMasterCollection
+  //       .where('locationId', isEqualTo: locationId)
+  //       .get();
+
+  //   return querySnapshot.docs.map((doc) => doc.data()).toList();
+  // }
+
+  // Future<void> checkAndPrintMatchingData() async {
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
+  //       await userTransactionCollection.get();
+
+  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   print('Fetched userTransactionData:');
+  //   print(userData);
+
+  //   if (userData.isNotEmpty) {
+  //     dynamic locationId = userData.first['locationId'];
+
+  //     if (locationId != null) {
+  //       venueMasterData = await fetchVenueMasterData(locationId);
+  //       userTransactionData = userData;
+
+  //       setState(() {}); // Update the UI with the fetched data
+  //     } else {
+  //       print('locationId is null');
+  //     }
+  //   } else {
+  //     print('userData is empty');
+  //   }
+  // }
+
+  // Future<void> checkAndPrintMatchingData() async {
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
+  //       await userTransactionCollection.get();
+
+  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   print('Fetched userTransactionData:');
+  //   print(userData);
+
+  //   if (userData.isNotEmpty) {
+  //     List locationIds =
+  //         userData.map((data) => data['locationId']).toList();
+
+  //     for (String locationId in locationIds) {
+  //       if (locationId != null) {
+  //         venueMasterData = await fetchVenueMasterData(locationId);
+  //         userTransactionData = userData;
+  //         // List<Object?> venueData = await fetchVenueMasterData(locationId);
+
+  //         print('Matching venueMaster Data for locationId: $locationId');
+  //         print(venueMasterData);
+
+  //         userTransactionData = userData;
+
+  //         setState(() {}); // Update the UI with the fetched data
+  //       } else {
+  //         print('locationId is null');
+  //       }
+  //     }
+  //   } else {
+  //     print('userData is empty');
+  //   }
+  // }
+
   @override
   void initState() {
     super.initState();
+    checkAndPrintMatchingData();
+    // fetchVenueMasterData();
     // listenToData(); // Call the function here
   }
 
@@ -36,20 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
     orderController.dispose();
   }
 
-  // void listenToData() {
-  //   // String? userId = FirebaseAuth.instance.currentUser?.uid;
-  //   FirebaseFirestore.instance
-  //       .collection('parameterData')
-  //       .snapshots():
-  //      {
-  //     for (var doc in snapshot.docs) {
-  //       Map<String, dynamic> data = doc.data();
-  //       print('Data: $data');
-  //     }
-  //   };
-  // }
-
-  // Default stream Builder
   static CollectionReference<Object?> fetchStream(String collection) {
     final CollectionReference collections =
         FirebaseFirestore.instance.collection(collection);
@@ -57,9 +244,45 @@ class _HomeScreenState extends State<HomeScreen> {
     return collections;
   }
 
+  // Future<List<Object?>> fetchVenueMasterData(
+  //     String locationId) async {
+  //   final CollectionReference venueMasterCollection =
+  //       FirebaseFirestore.instance.collection('venueMaster');
+
+  //   QuerySnapshot<Object?> querySnapshot =
+  //       await venueMasterCollection
+  //           .where('locationId', isEqualTo: locationId)
+  //           .get();
+
+  //   return querySnapshot.docs.map((doc) => doc.data()).toList();
+  // }
+
+  // Future<Object> fetchMatchData() async {
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //    QuerySnapshot<Map<String, dynamic>> userTransactionQuerySnapshot =
+  //       await userTransactionCollection.get();
+
+  //   List<Map<String, dynamic>> userTransactionData =
+  //       querySnapshot.docs.map((doc) => doc.data()).toList();
+
+  //   if (userTransactionData.isNotEmpty) {
+  //     String locationId = userTransactionData.first['locationId'];
+  //     List<Object?> venueMasterData =
+  //         await fetchVenueMasterData(locationId);
+  //     // return fetchVenueMasterData(locationId);
+  //     print('Matching venueMaster Data:');
+  //     print(venueMasterData);
+
+  //     print('Matching userTransaction Data:');
+  //     print(userTransactionData);
+  //   }
+  //   // return [];
+  // }
+
   @override
   Widget build(BuildContext context) {
-
     List<Map<String, dynamic>> countryImpactApi = [
       {
         "id": "1",
@@ -116,22 +339,254 @@ class _HomeScreenState extends State<HomeScreen> {
           {"id": 2, "city": "Sydney", "image": ImageAssets.sydneyIcon},
         ],
         "order": [
-          {"id": 1, "item": "Saumon a la Parisienne", "cost": "32.00"},
-          {"id": 2, "item": "Croque Monsieur", "cost": "13.00"},
-          {"id": 3, "item": "Total", "cost": "61.00"},
+          {"id": 1, "item": "Pizza", "cost": "200.00"},
+          {"id": 2, "item": "Burger", "cost": "80.00"},
+          {"id": 3, "item": "Total", "cost": "280.00"},
         ],
         "title": "Meal Donation",
         "date": "06/12/2023"
       },
     ];
 
-    void handleOrder() {
-      setState(() {
-        orderState = false;
-      });
-      Navigator.of(context).pop();
+    Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
+      // print('data of response ${result}');
+      List<ListItem> lineItems = result.order?.lineItems?.map((item) {
+            return ListItem(
+              name: item.name ?? '',
+              uid: item.uid ?? '',
+              amount: item.basePriceMoney?.amount ?? 0,
+              quantity: item.quantity ?? '',
+            );
+          }).toList() ??
+          [];
+
+      num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
+
+      UserActivityData userActivityData = UserActivityData(
+        id: result.order?.id ?? '',
+        locationId: result.order?.locationId ?? '',
+        createdAt: result.order?.createdAt ?? '',
+        totalAmount: totalAmount,
+        lineItems: lineItems,
+      );
+
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+      final FirebaseAuth auth = FirebaseAuth.instance;
+
+      final User? user = auth.currentUser;
+      if (user != null) {
+        final String userId = user.uid;
+
+        await firestore.collection("userTransaction").doc(userId).set({
+          'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
+        }, SetOptions(merge: true));
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Successfully added to Impact',
+              style: TextStyle(color: Colors.green),
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 3), () {
+          Navigator.pop(context);
+        });
+        print("Data saved to Firebase");
+      } else {
+        print("User not authenticated");
+      }
     }
 
+    // Future<void> handleOrder() async {
+    //   setState(() {
+    //     errorText = '';
+    //     // orderState = false;
+    //   });
+
+    //   if (orderController.text.isEmpty) {
+    //     setState(() {
+    //       errorText = 'Invalid order number';
+    //     });
+    //     return;
+    //   }
+
+    //   final response = await square.retrieveOrder(
+    //       orderId: RetrieveOrderRequest(orderId: orderController.text));
+
+    //   if (response is RetrieveOrderResponse) {
+    //     RetrieveOrderResponse result = response as RetrieveOrderResponse;
+
+    //     final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //     final FirebaseAuth auth = FirebaseAuth.instance;
+    //     final User? user = auth.currentUser;
+
+    //     if (user != null) {
+    //       final String userId = user.uid;
+    //       final DocumentSnapshot<Map<String, dynamic>> existingOrder =
+    //           await firestore.collection("userTransaction").doc(userId).get();
+
+    //       if (existingOrder.exists &&
+    //           existingOrder.data()?['id'] == result.order?.id) {
+    //         setState(() {
+    //           errorText = "Sorry, order already in your impact";
+    //         });
+    //         return;
+    //       }
+    //     }
+
+    //     await saveUserTransactionData(result);
+
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         content: Text(
+    //           'Successfully added to Impact',
+    //           style: TextStyle(color: Colors.green),
+    //         ),
+    //         duration: Duration(seconds: 3),
+    //       ),
+    //     );
+
+    //     Future.delayed(const Duration(seconds: 3), () {
+    //       Navigator.pop(context);
+    //     });
+    //   } else if (response is Map<String, dynamic> &&
+    //       response.containsKey('errors')) {
+    //     String detail = response['errors'][0]['detail'];
+    //     setState(() {
+    //       errorText = detail;
+    //     });
+    //   }
+    // }
+
+    // Future<void> handleOrder() async {
+    //   setState(() {
+    //     errorText = '';
+    //   });
+
+    //   if (orderController.text.isEmpty) {
+    //     setState(() {
+    //       errorText = 'Invalid order number';
+    //     });
+    //     return;
+    //   } else {
+    //     final response = await square.retrieveOrder(
+    //         orderId: RetrieveOrderRequest(orderId: orderController.text));
+
+    //     if (response is RetrieveOrderResponse) {
+    //       RetrieveOrderResponse result = response as RetrieveOrderResponse;
+
+    //       final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //       final FirebaseAuth auth = FirebaseAuth.instance;
+    //       final User? user = auth.currentUser;
+
+    //       if (user != null) {
+    //         final String userId = user.uid;
+    //         final DocumentSnapshot<Map<String, dynamic>> existingOrder =
+    //             await firestore.collection("userTransaction").doc(userId).get();
+
+    //         if (existingOrder.exists &&
+    //             existingOrder.data()?['id'] == result.order?.id) {
+    //           setState(() {
+    //             errorText = "Order Id is already in impact";
+    //           });
+    //           return;
+    //         } else {
+    //           await saveUserTransactionData(result);
+    //         }
+    //       }
+
+    //       // if (response.containsKey('errors')) {}
+
+    //       // ScaffoldMessenger.of(context).showSnackBar(
+    //       //   const SnackBar(
+    //       //     content: Text(
+    //       //       'Successfully added to Impact',
+    //       //       style: TextStyle(color: Colors.green),
+    //       //     ),
+    //       //     duration: Duration(seconds: 3),
+    //       //   ),
+    //       // );
+
+    //       // Future.delayed(const Duration(seconds: 3), () {
+    //       //   Navigator.pop(context);
+    //       // });
+    //     } else {
+    //       print('---> Error accor');
+    //     }
+    //     // else if (response.containsKey('errors')) {
+    //     //   // String detail = response['errors'][0]['detail'];
+    //     //   setState(() {
+    //     //     errorText = 'Order not found for id ${orderController.text}';
+    //     //   });
+    //     // } else {
+    //     //   setState(() {
+    //     //     errorText = 'Order not found for id ${orderController.text}';
+    //     //   });
+    //     // }
+    //   }
+    // }
+
+    Future<void> handleOrder() async {
+      setState(() {
+        errorText = '';
+      });
+
+      if (orderController.text.isEmpty) {
+        setState(() {
+          errorText = 'Invalid order number';
+        });
+        return;
+      }
+
+      try {
+        final response = await square.retrieveOrder(
+            orderId: RetrieveOrderRequest(orderId: orderController.text));
+
+        if (response is RetrieveOrderResponse) {
+          RetrieveOrderResponse result = response as RetrieveOrderResponse;
+
+          final FirebaseFirestore firestore = FirebaseFirestore.instance;
+          final FirebaseAuth auth = FirebaseAuth.instance;
+          final User? user = auth.currentUser;
+
+          if (user != null) {
+            final String userId = user.uid;
+            final DocumentSnapshot<Map<String, dynamic>> existingOrder =
+                await firestore.collection("userTransaction").doc(userId).get();
+
+            if (existingOrder.exists &&
+                existingOrder.data()?['id'] == result.order?.id) {
+              setState(() {
+                errorText = "Order Id is already in impact";
+              });
+              return;
+            } else {
+              await saveUserTransactionData(result);
+            }
+          }
+        } else if (response is Map<String, dynamic> &&
+            response.containsKey('errors')) {
+          String detail = response['errors'][0]['detail'];
+          setState(() {
+            errorText = detail;
+          });
+        } else {
+          setState(() {
+            errorText = 'Order not found for id ${orderController.text}';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          errorText = 'An error occurred. Please try again.';
+        });
+        print('---> Error: $e');
+      }
+    }
+
+    var theme = Theme.of(context);
     return Scaffold(
       appBar: const AppBarScreen(title: 'Impact'),
       body: Padding(
@@ -145,104 +600,112 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: BoxDecoration(
                   border: Border.all(width: 0, color: Colors.transparent),
                 ),
-                child: TabBar(
-                  indicator: const BoxDecoration(),
-                  labelPadding: EdgeInsets.zero,
-                  indicatorPadding: EdgeInsets.zero,
-                  onTap: (index) {
-                    setState(() {
-                      selectedIndex = index;
-                    });
-                    if (kDebugMode) {
-                      print('Selected tab index: $selectedIndex');
-                    }
-                  },
-                  tabs: [
-                    Tab(
-                      child: Padding(
-                        padding: selectedIndex == 0
-                            ? const EdgeInsets.only(top: 4)
-                            : const EdgeInsets.only(top: 10),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          decoration: BoxDecoration(
-                            color: selectedIndex != 0
-                                ? AppColor.primaryColor
-                                : AppColor.whiteColor,
-                            border: const Border(
-                              top: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                              left: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                              right: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                            ),
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(6),
-                                topRight: Radius.circular(6)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              'My Impact'.toUpperCase(),
-                              style: TextStyle(
-                                color: selectedIndex == 0
-                                    ? AppColor.primaryColor
-                                    : AppColor.whiteColor,
-                                fontWeight: FontWeight.bold,
+                child: Theme(
+                  data: theme.copyWith(
+                    colorScheme: theme.colorScheme.copyWith(
+                      surfaceVariant: Colors.transparent,
+                    ),
+                  ),
+                  child: TabBar(
+                    indicator: const BoxDecoration(),
+                    labelPadding: EdgeInsets.zero,
+                    indicatorPadding: EdgeInsets.zero,
+                    onTap: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                      if (kDebugMode) {
+                        print('Selected tab index: $selectedIndex');
+                      }
+                    },
+                    tabs: [
+                      Tab(
+                        child: Padding(
+                          padding: selectedIndex == 0
+                              ? const EdgeInsets.only(top: 4)
+                              : const EdgeInsets.only(top: 10),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            decoration: BoxDecoration(
+                              color: selectedIndex != 0
+                                  ? AppColor.primaryColor
+                                  : AppColor.whiteColor,
+                              border: const Border(
+                                top: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
+                                left: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
+                                right: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
                               ),
-                              textAlign: TextAlign.center,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(6),
+                                  topRight: Radius.circular(6)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Text(
+                                'My Impact'.toUpperCase(),
+                                style: TextStyle(
+                                  color: selectedIndex == 0
+                                      ? AppColor.primaryColor
+                                      : AppColor.whiteColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Tab(
-                      child: Padding(
-                        padding: selectedIndex == 1
-                            ? const EdgeInsets.only(top: 4)
-                            : const EdgeInsets.only(top: 10),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          decoration: BoxDecoration(
-                            color: selectedIndex != 1
-                                ? AppColor.primaryColor
-                                : AppColor.whiteColor,
-                            border: const Border(
-                              top: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                              left: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                              right: BorderSide(
-                                  width: 1, color: AppColor.primaryColor),
-                            ),
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(6),
-                                topRight: Radius.circular(6)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              'Community Impact'.toUpperCase(),
-                              style: TextStyle(
-                                color: selectedIndex == 1
-                                    ? AppColor.primaryColor
-                                    : AppColor.whiteColor,
-                                fontWeight: FontWeight.bold,
+                      Tab(
+                        child: Padding(
+                          padding: selectedIndex == 1
+                              ? const EdgeInsets.only(top: 4)
+                              : const EdgeInsets.only(top: 10),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            decoration: BoxDecoration(
+                              color: selectedIndex != 1
+                                  ? AppColor.primaryColor
+                                  : AppColor.whiteColor,
+                              border: const Border(
+                                top: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
+                                left: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
+                                right: BorderSide(
+                                    width: 1, color: AppColor.primaryColor),
                               ),
-                              textAlign: TextAlign.center,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(6),
+                                  topRight: Radius.circular(6)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Text(
+                                'Community Impact'.toUpperCase(),
+                                style: TextStyle(
+                                  color: selectedIndex == 1
+                                      ? AppColor.primaryColor
+                                      : AppColor.whiteColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                  labelColor: AppColor.whiteColor,
-                  unselectedLabelColor: AppColor.primaryColor,
+                    ],
+                    labelColor: AppColor.whiteColor,
+                    unselectedLabelColor: AppColor.primaryColor,
+                  ),
                 ),
               ),
               Expanded(
                 child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     Column(
                       children: [
@@ -441,32 +904,93 @@ class _HomeScreenState extends State<HomeScreen> {
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  Text(
-                                                    'Add your Order'
-                                                        .toUpperCase(),
-                                                    style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color:
-                                                          AppColor.primaryColor,
-                                                    ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 20),
+                                                        child: Text(
+                                                          'Add your Order'
+                                                              .toUpperCase(),
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: AppColor
+                                                                .primaryColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () => {
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                        },
+                                                        child: Container(
+                                                          width: 20,
+                                                          height: 20,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: AppColor
+                                                                .blackColor,
+                                                          ),
+                                                          child: const Icon(
+                                                            Icons.close,
+                                                            color: AppColor
+                                                                .whiteColor,
+                                                            size: 15,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                   const SizedBox(height: 20),
-                                                  const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 20),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20),
                                                     child: InputBox(
                                                       labelText:
-                                                          'Enter Receipt Number / order Number',
+                                                          'Enter Receipt / Order Number',
                                                       inputType: 'number',
-                                                      inputController: '',
+                                                      inputController:
+                                                          orderController,
                                                     ),
                                                   ),
+                                                  errorText.isNotEmpty
+                                                      ? Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 15),
+                                                          child: Text(
+                                                            errorText,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: AppColor
+                                                                  .redColor,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
+                                                        )
+                                                      : Container(),
                                                   const SizedBox(height: 10),
                                                   ButtonBox(
-                                                    buttonText: 'Order',
+                                                    buttonText: 'Fetch Order',
                                                     fillColor: true,
                                                     onPressed: handleOrder,
                                                   ),
@@ -503,7 +1027,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: orderState ? MediaQuery.of(context).size.height * 0.1 : MediaQuery.of(context).size.height * 0.32,
+                          height: orderState
+                              ? MediaQuery.of(context).size.height * 0.1
+                              : MediaQuery.of(context).size.height * 0.32,
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -512,7 +1038,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 2),
                                   child: ExpansionTiles(
-                                    donateData: totalDonationApi,
+                                    // donateData: totalDonationApi,
+                                    donateData: venueMasterData,
+                                    orderData: userTransactionData,
                                   ),
                                 )
                               ],
@@ -527,8 +1055,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             (context, AsyncSnapshot<QuerySnapshot> snapShot) {
                           if (!snapShot.hasData) {
                             return const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColor.primaryColor,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    color: AppColor.primaryColor,
+                                  ),
+                                ],
                               ),
                             );
                           } else {
@@ -585,14 +1118,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               .primaryColor),
                                                     ),
                                                     SizedBox(
-                                                      width: MediaQuery.of(context).size.width * .65,
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              .65,
                                                       child: Text(
                                                         communityData[
                                                             'parameterName'],
                                                         style: const TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w400),
+                                                                FontWeight
+                                                                    .w400),
                                                       ),
                                                     )
                                                   ],

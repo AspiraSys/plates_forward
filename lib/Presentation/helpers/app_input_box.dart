@@ -10,15 +10,14 @@ class InputBox extends StatefulWidget {
   final bool disabled;
   final bool phone;
 
-  const InputBox({
-    super.key,
-    required this.labelText,
-    required this.inputType,
-    this.inputController,
-    this.accountDetail = false,
-    this.disabled = true,
-    this.phone = false
-  });
+  const InputBox(
+      {super.key,
+      required this.labelText,
+      required this.inputType,
+      this.inputController,
+      this.accountDetail = false,
+      this.disabled = true,
+      this.phone = false});
 
   @override
   State<InputBox> createState() => _InputBoxState();
@@ -118,12 +117,19 @@ class PhoneNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    String formattedText = newValue.text;
+    String formattedText = newValue.text.trim().replaceAll(' ', '');
+
+    if (formattedText.isEmpty) {
+      return const TextEditingValue(
+        text: '',
+        selection: TextSelection.collapsed(offset: 0),
+      );
+    }
 
     if (newValue.text.length == 1) {
-      formattedText = '+61 ${newValue.text}';
+      formattedText = '+61${newValue.text}';
     } else if (newValue.text.length > 1 && !newValue.text.startsWith('+61')) {
-      formattedText = '+61 ${newValue.text.substring(3)}';
+      formattedText = '+61${newValue.text.substring(3)}';
     }
 
     return TextEditingValue(

@@ -69,7 +69,7 @@ class VenueCard extends StatelessWidget {
                                         (loadingProgress.expectedTotalBytes ??
                                             1)
                                     : null,
-                               color: AppColor.primaryColor,
+                                //  color: AppColor.primaryColor,
                               ),
                             );
                           },
@@ -136,11 +136,11 @@ class VenueCard extends StatelessWidget {
                           ),
                           GestureDetector(
                             onTap: () async {
-                                  if (await canLaunch(websiteLink)) {
-                                    await launch(websiteLink);
-                                  } else {
-                                    throw 'Could not launch $websiteLink';
-                                  }
+                              if (await canLaunch(websiteLink)) {
+                                await launch(websiteLink);
+                              } else {
+                                throw 'Could not launch $websiteLink';
+                              }
                             },
                             child: Container(
                               width: 160,

@@ -45,9 +45,17 @@ class _ButtonBox extends State<ButtonBox> {
                   ? null
                   : Border.all(width: 1, color: AppColor.primaryColor)),
           child: Row(
-            mainAxisAlignment: widget.isLoading ? MainAxisAlignment.spaceAround : MainAxisAlignment.center,
+            mainAxisAlignment: widget.isLoading
+                ? MainAxisAlignment.spaceAround
+                : MainAxisAlignment.center,
             children: [
-              widget.isLoading ? Image.asset(ImageAssets.loaderIcon, width: 20, height: 20,) : Container(),
+              widget.isLoading
+                  ? Image.asset(
+                      ImageAssets.loaderIcon,
+                      width: 20,
+                      height: 20,
+                    )
+                  : Container(),
               Text(
                 widget.buttonText.toUpperCase(),
                 textAlign: TextAlign.center,

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -16,14 +15,6 @@ class DonateScreen extends StatefulWidget {
 }
 
 class _DonateScreenState extends State<DonateScreen> {
-  // List<Map<String, dynamic>> donateToApi = [
-  //   {'id': '1', 'image': ImageAssets.sydneyIcon, 'name': 'Sydney'},
-  //   {'id': '2', 'image': ImageAssets.kyivIcon, 'name': 'Kyivl'},
-  //   {'id': '3', 'image': ImageAssets.coyoacanIcon, 'name': 'Coyoacan'},
-  //   {'id': '4', 'image': ImageAssets.colomboIcon, 'name': 'Colombo'},
-  //   {'id': '5', 'image': ImageAssets.kabulIcon, 'name': 'Kabul'},
-  // ];
-
   int numberOfMeals = 1;
   int totalCost = 10;
   int selectedIndex = -1;
@@ -155,7 +146,7 @@ class _DonateScreenState extends State<DonateScreen> {
             ),
           ),
           StreamBuilder(
-              stream: fetchStream('donateFetch').snapshots(),
+              stream: fetchStream('venueMaster').snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapShot) {
                 if (!snapShot.hasData) {
                   return Center(
@@ -170,7 +161,7 @@ class _DonateScreenState extends State<DonateScreen> {
                     ),
                   );
                 } else {
-                  return  Padding(
+                  return Padding(
                     padding: const EdgeInsets.only(bottom: 10, left: 25),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -185,14 +176,12 @@ class _DonateScreenState extends State<DonateScreen> {
                                 for (int index = 0;
                                     index < snapShot.data!.docs.length;
                                     index++)
-                                    
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
                                         selectedIndex = index;
                                       });
                                     },
-                                    
                                     child: Padding(
                                       padding: const EdgeInsets.only(right: 12),
                                       child: Container(
@@ -234,7 +223,7 @@ class _DonateScreenState extends State<DonateScreen> {
                                                   color: selectedIndex == index
                                                       ? AppColor.whiteColor
                                                       : AppColor.primaryColor),
-                                                      textAlign: TextAlign.center,
+                                              textAlign: TextAlign.center,
                                             )
                                           ],
                                         ),

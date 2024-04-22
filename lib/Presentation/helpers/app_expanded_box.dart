@@ -4,10 +4,12 @@ import 'package:plates_forward/utils/app_colors.dart';
 
 class ExpansionTiles extends StatefulWidget {
   final List<Map<String, dynamic>> donateData;
+  final List<Map<String, dynamic>> orderData;
 
   const ExpansionTiles({
     super.key,
     required this.donateData,
+    required this.orderData,
   });
 
   @override
@@ -18,6 +20,9 @@ class ExpansionTiles extends StatefulWidget {
 class _ExpansionTileState extends State<ExpansionTiles> {
   @override
   Widget build(BuildContext context) {
+      print('in ex ------> ${widget.donateData}');
+      print('in orer <----- ${widget.orderData}');
+
     return ListView.builder(
       physics: const ScrollPhysics(),
       shrinkWrap: true,
@@ -43,11 +48,13 @@ class _ExpansionTileState extends State<ExpansionTiles> {
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(6)),
               color: AppColor.primaryColor),
-          child: ExpansionTile(
+          child: ExpansionTile(   
+            trailing: country.length <= 1 ? const SizedBox.shrink() : null ,         
             enabled: country.length <= 1 ? false : true,
-            
-            iconColor: country.length <= 1 ? Colors.transparent  : AppColor.whiteColor,
-            collapsedIconColor: country.length <= 1 ? Colors.transparent  : AppColor.whiteColor,
+            iconColor:
+                country.length <= 1 ? AppColor.primaryColor : AppColor.whiteColor,
+            collapsedIconColor:
+                country.length <= 1 ? AppColor.primaryColor : AppColor.whiteColor,
             textColor: AppColor.whiteColor,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

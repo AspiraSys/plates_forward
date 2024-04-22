@@ -5,6 +5,7 @@ import 'package:plates_forward/Utils/app_router.dart';
 import 'package:plates_forward/Utils/app_routes_path.dart';
 import 'package:plates_forward/firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/services.dart';
 
 void main () async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,10 @@ void main () async{
     androidProvider: AndroidProvider.debug,
     appleProvider: AppleProvider.appAttest,
   );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const MyApp());
 }
 

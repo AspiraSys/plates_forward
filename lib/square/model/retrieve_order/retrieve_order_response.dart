@@ -1,5 +1,6 @@
 class RetrieveOrderResponse {
   Order? order;
+
   RetrieveOrderResponse({this.order});
 
   RetrieveOrderResponse.fromJson(Map<String, dynamic> json) {
@@ -35,21 +36,21 @@ class Order {
 
   Order(
       {this.id,
-        this.locationId,
-        this.lineItems,
-        this.createdAt,
-        this.updatedAt,
-        this.state,
-        this.version,
-        this.totalTaxMoney,
-        this.totalDiscountMoney,
-        this.totalTipMoney,
-        this.totalMoney,
-        this.totalServiceChargeMoney,
-        this.netAmounts,
-        this.source,
-        this.customerId,
-        this.netAmountDueMoney});
+      this.locationId,
+      this.lineItems,
+      this.createdAt,
+      this.updatedAt,
+      this.state,
+      this.version,
+      this.totalTaxMoney,
+      this.totalDiscountMoney,
+      this.totalTipMoney,
+      this.totalMoney,
+      this.totalServiceChargeMoney,
+      this.netAmounts,
+      this.source,
+      this.customerId,
+      this.netAmountDueMoney});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -83,7 +84,7 @@ class Order {
         ? NetAmounts.fromJson(json['net_amounts'])
         : null;
     source =
-    json['source'] != null ? Source.fromJson(json['source']) : null;
+        json['source'] != null ? Source.fromJson(json['source']) : null;
     customerId = json['customer_id'];
     netAmountDueMoney = json['net_amount_due_money'] != null
         ? BasePriceMoney.fromJson(json['net_amount_due_money'])
@@ -146,16 +147,16 @@ class LineItems {
 
   LineItems(
       {this.uid,
-        this.quantity,
-        this.name,
-        this.basePriceMoney,
-        this.grossSalesMoney,
-        this.totalTaxMoney,
-        this.totalDiscountMoney,
-        this.totalMoney,
-        this.variationTotalPriceMoney,
-        this.itemType,
-        this.totalServiceChargeMoney});
+      this.quantity,
+      this.name,
+      this.basePriceMoney,
+      this.grossSalesMoney,
+      this.totalTaxMoney,
+      this.totalDiscountMoney,
+      this.totalMoney,
+      this.variationTotalPriceMoney,
+      this.itemType,
+      this.totalServiceChargeMoney});
 
   LineItems.fromJson(Map<String, dynamic> json) {
     uid = json['uid'];
@@ -246,10 +247,10 @@ class NetAmounts {
 
   NetAmounts(
       {this.totalMoney,
-        this.taxMoney,
-        this.discountMoney,
-        this.tipMoney,
-        this.serviceChargeMoney});
+      this.taxMoney,
+      this.discountMoney,
+      this.tipMoney,
+      this.serviceChargeMoney});
 
   NetAmounts.fromJson(Map<String, dynamic> json) {
     totalMoney = json['total_money'] != null

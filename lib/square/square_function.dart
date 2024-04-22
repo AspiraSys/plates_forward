@@ -21,10 +21,12 @@ class SquareFunction {
   };
 
   Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
-
     http.Response? response;
     try {
-      response = await HttpBase().get(api: UrlConstants.retrieveOrderApi + orderId.orderId,header: header)
+      response = await HttpBase()
+          .get(
+              api: UrlConstants.retrieveOrderApi + orderId.orderId,
+              header: header)
           .timeout(const Duration(minutes: REQUEST_TIME_OUT));
       debugPrint(response?.body ?? "");
       return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
@@ -52,7 +54,8 @@ class SquareFunction {
     ''';
 
     try {
-      response = await HttpBase().post(api: UrlConstants.createPaymentApi,header: header,body: body)
+      response = await HttpBase()
+          .post(api: UrlConstants.createPaymentApi, header: header, body: body)
           .timeout(const Duration(minutes: REQUEST_TIME_OUT));
       debugPrint("");
       debugPrint("");
@@ -60,9 +63,7 @@ class SquareFunction {
       return CreatePaymentResponse.fromJson(json.decode(response?.body ?? ""));
     } catch (error) {
       return ExceptionHandlers.getExceptionString(
-          error,
-          response?.statusCode ?? 0,
-          UrlConstants.createPaymentApi);
+          error, response?.statusCode ?? 0, UrlConstants.createPaymentApi);
     }
   }
 
@@ -80,7 +81,8 @@ class SquareFunction {
     ''';
 
     try {
-      response = await HttpBase().post(api: UrlConstants.createOrderApi,header: header,body: body)
+      response = await HttpBase()
+          .post(api: UrlConstants.createOrderApi, header: header, body: body)
           .timeout(const Duration(minutes: REQUEST_TIME_OUT));
       debugPrint("");
       debugPrint("");
@@ -88,9 +90,7 @@ class SquareFunction {
       return CreateOrderResponse.fromJson(json.decode(response?.body ?? ""));
     } catch (error) {
       return ExceptionHandlers.getExceptionString(
-          error,
-          response?.statusCode ?? 0,
-          UrlConstants.createPaymentApi);
+          error, response?.statusCode ?? 0, UrlConstants.createPaymentApi);
     }
   }
 }

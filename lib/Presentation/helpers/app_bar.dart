@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/Utils/app_routes_path.dart';
 import 'package:plates_forward/utils/app_assets.dart';
-
 class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool subScreen;
@@ -85,7 +84,8 @@ class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
                               height: 350,
                               child: Center(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 40, horizontal: 10),
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
@@ -98,8 +98,8 @@ class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
                                             fontWeight: FontWeight.w700),
                                       ),
                                       const Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(horizontal: 42, vertical: 10),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 42, vertical: 10),
                                         child: Text(
                                           'Share your donation with friends and inspire them to join in!',
                                           textAlign: TextAlign.center,

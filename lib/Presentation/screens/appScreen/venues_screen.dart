@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/venue_card.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 
@@ -27,13 +26,14 @@ class VenueScreen extends StatelessWidget {
             stream: fetchStream('venueData').snapshots(),
             builder: (context, snapShot) {
               if (!snapShot.hasData) {
-                return Center(
-                  child: Container(
-                    width: 100,
-                    color: AppColor.whiteColor,
-                    child: const Center(
-                      child: CircularProgressIndicator(color: AppColor.primaryColor,),
-                    ),
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: AppColor.primaryColor,
+                      ),
+                    ],
                   ),
                 );
               } else {
