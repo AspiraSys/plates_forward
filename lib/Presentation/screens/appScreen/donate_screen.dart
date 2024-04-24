@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
+import 'package:plates_forward/stripe/stripe_function.dart';
+import 'package:plates_forward/stripe/stripe_response_model.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
 
@@ -18,6 +20,7 @@ class _DonateScreenState extends State<DonateScreen> {
   int numberOfMeals = 1;
   int totalCost = 10;
   int selectedIndex = -1;
+  var stripe = StripePayment();
 
   void incrementMeals() {
     setState(() {
@@ -242,8 +245,22 @@ class _DonateScreenState extends State<DonateScreen> {
           const Spacer(),
           Center(
             child: InkWell(
-              onTap: () => Navigator.of(context)
-                  .pushNamed(RoutePaths.donateSuccessRoute),
+              onTap: () async {
+                StripeResponseModel result = await stripe.stripeMakePayment(
+                    amount: totalCost.toString(), currency: "INR");
+                if (result.isSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(result.message),
+                      backgroundColor: Colors.green));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(result.message),
+                    backgroundColor: Colors.redAccent,
+                  ));
+                }
+                /*Navigator.of(context)
+                    .pushNamed(RoutePaths.donateSuccessRoute)*/
+              },
               child: Container(
                 width: 176,
                 padding: const EdgeInsets.all(16),
