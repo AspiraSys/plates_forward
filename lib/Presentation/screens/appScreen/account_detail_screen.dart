@@ -168,7 +168,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                     child: InputBox(
                       inputController: _emailController,
                       labelText: 'Enter your email here',
-                      inputType: 'text',
+                      inputType: 'email',
                       disabled: false,
                     ),
                   ),
@@ -190,7 +190,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                     child: InputBox(
                       inputController: _mobileNumberController,
                       labelText: 'Enter your mobile name',
-                      inputType: 'text',
+                      inputType: 'phone',
                     ),
                   ),
                   // Container(

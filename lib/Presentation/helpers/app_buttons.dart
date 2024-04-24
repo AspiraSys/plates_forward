@@ -9,6 +9,7 @@ class ButtonBox extends StatefulWidget {
   final bool fillColor;
   final bool isLoading;
   final VoidCallback onPressed;
+  final bool opacityColor;
 
   const ButtonBox({
     super.key,
@@ -16,6 +17,7 @@ class ButtonBox extends StatefulWidget {
     required this.fillColor,
     required this.onPressed,
     this.isLoading = false,
+    this.opacityColor = false,
   });
 
   @override

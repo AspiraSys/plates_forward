@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../models/users_data.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
@@ -32,6 +33,7 @@ class SignUpScreenState extends State<SignUpScreen>
   bool isLoading = false;
   File? _pickedImage;
   String imagesUrl = '';
+  bool checked = false;
 
   @override
   void dispose() {
@@ -219,10 +221,15 @@ class SignUpScreenState extends State<SignUpScreen>
                           color: const Color.fromARGB(79, 244, 67, 54)),
                       child: Row(
                         children: [
-                          const Icon(
-                            Icons.close,
-                            size: 24,
-                            color: Colors.red,
+                          GestureDetector(
+                            onTap: () => setState(() {
+                              errorText = '';
+                            }),
+                            child: const Icon(
+                              Icons.close,
+                              size: 24,
+                              color: Colors.red,
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
@@ -358,7 +365,7 @@ class SignUpScreenState extends State<SignUpScreen>
                       child: InputBox(
                         inputController: _emailController,
                         labelText: 'Enter your email here',
-                        inputType: 'text',
+                        inputType: 'email',
                       ),
                     ),
                     Container(
@@ -379,7 +386,7 @@ class SignUpScreenState extends State<SignUpScreen>
                       child: InputBox(
                         inputController: _mobileNumberController,
                         labelText: 'Enter your mobile name',
-                        inputType: 'text',
+                        inputType: 'phone',
                         phone: true,
                       ),
                     ),
@@ -408,9 +415,13 @@ class SignUpScreenState extends State<SignUpScreen>
                         const Padding(
                             padding: EdgeInsets.only(top: 20, bottom: 20)),
                         Checkbox(
-                          value: true,
-                          onChanged: (newValue) {},
-                          activeColor: AppColor.primaryColor,
+                          value: checked,
+                          onChanged: (newValue) {
+                            setState(() {
+                              checked = newValue!;
+                            });
+                          },
+                          activeColor: checked ? AppColor.primaryColor : AppColor.whiteColor,
                         ),
                         RichText(
                             text: const TextSpan(
@@ -437,13 +448,29 @@ class SignUpScreenState extends State<SignUpScreen>
                 ),
               ),
             ),
+            GestureDetector(
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RoutePaths.loginRoute),
+              child: Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 4, bottom: 10),
+                child: const Text(
+                  "Return to SignIn",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color.fromRGBO(2, 60, 167, 1),
+                  ),
+                ),
+              ),
+            ),
             Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.only(top: 20, bottom: 20),
                 child: ButtonBox(
                   buttonText: 'Sign up',
                   fillColor: true,
-                  onPressed: _handleSignUp,
+                  onPressed: _handleSignUp,                  
                 )),
           ],
         ),

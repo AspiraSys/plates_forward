@@ -10,14 +10,15 @@ class InputBox extends StatefulWidget {
   final bool disabled;
   final bool phone;
 
-  const InputBox(
-      {super.key,
-      required this.labelText,
-      required this.inputType,
-      this.inputController,
-      this.accountDetail = false,
-      this.disabled = true,
-      this.phone = false});
+  const InputBox({
+    super.key,
+    required this.labelText,
+    required this.inputType,
+    this.inputController,
+    this.accountDetail = false,
+    this.disabled = true,
+    this.phone = false,
+  });
 
   @override
   State<InputBox> createState() => _InputBoxState();
@@ -27,7 +28,6 @@ class _InputBoxState extends State<InputBox> {
   late TextEditingController _controller;
   bool obscureText = false;
   bool showPassword = true;
-  bool showText = true;
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _InputBoxState extends State<InputBox> {
     } else {
       _controller = TextEditingController(text: widget.inputController ?? '');
     }
-    obscureText = widget.inputType == 'password' ? true : false;
+    obscureText = widget.inputType == 'password'; // Updated here
   }
 
   @override
@@ -54,26 +54,17 @@ class _InputBoxState extends State<InputBox> {
       ),
       margin: const EdgeInsets.only(top: 2),
       child: TextFormField(
+        keyboardType: getKeyboardType(),
         inputFormatters: widget.phone ? [PhoneNumberFormatter()] : null,
         controller: _controller,
-        obscureText: widget.inputType == 'password' ? showPassword : false,
-        enableInteractiveSelection: false,
+        obscureText: obscureText,
         decoration: InputDecoration(
-          // prefixText: widget.phone ? '+61' : '',
-          // prefixStyle: const TextStyle(
-          //   fontSize: 14,
-          //   fontWeight: FontWeight.w400,
-          //   color: AppColor.blackColor,
-          //   decoration: TextDecoration.none,
-          // ),
           enabled: widget.disabled,
           suffixIcon: obscureText
               ? GestureDetector(
                   onTap: () {
                     setState(() {
                       showPassword = !showPassword;
-                      // showText = !showText;
-                      // obscureText = !showPassword;
                     });
                   },
                   child: widget.accountDetail
@@ -110,6 +101,21 @@ class _InputBoxState extends State<InputBox> {
         ),
       ),
     );
+  }
+
+  TextInputType getKeyboardType() {
+    switch (widget.inputType) {
+      case 'text':
+        return TextInputType.text;
+      case 'password':
+        return TextInputType.visiblePassword;
+      case 'phone':
+        return TextInputType.phone;
+      case 'email':
+        return TextInputType.emailAddress;
+      default:
+        return TextInputType.text;
+    }
   }
 }
 

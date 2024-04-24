@@ -109,10 +109,15 @@ class LoginScreenState extends State<LoginScreen>
                             color: const Color.fromARGB(79, 244, 67, 54)),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.close,
-                              size: 24,
-                              color: Colors.red,
+                            GestureDetector(
+                              onTap: () => setState(() {
+                                errorText = '';
+                              }),
+                              child: const Icon(
+                                Icons.close,
+                                size: 24,
+                                color: Colors.red,
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 10),
@@ -146,7 +151,7 @@ class LoginScreenState extends State<LoginScreen>
                 child: InputBox(
                   inputController: _emailController,
                   labelText: 'Enter your email here',
-                  inputType: 'text',
+                  inputType: 'email',
                 ),
               ),
               Container(

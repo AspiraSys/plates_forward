@@ -28,6 +28,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   bool orderState = false;
+  bool isLoading = false;
   final TextEditingController orderController = TextEditingController();
 
   String errorText = '';
@@ -35,20 +36,24 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> venueMasterData = [];
   List<Map<String, dynamic>> userTransactionData = [];
 
-  Future<List<Object?>> fetchVenueMasterData(
+  Future<List<Map<String, dynamic>>> fetchVenueMasterData(
       String locationId) async {
     final CollectionReference venueMasterCollection =
         FirebaseFirestore.instance.collection('venueMaster');
 
-    QuerySnapshot<Object?> querySnapshot =
-        await venueMasterCollection
-            .where('locationId', isEqualTo: locationId)
-            .get();
+    QuerySnapshot<Object?> querySnapshot = await venueMasterCollection
+        .where('locationId', isEqualTo: locationId)
+        .get();
 
-    return querySnapshot.docs.map((doc) => doc.data()).toList();
+    return querySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
   }
 
-Future<void> checkAndPrintMatchingData() async {
+  Future<void> checkAndPrintMatchingData() async {
+    setState(() {
+      isLoading = true;
+    });
     final CollectionReference userTransactionCollection =
         FirebaseFirestore.instance.collection('userTransaction');
 
@@ -59,176 +64,50 @@ Future<void> checkAndPrintMatchingData() async {
         .map((doc) => doc.data() as Map<String, dynamic>)
         .toList();
 
-    print('Fetched userTransactionData:');
-    print(userData);
-
     if (userData.isNotEmpty) {
-      List<String?> locationIds = userData
+      List<Map<String, dynamic>> userActivityDataList = userData
           .map((data) => (data['userActivityData'] as List<dynamic>)
-              .map((activity) => activity['locationId'] as String?)
+              .cast<Map<String, dynamic>>()
               .toList())
           .expand((i) => i)
           .toList();
 
+      List<String?> locationIds = userActivityDataList
+          .map((activity) => activity['locationId'] as String?)
+          .toList()
+          .whereType<String>()
+          .toList();
+
       for (String? locationId in locationIds) {
         if (locationId != null) {
-         final venueData =
-              await fetchVenueMasterData(locationId);
+          final venueData = await fetchVenueMasterData(locationId);
 
-          print('Matching venueMaster Data for locationId: $locationId');
-          print(venueData);
-
-          venueMasterData.addAll(venueData as Iterable<Map<String, dynamic>>);
-          
-
-          setState(() {}); // Update the UI with the fetched data
+          venueMasterData.addAll(venueData);
         } else {
           print('locationId is null');
         }
-       
       }
+
+      userTransactionData = userActivityDataList;
+
+      setState(() {
+        isLoading = false;
+      });
     } else {
-      print('userData is empty');
+      setState(() {
+        isLoading = false;
+      });
     }
-
-     userTransactionData.addAll(userData as Iterable<Map<String, dynamic>>);
-
-    // print('Matching userTransaction Data for locationId: $locationId');
-    // print(userTransactionData);
   }
-  // Future<void> checkAndPrintMatchingData() async {
-  //   final CollectionReference userTransactionCollection =
-  //       FirebaseFirestore.instance.collection('userTransaction');
-
-  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
-  //       await userTransactionCollection.get();
-
-  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
-  //       .map((doc) => doc.data() as Map<String, dynamic>)
-  //       .toList();
-
-  //   print('Fetched userTransactionData:');
-  //   // print(userData);
-
-  //   if (userData.isNotEmpty) {
-  //     List<String?> locationIds = userData
-  //         .map((data) => (data['userActivityData'] as List<dynamic>)
-  //             .map((activity) => activity['locationId'] as String?)
-  //             .toList())
-  //         .expand((i) => i)
-  //         .toList();
-
-  //     for (String? locationId in locationIds) {
-  //       if (locationId != null) {
-  //         List<Object?> venueData =
-  //             await fetchVenueMasterData(locationId);
-
-  //         print('Matching venueMaster Data for locationId: $locationId');
-  //         // print(venueData);
-
-  //         venueMasterData .addAll(venueData as Iterable<Map<String, dynamic>>);
-  //         userTransactionData = userData;
-
-  //         print('Matching userTransaction Data for locationId: $locationId');
-  //         // print(userTransactionData);
-
-  //         setState(() {}); // Update the UI with the fetched data
-  //       } else {
-  //         print('locationId is null');
-  //       }
-  //     }
-  //   } else {
-  //     print('userData is empty');
-  //   }
-  // }
-
-
-  // Future<List<Object?>> fetchVenueMasterData(String locationId) async {
-  //   final CollectionReference venueMasterCollection =
-  //       FirebaseFirestore.instance.collection('venueMaster');
-
-  //   QuerySnapshot<Object?> querySnapshot = await venueMasterCollection
-  //       .where('locationId', isEqualTo: locationId)
-  //       .get();
-
-  //   return querySnapshot.docs.map((doc) => doc.data()).toList();
-  // }
-
-  // Future<void> checkAndPrintMatchingData() async {
-  //   final CollectionReference userTransactionCollection =
-  //       FirebaseFirestore.instance.collection('userTransaction');
-
-  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
-  //       await userTransactionCollection.get();
-
-  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
-  //       .map((doc) => doc.data() as Map<String, dynamic>)
-  //       .toList();
-
-  //   print('Fetched userTransactionData:');
-  //   print(userData);
-
-  //   if (userData.isNotEmpty) {
-  //     dynamic locationId = userData.first['locationId'];
-
-  //     if (locationId != null) {
-  //       venueMasterData = await fetchVenueMasterData(locationId);
-  //       userTransactionData = userData;
-
-  //       setState(() {}); // Update the UI with the fetched data
-  //     } else {
-  //       print('locationId is null');
-  //     }
-  //   } else {
-  //     print('userData is empty');
-  //   }
-  // }
-
-  // Future<void> checkAndPrintMatchingData() async {
-  //   final CollectionReference userTransactionCollection =
-  //       FirebaseFirestore.instance.collection('userTransaction');
-
-  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
-  //       await userTransactionCollection.get();
-
-  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
-  //       .map((doc) => doc.data() as Map<String, dynamic>)
-  //       .toList();
-
-  //   print('Fetched userTransactionData:');
-  //   print(userData);
-
-  //   if (userData.isNotEmpty) {
-  //     List locationIds =
-  //         userData.map((data) => data['locationId']).toList();
-
-  //     for (String locationId in locationIds) {
-  //       if (locationId != null) {
-  //         venueMasterData = await fetchVenueMasterData(locationId);
-  //         userTransactionData = userData;
-  //         // List<Object?> venueData = await fetchVenueMasterData(locationId);
-
-  //         print('Matching venueMaster Data for locationId: $locationId');
-  //         print(venueMasterData);
-
-  //         userTransactionData = userData;
-
-  //         setState(() {}); // Update the UI with the fetched data
-  //       } else {
-  //         print('locationId is null');
-  //       }
-  //     }
-  //   } else {
-  //     print('userData is empty');
-  //   }
-  // }
 
   @override
   void initState() {
     super.initState();
-    checkAndPrintMatchingData();
-    // fetchVenueMasterData();
-    // listenToData(); // Call the function here
+    checkAndPrintMatchingData().then((_) {
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -243,43 +122,6 @@ Future<void> checkAndPrintMatchingData() async {
 
     return collections;
   }
-
-  // Future<List<Object?>> fetchVenueMasterData(
-  //     String locationId) async {
-  //   final CollectionReference venueMasterCollection =
-  //       FirebaseFirestore.instance.collection('venueMaster');
-
-  //   QuerySnapshot<Object?> querySnapshot =
-  //       await venueMasterCollection
-  //           .where('locationId', isEqualTo: locationId)
-  //           .get();
-
-  //   return querySnapshot.docs.map((doc) => doc.data()).toList();
-  // }
-
-  // Future<Object> fetchMatchData() async {
-  //   final CollectionReference userTransactionCollection =
-  //       FirebaseFirestore.instance.collection('userTransaction');
-
-  //    QuerySnapshot<Map<String, dynamic>> userTransactionQuerySnapshot =
-  //       await userTransactionCollection.get();
-
-  //   List<Map<String, dynamic>> userTransactionData =
-  //       querySnapshot.docs.map((doc) => doc.data()).toList();
-
-  //   if (userTransactionData.isNotEmpty) {
-  //     String locationId = userTransactionData.first['locationId'];
-  //     List<Object?> venueMasterData =
-  //         await fetchVenueMasterData(locationId);
-  //     // return fetchVenueMasterData(locationId);
-  //     print('Matching venueMaster Data:');
-  //     print(venueMasterData);
-
-  //     print('Matching userTransaction Data:');
-  //     print(userTransactionData);
-  //   }
-  //   // return [];
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -314,42 +156,7 @@ Future<void> checkAndPrintMatchingData() async {
       },
     ];
 
-    List<Map<String, dynamic>> totalDonationApi = [
-      {
-        "id": 1,
-        "image": ImageAssets.kyivIcon,
-        "country": [
-          {"id": 1, "city": "Kyviv", "image": ImageAssets.kyivIcon},
-          // {"id": 2, "city": "Sydney", "image": ImageAssets.sydneyIcon},
-        ],
-        "order": [
-          {"id": 1, "item": "Saumon a la Parisienne", "cost": "32.00"},
-          {"id": 2, "item": "Croque Monsieur", "cost": "13.00"},
-          {"id": 3, "item": "Salade de Truite Fumee", "cost": "16.00"},
-          {"id": 4, "item": "Total", "cost": "61.00"},
-        ],
-        "title": "Kyviv Social",
-        "date": "06/12/2023"
-      },
-      {
-        "id": 2,
-        "image": ImageAssets.bowlMeal,
-        "country": [
-          {"id": 1, "city": "Kyviv", "image": ImageAssets.kyivIcon},
-          {"id": 2, "city": "Sydney", "image": ImageAssets.sydneyIcon},
-        ],
-        "order": [
-          {"id": 1, "item": "Pizza", "cost": "200.00"},
-          {"id": 2, "item": "Burger", "cost": "80.00"},
-          {"id": 3, "item": "Total", "cost": "280.00"},
-        ],
-        "title": "Meal Donation",
-        "date": "06/12/2023"
-      },
-    ];
-
     Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
-      // print('data of response ${result}');
       List<ListItem> lineItems = result.order?.lineItems?.map((item) {
             return ListItem(
               name: item.name ?? '',
@@ -385,7 +192,7 @@ Future<void> checkAndPrintMatchingData() async {
           const SnackBar(
             content: Text(
               'Successfully added to Impact',
-              style: TextStyle(color: Colors.green),
+              style: TextStyle(color: AppColor.whiteColor),
             ),
             duration: Duration(seconds: 3),
           ),
@@ -394,140 +201,10 @@ Future<void> checkAndPrintMatchingData() async {
         Future.delayed(const Duration(seconds: 3), () {
           Navigator.pop(context);
         });
-        print("Data saved to Firebase");
       } else {
         print("User not authenticated");
       }
     }
-
-    // Future<void> handleOrder() async {
-    //   setState(() {
-    //     errorText = '';
-    //     // orderState = false;
-    //   });
-
-    //   if (orderController.text.isEmpty) {
-    //     setState(() {
-    //       errorText = 'Invalid order number';
-    //     });
-    //     return;
-    //   }
-
-    //   final response = await square.retrieveOrder(
-    //       orderId: RetrieveOrderRequest(orderId: orderController.text));
-
-    //   if (response is RetrieveOrderResponse) {
-    //     RetrieveOrderResponse result = response as RetrieveOrderResponse;
-
-    //     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //     final FirebaseAuth auth = FirebaseAuth.instance;
-    //     final User? user = auth.currentUser;
-
-    //     if (user != null) {
-    //       final String userId = user.uid;
-    //       final DocumentSnapshot<Map<String, dynamic>> existingOrder =
-    //           await firestore.collection("userTransaction").doc(userId).get();
-
-    //       if (existingOrder.exists &&
-    //           existingOrder.data()?['id'] == result.order?.id) {
-    //         setState(() {
-    //           errorText = "Sorry, order already in your impact";
-    //         });
-    //         return;
-    //       }
-    //     }
-
-    //     await saveUserTransactionData(result);
-
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         content: Text(
-    //           'Successfully added to Impact',
-    //           style: TextStyle(color: Colors.green),
-    //         ),
-    //         duration: Duration(seconds: 3),
-    //       ),
-    //     );
-
-    //     Future.delayed(const Duration(seconds: 3), () {
-    //       Navigator.pop(context);
-    //     });
-    //   } else if (response is Map<String, dynamic> &&
-    //       response.containsKey('errors')) {
-    //     String detail = response['errors'][0]['detail'];
-    //     setState(() {
-    //       errorText = detail;
-    //     });
-    //   }
-    // }
-
-    // Future<void> handleOrder() async {
-    //   setState(() {
-    //     errorText = '';
-    //   });
-
-    //   if (orderController.text.isEmpty) {
-    //     setState(() {
-    //       errorText = 'Invalid order number';
-    //     });
-    //     return;
-    //   } else {
-    //     final response = await square.retrieveOrder(
-    //         orderId: RetrieveOrderRequest(orderId: orderController.text));
-
-    //     if (response is RetrieveOrderResponse) {
-    //       RetrieveOrderResponse result = response as RetrieveOrderResponse;
-
-    //       final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //       final FirebaseAuth auth = FirebaseAuth.instance;
-    //       final User? user = auth.currentUser;
-
-    //       if (user != null) {
-    //         final String userId = user.uid;
-    //         final DocumentSnapshot<Map<String, dynamic>> existingOrder =
-    //             await firestore.collection("userTransaction").doc(userId).get();
-
-    //         if (existingOrder.exists &&
-    //             existingOrder.data()?['id'] == result.order?.id) {
-    //           setState(() {
-    //             errorText = "Order Id is already in impact";
-    //           });
-    //           return;
-    //         } else {
-    //           await saveUserTransactionData(result);
-    //         }
-    //       }
-
-    //       // if (response.containsKey('errors')) {}
-
-    //       // ScaffoldMessenger.of(context).showSnackBar(
-    //       //   const SnackBar(
-    //       //     content: Text(
-    //       //       'Successfully added to Impact',
-    //       //       style: TextStyle(color: Colors.green),
-    //       //     ),
-    //       //     duration: Duration(seconds: 3),
-    //       //   ),
-    //       // );
-
-    //       // Future.delayed(const Duration(seconds: 3), () {
-    //       //   Navigator.pop(context);
-    //       // });
-    //     } else {
-    //       print('---> Error accor');
-    //     }
-    //     // else if (response.containsKey('errors')) {
-    //     //   // String detail = response['errors'][0]['detail'];
-    //     //   setState(() {
-    //     //     errorText = 'Order not found for id ${orderController.text}';
-    //     //   });
-    //     // } else {
-    //     //   setState(() {
-    //     //     errorText = 'Order not found for id ${orderController.text}';
-    //     //   });
-    //     // }
-    //   }
-    // }
 
     Future<void> handleOrder() async {
       setState(() {
@@ -546,7 +223,7 @@ Future<void> checkAndPrintMatchingData() async {
             orderId: RetrieveOrderRequest(orderId: orderController.text));
 
         if (response is RetrieveOrderResponse) {
-          RetrieveOrderResponse result = response as RetrieveOrderResponse;
+          RetrieveOrderResponse result = response;
 
           final FirebaseFirestore firestore = FirebaseFirestore.instance;
           final FirebaseAuth auth = FirebaseAuth.instance;
@@ -961,7 +638,7 @@ Future<void> checkAndPrintMatchingData() async {
                                                     child: InputBox(
                                                       labelText:
                                                           'Enter Receipt / Order Number',
-                                                      inputType: 'number',
+                                                      inputType: 'text',
                                                       inputController:
                                                           orderController,
                                                     ),
@@ -1033,16 +710,45 @@ Future<void> checkAndPrintMatchingData() async {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                // ExpansionTileControllerApp()
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 2),
-                                  child: ExpansionTiles(
-                                    // donateData: totalDonationApi,
-                                    donateData: venueMasterData,
-                                    orderData: userTransactionData,
-                                  ),
-                                )
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 2),
+                                    child: isLoading
+                                        ? Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 50),
+                                            child:
+                                                const CircularProgressIndicator(
+                                              color: AppColor.primaryColor,
+                                              strokeWidth: 15,
+                                            ))
+                                        : venueMasterData.isEmpty &&
+                                                userTransactionData.isEmpty
+                                            ? Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 50),
+                                                child: const Text(
+                                                  'No orders yet made!',
+                                                  style: TextStyle(
+                                                    color:
+                                                        AppColor.primaryColor,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 2,
+                                                  ),
+                                                ),
+                                              )
+                                            : ExpansionTiles(
+                                                donateData: venueMasterData,
+                                                orderData: userTransactionData,
+                                              )
+
+                                    // ExpansionTiles(
+                                    //   donateData: venueMasterData,
+                                    //   orderData: userTransactionData,
+                                    // ),
+                                    )
                               ],
                             ),
                           ),

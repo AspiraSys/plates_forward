@@ -72,7 +72,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             child: const InputBox(
               inputController: '',
               labelText: 'Enter your email here',
-              inputType: 'text',
+              inputType: 'email',
             ),
           ),
           Container(
@@ -85,20 +85,21 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     _handleSendEmail();
                   })),
           GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(RoutePaths.loginRoute),
+            onTap: () =>  Navigator.of(context).pushNamed(RoutePaths.loginRoute),
             child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 24),
-              child: const Text(
-                "Return to Sign In",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color.fromRGBO(2, 60, 167, 1),
-                ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.only(top: 24),
+            child: const Text(
+              "Return to Sign In",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color.fromRGBO(2, 60, 167, 1),
               ),
             ),
           ),
+          ),     
+          
           Container(
             alignment: Alignment.center,
             margin: const EdgeInsets.only(top: 128),
@@ -125,10 +126,11 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       ),
     );
   }
-
   _handleSendEmail() {}
 
   _handleSignUp() {
     Navigator.of(context).pushNamed(RoutePaths.signupRoute);
   }
 }
+
+
