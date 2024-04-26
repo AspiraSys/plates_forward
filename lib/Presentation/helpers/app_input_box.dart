@@ -37,7 +37,7 @@ class _InputBoxState extends State<InputBox> {
     } else {
       _controller = TextEditingController(text: widget.inputController ?? '');
     }
-    obscureText = widget.inputType == 'password'; // Updated here
+    obscureText = widget.inputType == 'password';
   }
 
   @override
@@ -57,7 +57,7 @@ class _InputBoxState extends State<InputBox> {
         keyboardType: getKeyboardType(),
         inputFormatters: widget.phone ? [PhoneNumberFormatter()] : null,
         controller: _controller,
-        obscureText: obscureText,
+        obscureText: obscureText ? showPassword : false,
         decoration: InputDecoration(
           enabled: widget.disabled,
           suffixIcon: obscureText

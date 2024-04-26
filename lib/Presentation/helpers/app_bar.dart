@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/Utils/app_routes_path.dart';
 import 'package:plates_forward/utils/app_assets.dart';
+
 class AppBarScreen extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool subScreen;

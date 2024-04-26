@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 // import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../models/users_data.dart';
@@ -78,6 +79,20 @@ class SignUpScreenState extends State<SignUpScreen>
         _emailController.text.isEmpty) {
       setState(() {
         errorText = 'Please enter all the fields';
+      });
+      return;
+    } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+            .hasMatch(_firstNameController.text) ||
+        RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+            .hasMatch(_lastNameController.text)) {
+      setState(() {
+        errorText = 'Invalid Name';
+      });
+      return;
+    } else if (_firstNameController.text.length > 8 ||
+        _lastNameController.text.length > 8) {
+      setState(() {
+        errorText = 'Please enter at least 8 characters ';
       });
       return;
     } else if (!_emailController.text.contains('@')) {
@@ -231,7 +246,8 @@ class SignUpScreenState extends State<SignUpScreen>
                               color: Colors.red,
                             ),
                           ),
-                          Padding(
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
                             padding: const EdgeInsets.only(left: 10),
                             child: Text(
                               errorText,
@@ -421,7 +437,9 @@ class SignUpScreenState extends State<SignUpScreen>
                               checked = newValue!;
                             });
                           },
-                          activeColor: checked ? AppColor.primaryColor : AppColor.whiteColor,
+                          activeColor: checked
+                              ? AppColor.primaryColor
+                              : AppColor.whiteColor,
                         ),
                         RichText(
                             text: const TextSpan(
@@ -470,7 +488,7 @@ class SignUpScreenState extends State<SignUpScreen>
                 child: ButtonBox(
                   buttonText: 'Sign up',
                   fillColor: true,
-                  onPressed: _handleSignUp,                  
+                  onPressed: _handleSignUp,
                 )),
           ],
         ),

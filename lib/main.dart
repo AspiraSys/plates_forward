@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:plates_forward/stripe/constants.dart';
 
-void main () async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -41,14 +41,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Plate It Forward',
-      theme: ThemeData(
-        primaryColor: AppColor.primaryColor
-      ),
-      initialRoute: RoutePaths.splashRoute,
-      // initialRoute: RoutePaths.splashRoute,
-      // navigatorObservers: [AppNavigatorObserver()],
-      onGenerateRoute: AppRouter.navigateRoute
-    );
+        title: 'Plate It Forward',
+        theme: ThemeData(primaryColor: AppColor.primaryColor),
+        initialRoute: RoutePaths.splashRoute,
+        // initialRoute: RoutePaths.splashRoute,
+        // navigatorObservers: [AppNavigatorObserver()],
+        onGenerateRoute: AppRouter.navigateRoute);
   }
 }

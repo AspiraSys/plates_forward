@@ -125,37 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> countryImpactApi = [
-      {
-        "id": "1",
-        "country": "Australia",
-        "count": "75,199",
-        "t_count": "36",
-        "flag": ImageAssets.australiaFlag
-      },
-      {
-        "id": "2",
-        "country": "Ukraine",
-        "count": "75,199",
-        "t_count": "48",
-        "flag": ImageAssets.ukraineFlag
-      },
-      {
-        "id": "3",
-        "country": "Afghnistan",
-        "count": "75,199",
-        "t_count": "44",
-        "flag": ImageAssets.afghanistanFlag
-      },
-      {
-        "id": "4",
-        "country": "Sri Lanka",
-        "count": "75,199",
-        "t_count": "44",
-        "flag": ImageAssets.sriLankaFlag
-      },
-    ];
-
     Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
       List<ListItem> lineItems = result.order?.lineItems?.map((item) {
             return ListItem(
@@ -261,6 +230,27 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         print('---> Error: $e');
       }
+    }
+
+    int countCityOccurrences(
+      List<Map<String, dynamic>> venueMasterData,
+      String cityName,
+    ) {
+      return venueMasterData
+          .where((doc) =>
+              doc['venueCityName'] == cityName ||
+              doc['secondaryCityName'] == cityName)
+          .length;
+    }
+
+    int calculateTotalCount(List<Map<String, dynamic>> venueMasterData,
+        List<Map<String, dynamic>> countryData) {
+      int totalCount = 0;
+
+      for (var doc in countryData) {
+        totalCount += countCityOccurrences(venueMasterData, doc['countryName']);
+      }
+      return totalCount;
     }
 
     var theme = Theme.of(context);
@@ -386,154 +376,195 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Column(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          width: MediaQuery.of(context).size.width * 8,
-                          height: MediaQuery.of(context).size.height * 0.38,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  for (int index = 0;
-                                      index < countryImpactApi.length;
-                                      index += 2)
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20),
-                                          child: Image.asset(
-                                            countryImpactApi[index]['flag'],
-                                            width: 80,
-                                            height: 46,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 7),
-                                          child: Text(
-                                            countryImpactApi[index]['country'],
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
+                        StreamBuilder(
+                            stream:
+                                fetchStream('parameterCountryData').snapshots(),
+                            builder: (context,
+                                AsyncSnapshot<QuerySnapshot> snapShot) {
+                              if (!snapShot.hasData) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColor.primaryColor,
+                                  ),
+                                );
+                              } else {
+                                List<Map<String, dynamic>> countryData =
+                                    snapShot.data!.docs
+                                        .map((doc) =>
+                                            doc.data() as Map<String, dynamic>)
+                                        .toList();
+                                int totalCount = calculateTotalCount(
+                                    venueMasterData, countryData);
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  width: MediaQuery.of(context).size.width * 8,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.38,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          for (int index = 0;
+                                              index <
+                                                  snapShot.data!.docs.length;
+                                              index += 2)
+                                            Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20),
+                                                  child: Image.network(
+                                                    snapShot.data!.docs[index]
+                                                        ['countryFlag'],
+                                                    width: 80,
+                                                    height: 46,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 7),
+                                                  child: Text(
+                                                    snapShot.data!.docs[index]
+                                                        ['countryName'],
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                  style: const TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w700,
+                                                    color:
+                                                        AppColor.primaryColor,
+                                                  ),
+                                                )
+                                              ],
                                             ),
-                                          ),
-                                        ),
-                                        Text(
-                                          countryImpactApi[index]['t_count'],
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.primaryColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                ],
-                              ),
-                              Container(
-                                width: 160,
-                                height: 160,
-                                decoration: const BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(80)),
-                                    color: AppColor.primaryColor),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    const Text(
-                                      'Meals',
-                                      style: TextStyle(
-                                          color: AppColor.whiteColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          ImageAssets.handLeft,
-                                          width: 20,
-                                          height: 48,
-                                        ),
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Text(
-                                            '172',
-                                            style: TextStyle(
-                                                color: AppColor.whiteColor,
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ),
-                                        Image.asset(
-                                          ImageAssets.handRight,
-                                          width: 20,
-                                          height: 48,
-                                        )
-                                      ],
-                                    ),
-                                    const Text(
-                                      'Donate',
-                                      style: TextStyle(
-                                          color: AppColor.whiteColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  for (int index = 1;
-                                      index < countryImpactApi.length;
-                                      index += 2)
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 20),
-                                          child: Image.asset(
-                                            countryImpactApi[index]['flag'],
-                                            width: 80,
-                                            height: 46,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 7),
-                                          child: Text(
-                                            countryImpactApi[index]['country'],
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
+                                        ],
+                                      ),
+                                      Container(
+                                        width: 160,
+                                        height: 160,
+                                        decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(80)),
+                                            color: AppColor.primaryColor),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            const Text(
+                                              'Meals',
+                                              style: TextStyle(
+                                                  color: AppColor.whiteColor,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400),
                                             ),
-                                          ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  ImageAssets.handLeft,
+                                                  width: 20,
+                                                  height: 48,
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 10),
+                                                  child: Text(
+                                                    totalCount.toString(),
+                                                    style: const TextStyle(
+                                                        color:
+                                                            AppColor.whiteColor,
+                                                        fontSize: 40,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  ),
+                                                ),
+                                                Image.asset(
+                                                  ImageAssets.handRight,
+                                                  width: 20,
+                                                  height: 48,
+                                                )
+                                              ],
+                                            ),
+                                            const Text(
+                                              'Donate',
+                                              style: TextStyle(
+                                                  color: AppColor.whiteColor,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400),
+                                            )
+                                          ],
                                         ),
-                                        Text(
-                                          countryImpactApi[index]['t_count'],
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.primaryColor,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          for (int index = 1;
+                                              index <
+                                                  snapShot.data!.docs.length;
+                                              index += 2)
+                                            Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20),
+                                                  child: Image.network(
+                                                    snapShot.data!.docs[index]
+                                                        ['countryFlag'],
+                                                    width: 80,
+                                                    height: 46,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 7),
+                                                  child: Text(
+                                                    snapShot.data!.docs[index]
+                                                        ['countryName'],
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                  style: const TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w700,
+                                                    color:
+                                                        AppColor.primaryColor,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            }),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: Row(
@@ -705,7 +736,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         SizedBox(
                           height: orderState
-                              ? MediaQuery.of(context).size.height * 0.1
+                              ? MediaQuery.of(context).size.height * 0.05
                               : MediaQuery.of(context).size.height * 0.32,
                           child: SingleChildScrollView(
                             child: Column(
@@ -720,7 +751,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child:
                                                 const CircularProgressIndicator(
                                               color: AppColor.primaryColor,
-                                              strokeWidth: 15,
+                                              strokeWidth: 3,
                                             ))
                                         : venueMasterData.isEmpty &&
                                                 userTransactionData.isEmpty

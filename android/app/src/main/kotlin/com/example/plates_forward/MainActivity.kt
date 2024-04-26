@@ -1,4 +1,4 @@
-package com.example.plates_forward
+package com.plateItForward.app
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity

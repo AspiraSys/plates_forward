@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class VenueCard extends StatelessWidget {
   final num id;
   final String name;

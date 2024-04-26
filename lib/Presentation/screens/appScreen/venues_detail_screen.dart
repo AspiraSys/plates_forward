@@ -115,7 +115,9 @@ class VenueDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(activeIcon: 1,),
+      bottomNavigationBar: const BottomNavBar(
+        activeIcon: 1,
+      ),
     );
   }
 }

@@ -33,7 +33,8 @@ class DonateSuccessfulScreen extends StatelessWidget {
                 height: 40,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                 child: Text(
                   'Thanks for your generosity and support!'.toUpperCase(),
                   style: const TextStyle(
@@ -58,7 +59,9 @@ class DonateSuccessfulScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(activeIcon: 2,),
+      bottomNavigationBar: const BottomNavBar(
+        activeIcon: 2,
+      ),
     );
   }
 }
