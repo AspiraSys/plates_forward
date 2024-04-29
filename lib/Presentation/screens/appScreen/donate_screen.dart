@@ -1,13 +1,14 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
+// import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/models/stripe_model.dart';
+import 'package:plates_forward/models/user_activity.dart';
 import 'package:plates_forward/stripe/stripe_function.dart';
 import 'package:plates_forward/stripe/stripe_response_model.dart';
 import 'package:plates_forward/utils/app_assets.dart';
@@ -25,6 +26,8 @@ class _DonateScreenState extends State<DonateScreen> {
   int numberOfMeals = 1;
   int totalCost = 10;
   int selectedIndex = -1;
+  bool enable = false;
+  String locationId = '';
   var stripe = StripePayment();
 
   void incrementMeals() {
@@ -170,6 +173,9 @@ class _DonateScreenState extends State<DonateScreen> {
                       ),
                     );
                   } else {
+                    List<DocumentSnapshot> activeVenues = snapShot.data!.docs
+                        .where((doc) => doc['isActive'] == 1)
+                        .toList();
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10, left: 25),
                       child: SingleChildScrollView(
@@ -183,14 +189,14 @@ class _DonateScreenState extends State<DonateScreen> {
                               child: Row(
                                 children: [
                                   for (int index = 0;
-                                      index < snapShot.data!.docs.length;
+                                      index < activeVenues.length;
                                       index++)
                                     GestureDetector(
                                       onTap: () {
-                                        onVenueSelected(
-                                            snapShot.data!.docs[index]);
+                                        onVenueSelected(activeVenues[index]);
                                         setState(() {
                                           selectedIndex = index;
+                                          enable = true;
                                         });
                                       },
                                       child: Padding(
@@ -221,14 +227,14 @@ class _DonateScreenState extends State<DonateScreen> {
                                                         : AppColor.primaryColor,
                                                     BlendMode.srcIn),
                                                 child: Image.network(
-                                                  snapShot.data!.docs[index]
+                                                  activeVenues[index]
                                                       ['venueImage'],
                                                   width: 40,
                                                   height: 40,
                                                 ),
                                               ),
                                               Text(
-                                                snapShot.data!.docs[index]
+                                                activeVenues[index]
                                                     ['venueName'],
                                                 style: TextStyle(
                                                     fontSize: 10,
@@ -254,13 +260,13 @@ class _DonateScreenState extends State<DonateScreen> {
                     );
                   }
                 }),
-            const Padding(
-              padding: EdgeInsets.only(top: 10, left: 25, bottom: 10),
-              child: Text(
-                'Billing Address',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.only(top: 10, left: 25, bottom: 10),
+            //   child: Text(
+            //     'Billing Address',
+            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            //   ),
+            // ),
             // Expanded(
             //   child: Center(
             //     child: SingleChildScrollView(
@@ -401,42 +407,53 @@ class _DonateScreenState extends State<DonateScreen> {
             //     ),
             //   ),
             // ),
-            // // const Spacer(),
+            const Spacer(),
             Center(
               child: Container(
                 padding: const EdgeInsets.only(top: 30),
-                child: InkWell(
-                  onTap: () async {
-                    StripeResponseModel result = await stripe.stripeMakePayment(
-                        amount: (totalCost * 100).toString(), currency: "USD");
-                    if (result.isSuccess) {
-                      firebaseDataTrans(result.response);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                child: IgnorePointer(
+                  ignoring: !enable,
+                  child: InkWell(
+                    onTap: () async {
+                      StripeResponseModel result =
+                          await stripe.stripeMakePayment(
+                              amount: (totalCost * 100).toString(),
+                              currency: "USD");
+                      if (result.isSuccess) {
+                        firebaseDataTrans(result.response);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(result.message),
+                            backgroundColor: Colors.green));
+                        Future.delayed(const Duration(seconds: 2), () {
+                          Navigator.of(context)
+                              .pushNamed(RoutePaths.donateSuccessRoute);
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(result.message),
-                          backgroundColor: Colors.green));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(result.message),
-                        backgroundColor: Colors.redAccent,
-                      ));
-                    }
-                    /*Navigator.of(context)
-                        .pushNamed(RoutePaths.donateSuccessRoute)*/
-                  },
-                  child: Container(
-                    width: 176,
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: AppColor.primaryColor,
-                    ),
-                    child: Text(
-                      'Donate'.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: AppColor.whiteColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 2),
+                          backgroundColor: Colors.redAccent,
+                        ));
+                      }
+                      /*Navigator.of(context)
+                          .pushNamed(RoutePaths.donateSuccessRoute)*/
+                    },
+                    child: Container(
+                      width: 176,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: enable
+                            ? AppColor.primaryColor
+                            : const Color.fromARGB(168, 2, 60, 167),
+                      ),
+                      child: Text(
+                        'Donate'.toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppColor.whiteColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2),
+                      ),
                     ),
                   ),
                 ),
@@ -458,7 +475,13 @@ class _DonateScreenState extends State<DonateScreen> {
     if (user != null) {
       final String userId = user.uid;
       try {
-        await StripeRepository().updateModel(stripeModel, userId);
+        await StripeRepository()
+            .updateModel(stripeModel, userId, locationId, numberOfMeals);
+        if (stripeModel.transactionId != null) {
+          await updateUserTransaction(stripeModel.transactionId!);
+        } else {
+          debugPrint('Transaction ID is null');
+        }
       } catch (e) {
         debugPrint('Error updating Firebase Firestore: $e');
       }
@@ -468,15 +491,94 @@ class _DonateScreenState extends State<DonateScreen> {
   }
 
   void onVenueSelected(DocumentSnapshot selectedDocument) {
-    print(
-        'Selected Venue: ${selectedDocument['venueName']} ${selectedDocument['venueCityName']} ${selectedDocument['locationId']}');
+    setState(() {
+      locationId = selectedDocument['locationId'];
+    });
+  }
+
+  Future<void> updateUserTransaction(String transactionId) async {
+    try {
+      DocumentSnapshot<Object?> stripeTransactionDoc = await FirebaseFirestore
+          .instance
+          .collection('stripeTransaction')
+          .doc(transactionId)
+          .get();
+
+      String generateRandomUid() {
+        const String chars =
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        Random rnd = Random();
+        String uid = '';
+        for (int i = 0; i < 10; i++) {
+          uid += chars[rnd.nextInt(chars.length)];
+        }
+        return uid;
+      }
+
+      if (stripeTransactionDoc.exists) {
+        Map<String, dynamic> stripeData =
+            stripeTransactionDoc.data() as Map<String, dynamic>;
+        List<ListItem> lineItems = {
+          ListItem(
+            name: 'Meals',
+            uid: generateRandomUid(),
+            amount: (stripeData['totalAmount'] / int.parse(stripeData['quantity'])) ?? 0,
+            quantity: stripeData['quantity'] ?? '',
+          )
+        }.toList();
+
+        UserActivityData userTransactionData = UserActivityData(
+          id: stripeData['transactionId'] ?? '',
+          locationId: stripeData['locationId'] ?? '',
+          createdAt: stripeData['createdAt'] ?? '',
+          totalAmount: stripeData['totalAmount'] ?? 0,
+          lineItems: lineItems,
+        );
+        // UserActivityData userTransactionData = UserActivityData{
+
+        // id: stripeData['transactionId'],
+        // 'locationId': stripeData['locationId'],
+        // 'createdAt': stripeData['createdAt'],
+        // 'totalAmount': stripeData['totalAmount'],
+        // 'lineItems': lineItems
+        // };
+
+        final FirebaseAuth auth = FirebaseAuth.instance;
+
+        final User? user = auth.currentUser;
+
+        if (user != null) {
+          final String userId = user.uid;
+          await FirebaseFirestore.instance
+              .collection("userTransaction")
+              .doc(userId)
+              .set({
+            'userActivityData':
+                FieldValue.arrayUnion([userTransactionData.toJson()])
+          }, SetOptions(merge: true));
+        } else {
+          print("user is not authenticate");
+        }
+        // await FirebaseFirestore.instance
+        //     .collection('userTransaction')
+        //     .doc(transactionId)
+        //     .set(userTransactionData);
+      } else {
+        print('Stripe transaction document does not exist');
+      }
+    } catch (e) {
+      print('Error updating userTransaction: $e');
+    }
   }
 }
 
 class StripeRepository {
-  Future<void> updateModel(StripeModel updatedModel, String userId) async {
+  Future<void> updateModel(StripeModel updatedModel, String userId,
+      String locationId, int numberOfMeals) async {
     Map<String, dynamic> modelMap = updatedModel.toJson();
     modelMap['userId'] = userId;
+    modelMap['locationId'] = locationId;
+    modelMap['quantity'] = numberOfMeals.toString();
     await FirebaseFirestore.instance
         .collection('stripeTransaction')
         .doc(updatedModel.transactionId)

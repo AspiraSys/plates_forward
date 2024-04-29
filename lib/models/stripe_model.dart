@@ -127,6 +127,8 @@ class StripeModel {
   bool? paymentProcess;
   DateTime? createdAt;
   String? userId;
+  String? locationId;
+  String? quantity;
 
   StripeModel({
     this.transactionId,
@@ -138,6 +140,8 @@ class StripeModel {
     this.paymentProcess,
     this.createdAt,
     this.userId,
+    this.locationId,
+    this.quantity,
   });
 
   factory StripeModel.fromJson(Map<String, dynamic> json) {
@@ -149,7 +153,10 @@ class StripeModel {
         status: json['status'],
         paymentProcess: false,
         createdAt: DateTime.now(),
-        userId: json['userId']);
+        userId: json['userId'],
+        locationId: json['locationId'],
+        quantity: json['quantity']
+      );
   }
 
   Map<String, dynamic> toJson() {
@@ -161,7 +168,9 @@ class StripeModel {
       'status': status,
       'paymentProcess': paymentProcess,
       'createdAt': createdAt?.toIso8601String(),
-      'userId': userId
+      'userId': userId,
+      'locationId': locationId,
+      'quantity': quantity,
     };
   }
 
@@ -174,7 +183,9 @@ class StripeModel {
       'status': stripeModel.status,
       'paymentProcess': stripeModel.paymentProcess,
       'createdAt': stripeModel.createdAt?.millisecondsSinceEpoch,
-      'userId': stripeModel.userId
+      'userId': stripeModel.userId,
+      'locationId': stripeModel.locationId,
+      'quantity' : stripeModel.quantity
     };
   }
 }

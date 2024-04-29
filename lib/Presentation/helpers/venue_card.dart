@@ -10,7 +10,7 @@ class VenueCard extends StatelessWidget {
   final String venue;
   final String about;
   final String vision;
-  final String chefName;
+  // final String chefName;
   final String websiteLink;
   final bool donationScreen;
 
@@ -22,7 +22,7 @@ class VenueCard extends StatelessWidget {
       this.venue = '',
       this.about = '',
       this.vision = '',
-      this.chefName = '',
+      // this.chefName = '',
       this.websiteLink = '',
       this.donationScreen = false});
 
@@ -121,20 +121,20 @@ class VenueCard extends StatelessWidget {
                   : Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * .5,
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Text(
-                              '~ ${chefName.toUpperCase()}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                  color: AppColor.blackColor),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
+                          // Container(
+                          //   width: MediaQuery.of(context).size.width * .5,
+                          //   padding: const EdgeInsets.only(top: 10),
+                          //   child: Text(
+                          //     '~ ${chefName.toUpperCase()}',
+                          //     style: const TextStyle(
+                          //         fontWeight: FontWeight.w500,
+                          //         fontSize: 12,
+                          //         color: AppColor.blackColor),
+                          //     textAlign: TextAlign.left,
+                          //   ),
+                          // ),
                           GestureDetector(
                             onTap: () async {
                               if (await canLaunch(websiteLink)) {

@@ -50,27 +50,88 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
+  // Future<void> checkAndPrintMatchingData() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   final User? user = FirebaseAuth.instance.currentUser;
+  //   if (user == null) {
+  //     return;
+  //   }
+  //   final String userId = user.uid;
+
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
+  //       await userTransactionCollection.get();
+
+  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   if (userData.isNotEmpty) {
+  //     List<Map<String, dynamic>> userActivityDataList = userData
+  //         .map((data) => (data['userActivityData'] as List<dynamic>)
+  //             .cast<Map<String, dynamic>>()
+  //             .toList())
+  //         .expand((i) => i)
+  //         .toList();
+
+  //     List<String?> locationIds = userActivityDataList
+  //         .map((activity) => activity['locationId'] as String?)
+  //         .toList()
+  //         .whereType<String>()
+  //         .toList();
+
+  //     for (String? locationId in locationIds) {
+  //       if (locationId != null) {
+  //         final venueData = await fetchVenueMasterData(locationId);
+
+  //         venueMasterData.addAll(venueData);
+  //       } else {
+  //         print('locationId is null');
+  //       }
+  //     }
+
+  //     userTransactionData = userActivityDataList;
+
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
   Future<void> checkAndPrintMatchingData() async {
     setState(() {
       isLoading = true;
     });
+
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return;
+    }
+    final String userId = user.uid;
+
     final CollectionReference userTransactionCollection =
         FirebaseFirestore.instance.collection('userTransaction');
 
-    QuerySnapshot<Object?> userTransactionQuerySnapshot =
-        await userTransactionCollection.get();
+    DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
+        await userTransactionCollection.doc(userId).get();
 
-    List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    if (userTransactionDocumentSnapshot.exists) {
+      Map<String, dynamic> userData =
+          userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
 
-    if (userData.isNotEmpty) {
-      List<Map<String, dynamic>> userActivityDataList = userData
-          .map((data) => (data['userActivityData'] as List<dynamic>)
+      List<Map<String, dynamic>> userActivityDataList =
+          (userData['userActivityData'] as List<dynamic>)
               .cast<Map<String, dynamic>>()
-              .toList())
-          .expand((i) => i)
-          .toList();
+              .toList();
 
       List<String?> locationIds = userActivityDataList
           .map((activity) => activity['locationId'] as String?)

@@ -47,7 +47,7 @@ class VenueScreen extends StatelessWidget {
                       venue: venueData['city'],
                       about: venueData['description'],
                       // vision: venueData['vision'],
-                      chefName: venueData['chefName'],
+                      // chefName: venueData['chefName'],
                       websiteLink: venueData['websiteLink'],
                     );
                   }).toList(),
