@@ -1,16 +1,25 @@
 class RetrieveOrderResponse {
   Order? order;
+  List<Errors>? errors;
 
-  RetrieveOrderResponse({this.order});
+  RetrieveOrderResponse({this.order, this.errors});
 
   RetrieveOrderResponse.fromJson(Map<String, dynamic> json) {
     order = json['order'] != null ? Order.fromJson(json['order']) : null;
+    if (json['errors'] != null) {
+      errors = <Errors>[];
+      json['errors'].forEach((v) {
+        errors!.add(Errors.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (order != null) {
       data['order'] = order!.toJson();
+    } else if(errors != null) {
+      data['errors'] = errors!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -83,8 +92,7 @@ class Order {
     netAmounts = json['net_amounts'] != null
         ? NetAmounts.fromJson(json['net_amounts'])
         : null;
-    source =
-        json['source'] != null ? Source.fromJson(json['source']) : null;
+    source = json['source'] != null ? Source.fromJson(json['source']) : null;
     customerId = json['customer_id'];
     netAmountDueMoney = json['net_amount_due_money'] != null
         ? BasePriceMoney.fromJson(json['net_amount_due_money'])
@@ -115,8 +123,7 @@ class Order {
       data['total_money'] = totalMoney!.toJson();
     }
     if (totalServiceChargeMoney != null) {
-      data['total_service_charge_money'] =
-          totalServiceChargeMoney!.toJson();
+      data['total_service_charge_money'] = totalServiceChargeMoney!.toJson();
     }
     if (netAmounts != null) {
       data['net_amounts'] = netAmounts!.toJson();
@@ -207,13 +214,11 @@ class LineItems {
       data['total_money'] = totalMoney!.toJson();
     }
     if (variationTotalPriceMoney != null) {
-      data['variation_total_price_money'] =
-          variationTotalPriceMoney!.toJson();
+      data['variation_total_price_money'] = variationTotalPriceMoney!.toJson();
     }
     data['item_type'] = itemType;
     if (totalServiceChargeMoney != null) {
-      data['total_service_charge_money'] =
-          totalServiceChargeMoney!.toJson();
+      data['total_service_charge_money'] = totalServiceChargeMoney!.toJson();
     }
     return data;
   }
@@ -303,6 +308,28 @@ class Source {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
+    return data;
+  }
+}
+
+class Errors {
+  String? code;
+  String? detail;
+  String? category;
+
+  Errors({this.code, this.detail, this.category});
+
+  Errors.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+    detail = json['detail'];
+    category = json['category'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['code'] = this.code;
+    data['detail'] = this.detail;
+    data['category'] = this.category;
     return data;
   }
 }

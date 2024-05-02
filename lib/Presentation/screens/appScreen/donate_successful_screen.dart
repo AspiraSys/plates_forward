@@ -13,6 +13,7 @@ class DonateSuccessfulScreen extends StatelessWidget {
         title: '',
         subScreen: true,
         isMission: true,
+        isDonatSub: true,
       ),
       body: Center(
         child: Container(

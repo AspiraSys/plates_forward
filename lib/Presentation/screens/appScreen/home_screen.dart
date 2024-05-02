@@ -4,13 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
-// import 'package:plates_forward/http_base/exception.dart';
 import 'package:plates_forward/models/user_activity.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
@@ -28,8 +26,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   bool orderState = false;
+  bool isButtonEnable = false;
   bool isLoading = false;
   final TextEditingController orderController = TextEditingController();
+  final GlobalKey<_DialogContentState> dialogKey =
+      GlobalKey<_DialogContentState>();
 
   String errorText = '';
   var square = SquareFunction();
@@ -174,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
-    orderController.dispose();
+    // orderController.dispose();
   }
 
   static CollectionReference<Object?> fetchStream(String collection) {
@@ -186,112 +187,114 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
-      List<ListItem> lineItems = result.order?.lineItems?.map((item) {
-            return ListItem(
-              name: item.name ?? '',
-              uid: item.uid ?? '',
-              amount: item.basePriceMoney?.amount ?? 0,
-              quantity: item.quantity ?? '',
-            );
-          }).toList() ??
-          [];
+    // Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
+    //   List<ListItem> lineItems = result.order?.lineItems?.map((item) {
+    //         return ListItem(
+    //           name: item.name ?? '',
+    //           uid: item.uid ?? '',
+    //           amount: item.basePriceMoney?.amount ?? 0,
+    //           quantity: item.quantity ?? '',
+    //         );
+    //       }).toList() ??
+    //       [];
 
-      num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
+    //   num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
 
-      UserActivityData userActivityData = UserActivityData(
-        id: result.order?.id ?? '',
-        locationId: result.order?.locationId ?? '',
-        createdAt: result.order?.createdAt ?? '',
-        totalAmount: totalAmount,
-        lineItems: lineItems,
-      );
+    //   UserActivityData userActivityData = UserActivityData(
+    //     id: result.order?.id ?? '',
+    //     locationId: result.order?.locationId ?? '',
+    //     createdAt: result.order?.createdAt ?? '',
+    //     totalAmount: totalAmount,
+    //     lineItems: lineItems,
+    //   );
 
-      final FirebaseFirestore firestore = FirebaseFirestore.instance;
-      final FirebaseAuth auth = FirebaseAuth.instance;
+    //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //   final FirebaseAuth auth = FirebaseAuth.instance;
 
-      final User? user = auth.currentUser;
-      if (user != null) {
-        final String userId = user.uid;
+    //   final User? user = auth.currentUser;
+    //   if (user != null) {
+    //     final String userId = user.uid;
 
-        await firestore.collection("userTransaction").doc(userId).set({
-          'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
-        }, SetOptions(merge: true));
+    //     await firestore.collection("userTransaction").doc(userId).set({
+    //       'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
+    //     }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Successfully added to Impact',
-              style: TextStyle(color: AppColor.whiteColor),
-            ),
-            duration: Duration(seconds: 3),
-          ),
-        );
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         content: Text(
+    //           'Successfully added to Impact',
+    //           style: TextStyle(color: AppColor.whiteColor),
+    //         ),
+    //         duration: Duration(seconds: 3),
+    //       ),
+    //     );
 
-        Future.delayed(const Duration(seconds: 3), () {
-          Navigator.pop(context);
-        });
-      } else {
-        print("User not authenticated");
-      }
-    }
+    //     Future.delayed(const Duration(seconds: 3), () {
+    //       Navigator.pop(context);
+    //     });
+    //   } else {
+    //     print("User not authenticated");
+    //   }
+    // }
 
-    Future<void> handleOrder() async {
-      setState(() {
-        errorText = '';
-      });
+    // Future<void> handleOrder() async {
+    //   setState(() {
+    //     errorText = '';
+    //     orderState = false;
+    //     isButtonEnable = false;
+    //   });
 
-      if (orderController.text.isEmpty) {
-        setState(() {
-          errorText = 'Invalid order number';
-        });
-        return;
-      }
+    //   if (orderController.text.isEmpty) {
+    //     setState(() {
+    //       errorText = 'Invalid order number';
+    //     });
+    //     return;
+    //   }
 
-      try {
-        final response = await square.retrieveOrder(
-            orderId: RetrieveOrderRequest(orderId: orderController.text));
+    //   try {
+    //     final response = await square.retrieveOrder(
+    //         orderId: RetrieveOrderRequest(orderId: orderController.text));
 
-        if (response is RetrieveOrderResponse) {
-          RetrieveOrderResponse result = response;
+    //     if (response is RetrieveOrderResponse) {
+    //       RetrieveOrderResponse result = response;
 
-          final FirebaseFirestore firestore = FirebaseFirestore.instance;
-          final FirebaseAuth auth = FirebaseAuth.instance;
-          final User? user = auth.currentUser;
+    //       final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    //       final FirebaseAuth auth = FirebaseAuth.instance;
+    //       final User? user = auth.currentUser;
 
-          if (user != null) {
-            final String userId = user.uid;
-            final DocumentSnapshot<Map<String, dynamic>> existingOrder =
-                await firestore.collection("userTransaction").doc(userId).get();
+    //       if (user != null) {
+    //         final String userId = user.uid;
+    //         final DocumentSnapshot<Map<String, dynamic>> existingOrder =
+    //             await firestore.collection("userTransaction").doc(userId).get();
 
-            if (existingOrder.exists &&
-                existingOrder.data()?['id'] == result.order?.id) {
-              setState(() {
-                errorText = "Order Id is already in impact";
-              });
-              return;
-            } else {
-              await saveUserTransactionData(result);
-            }
-          }
-        } else if (response is Map<String, dynamic> &&
-            response.containsKey('errors')) {
-          String detail = response['errors'][0]['detail'];
-          setState(() {
-            errorText = detail;
-          });
-        } else {
-          setState(() {
-            errorText = 'Order not found for id ${orderController.text}';
-          });
-        }
-      } catch (e) {
-        setState(() {
-          errorText = 'An error occurred. Please try again.';
-        });
-        print('---> Error: $e');
-      }
-    }
+    //         if (existingOrder.exists &&
+    //             existingOrder.data()?['id'] == result.order?.id) {
+    //           setState(() {
+    //             errorText = "Order Id is already in impact";
+    //           });
+    //           return;
+    //         } else {
+    //           await saveUserTransactionData(result);
+    //         }
+    //       }
+    //     } else if (response is Map<String, dynamic> &&
+    //         response.containsKey('errors')) {
+    //       String detail = response['errors'][0]['detail'];
+    //       setState(() {
+    //         errorText = detail;
+    //       });
+    //     } else {
+    //       setState(() {
+    //         errorText = 'Order not found for id ${orderController.text}';
+    //       });
+    //     }
+    //   } catch (e) {
+    //     setState(() {
+    //       errorText = 'An error occurred. Please try again.';
+    //     });
+    //     print('---> Error: $e');
+    //   }
+    // }
 
     int countCityOccurrences(
       List<Map<String, dynamic>> venueMasterData,
@@ -315,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     var theme = Theme.of(context);
+
     return Scaffold(
       appBar: const AppBarScreen(title: 'Impact'),
       body: Padding(
@@ -641,135 +645,36 @@ class _HomeScreenState extends State<HomeScreen> {
                               Container(
                                 width: 120,
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
+                                    const EdgeInsets.symmetric(vertical: 5),
                                 decoration: const BoxDecoration(
                                     color: AppColor.primaryColor,
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(6))),
                                 child: GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      orderState = true;
-                                    });
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Dialog(
-                                          elevation: 0,
-                                          backgroundColor: Colors.transparent,
-                                          child: Center(
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.8,
-                                              padding: const EdgeInsets.all(20),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color:
-                                                    AppColor.navBackgroundColor,
-                                              ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 20),
-                                                        child: Text(
-                                                          'Add your Order'
-                                                              .toUpperCase(),
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: AppColor
-                                                                .primaryColor,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      GestureDetector(
-                                                        onTap: () => {
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                        },
-                                                        child: Container(
-                                                          width: 20,
-                                                          height: 20,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            color: AppColor
-                                                                .blackColor,
-                                                          ),
-                                                          child: const Icon(
-                                                            Icons.close,
-                                                            color: AppColor
-                                                                .whiteColor,
-                                                            size: 15,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20),
-                                                    child: InputBox(
-                                                      labelText:
-                                                          'Enter Receipt / Order Number',
-                                                      inputType: 'text',
-                                                      inputController:
-                                                          orderController,
-                                                    ),
-                                                  ),
-                                                  errorText.isNotEmpty
-                                                      ? Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical: 15),
-                                                          child: Text(
-                                                            errorText,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: AppColor
-                                                                  .redColor,
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
-                                                        )
-                                                      : Container(),
-                                                  const SizedBox(height: 10),
-                                                  ButtonBox(
-                                                    buttonText: 'Fetch Order',
-                                                    fillColor: true,
-                                                    onPressed: handleOrder,
-                                                  ),
-                                                ],
-                                              ),
+                                    if (mounted) {
+                                      setState(() {
+                                        orderState = true;
+                                        isButtonEnable = true;
+                                      });
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Dialog(
+                                            elevation: 0,
+                                            backgroundColor: Colors.transparent,
+                                            child: _DialogContent(
+                                              key: dialogKey,
+                                              updateOrderState: (bool state) {
+                                                setState(() {
+                                                  orderState = state;
+                                                });
+                                              },
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   child: const Row(
                                     mainAxisAlignment:
@@ -1144,6 +1049,219 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: const BottomNavBar(
         activeIcon: 0,
+      ),
+    );
+  }
+}
+
+class _DialogContent extends StatefulWidget {
+  final Function(bool) updateOrderState;
+
+  const _DialogContent({super.key, required this.updateOrderState});
+
+  @override
+  _DialogContentState createState() => _DialogContentState();
+}
+
+class _DialogContentState extends State<_DialogContent> {
+  final TextEditingController _orderController = TextEditingController();
+
+  String errorText = '';
+  var square = SquareFunction();
+
+  @override
+  void dispose() {
+    _orderController.dispose();
+    super.dispose();
+  }
+
+  Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
+    List<ListItem> lineItems = result.order?.lineItems?.map((item) {
+          return ListItem(
+            name: item.name ?? '',
+            uid: item.uid ?? '',
+            amount: item.basePriceMoney?.amount ?? 0,
+            quantity: item.quantity ?? '',
+          );
+        }).toList() ??
+        [];
+
+    num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
+
+    UserActivityData userActivityData = UserActivityData(
+      id: result.order?.id ?? '',
+      locationId: result.order?.locationId ?? '',
+      createdAt: result.order?.createdAt ?? '',
+      totalAmount: totalAmount,
+      lineItems: lineItems,
+    );
+
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    final User? user = auth.currentUser;
+    if (user != null) {
+      final String userId = user.uid;
+
+      await firestore.collection("userTransaction").doc(userId).set({
+        'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
+      }, SetOptions(merge: true));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Successfully added to Impact',
+            style: TextStyle(color: AppColor.whiteColor),
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context);
+      });
+    } else {
+      print("User not authenticated");
+    }
+  }
+
+  Future<void> handleOrder() async {
+    final String orderId = _orderController.text;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user == null) {
+      print("User not authenticated");
+      return;
+    }
+
+    final String userUid = user.uid;
+    print('User UID: $userUid');
+    print('Order ID: $orderId');
+
+    final DocumentReference userTransactionDoc =
+        FirebaseFirestore.instance.collection('userTransaction').doc(userUid);
+
+    final DocumentSnapshot<Object?> transactionSnapshot =
+        await userTransactionDoc.get();
+
+    final response = await square.retrieveOrder(
+        orderId: RetrieveOrderRequest(orderId: orderId));
+
+    if (_orderController.text.isEmpty) {
+      setState(() {
+        errorText = 'Invalid order ID';
+      });
+      return;
+    } else if (transactionSnapshot.exists) {
+      final QuerySnapshot<Object?> querySnapshot = await transactionSnapshot
+          .reference
+          .collection('userActivityData')
+          .where('id', isEqualTo: orderId)
+          .get();
+      for (var doc in querySnapshot.docs) {
+        var idValue = doc['id'];
+        print('Matched ID: $idValue');
+        setState(() {
+          errorText = 'OrderId is already exists';
+        });
+        return;
+      }
+    } else if (response is RetrieveOrderResponse) {
+      if (response.errors != null) {
+        final errorDetail = response.errors![0].detail;
+        setState(() {
+          errorText = errorDetail!;
+        });
+      } else {
+        widget.updateOrderState(false);
+        // Proceed with saving user transaction data
+        await saveUserTransactionData(response);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.8,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: AppColor.navBackgroundColor,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    'Add your Order'.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.primaryColor,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (mounted) {
+                      widget.updateOrderState(false);
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColor.blackColor,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: AppColor.whiteColor,
+                      size: 15,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: InputBox(
+                labelText: 'Enter Receipt / Order Number',
+                inputType: 'text',
+                inputController: _orderController,
+              ),
+            ),
+            errorText.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Text(
+                      errorText,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColor.redColor,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  )
+                : Container(),
+            const SizedBox(height: 10),
+            ButtonBox(
+              buttonText: 'Fetch Order',
+              fillColor: true,
+              onPressed: handleOrder,
+            ),
+          ],
+        ),
       ),
     );
   }

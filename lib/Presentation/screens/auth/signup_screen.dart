@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter/widgets.dart';
@@ -114,6 +115,7 @@ class SignUpScreenState extends State<SignUpScreen>
       setState(() {
         errorText = 'Please enter at 10 digit of mobile number';
       });
+      return;
     }
 
     setState(() {
@@ -141,8 +143,16 @@ class SignUpScreenState extends State<SignUpScreen>
       final String userId = userCredential.user!.uid;
 
       await addUserDetails(userId);
+      setState(() {
+        isLoading = false;
+      });
+      _showSuccessDialog();
 
-      Navigator.of(context).pushNamed(RoutePaths.loginRoute);
+      // Navigate to login route after a delay
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.of(context).pushNamed(RoutePaths.loginRoute);
+      });
+      // Navigator.of(context).pushNamed(RoutePaths.loginRoute);
     } catch (e) {
       print('Error signing up: $e');
       setState(() {
@@ -192,6 +202,26 @@ class SignUpScreenState extends State<SignUpScreen>
         r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
     RegExp regExp = RegExp(pattern);
     return regExp.hasMatch(value);
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+        title: Text('Success', style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: AppColor.blackColor
+        ),),
+        content: Text('You have successfully signed up!',
+          style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              color: AppColor.blackColor),
+        ),
+        backgroundColor: AppColor.navBackgroundColor,
+      ),
+    );
   }
 
   @override
@@ -489,6 +519,8 @@ class SignUpScreenState extends State<SignUpScreen>
                   buttonText: 'Sign up',
                   fillColor: true,
                   onPressed: _handleSignUp,
+                  enabled: checked,
+                  opacityColor: !checked,
                 )),
           ],
         ),

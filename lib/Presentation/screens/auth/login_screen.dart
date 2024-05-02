@@ -17,9 +17,9 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   final TextEditingController _emailController =
-      TextEditingController(text: 'arun@yopmail.com');
+      TextEditingController();
   final TextEditingController _passwordController =
-      TextEditingController(text: 'Arun1234@');
+      TextEditingController();
 
   String errorText = '';
   bool isLoading = false;

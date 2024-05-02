@@ -20,6 +20,24 @@ class SquareFunction {
     'Authorization': 'Bearer ${UrlConstants.token}',
   };
 
+  // Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
+  //   http.Response? response;
+  //   try {
+  //     response = await HttpBase()
+  //         .get(
+  //             api: UrlConstants.retrieveOrderApi + orderId.orderId,
+  //             header: header)
+  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+  //     debugPrint('error res --> ${response?.body ?? ""}');
+  //     return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
+  //   } catch (error) {
+  //     return ExceptionHandlers.getExceptionString(
+  //         error,
+  //         response?.statusCode ?? 0,
+  //         UrlConstants.retrieveOrderApi + orderId.orderId);
+  //   }
+  // }
+
   Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
     http.Response? response;
     try {
@@ -28,8 +46,12 @@ class SquareFunction {
               api: UrlConstants.retrieveOrderApi + orderId.orderId,
               header: header)
           .timeout(const Duration(minutes: REQUEST_TIME_OUT));
-      debugPrint(response?.body ?? "");
-      return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
+      // debugPrint('res --> ${response?.body ?? ""}');
+      // final jsonResponse = json.decode(response?.body ?? "");
+     
+        // debugPrint('error res --> ${jsonResponse ?? ""}');
+        return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
+      
     } catch (error) {
       return ExceptionHandlers.getExceptionString(
           error,

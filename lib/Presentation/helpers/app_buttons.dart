@@ -10,6 +10,8 @@ class ButtonBox extends StatefulWidget {
   final bool isLoading;
   final VoidCallback onPressed;
   final bool opacityColor;
+  final bool enabled;
+  
 
   const ButtonBox({
     super.key,
@@ -18,6 +20,7 @@ class ButtonBox extends StatefulWidget {
     required this.onPressed,
     this.isLoading = false,
     this.opacityColor = false,
+    this.enabled = true
   });
 
   @override
@@ -36,12 +39,12 @@ class _ButtonBox extends State<ButtonBox> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: widget.onPressed,
+      onTap: widget.enabled ? widget.onPressed : null,
       child: Container(
           width: 176,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-              color: buttonColor ? AppColor.primaryColor : AppColor.whiteColor,
+              color: buttonColor ? widget.opacityColor ? const Color.fromARGB(168, 2, 60, 167) : AppColor.primaryColor : AppColor.whiteColor,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               border: buttonColor
                   ? null
