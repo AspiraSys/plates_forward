@@ -12,6 +12,7 @@ import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dar
 import 'package:plates_forward/Presentation/screens/appScreen/venues_screen.dart';
 import 'package:plates_forward/Presentation/screens/auth/forget_password_screen.dart';
 import 'package:plates_forward/Presentation/screens/auth/signup_screen.dart';
+import 'package:plates_forward/navigation/navigation_screen.dart';
 import 'package:plates_forward/presentation/Screens/auth/login_screen.dart';
 import 'package:plates_forward/presentation/Screens/splash_screen.dart';
 // import 'package:plates_forward/Presentation/Screens/splash_screen.dart';
@@ -48,21 +49,9 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) => const ForgetPasswordScreen(),
         );
-      case RoutePaths.homeRoute:
+      case RoutePaths.navigationRoute:
         return MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        );
-      case RoutePaths.venueRoute:
-        return MaterialPageRoute(
-          builder: (context) => const VenueScreen(),
-        );
-      case RoutePaths.donateRoute:
-        return MaterialPageRoute(
-          builder: (context) => const DonateScreen(),
-        );
-      case RoutePaths.missionRoute:
-        return MaterialPageRoute(
-          builder: (context) => const MissionScreen(),
+          builder: (context) => NavigationScreen(),
         );
       case RoutePaths.profileRoute:
         return MaterialPageRoute(

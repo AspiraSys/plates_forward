@@ -17,8 +17,8 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController(text: 'high@yopmail.com');
+  final TextEditingController _passwordController = TextEditingController(text: 'Jam1999@');
 
   String errorText = '';
   bool isLoading = false;
@@ -87,7 +87,7 @@ class LoginScreenState extends State<LoginScreen>
         // ignore: unnecessary_null_comparison
         if (userCredential != null) {
           // ignore: use_build_context_synchronously
-          Navigator.of(context).pushNamed(RoutePaths.homeRoute);
+          Navigator.of(context).pushNamed(RoutePaths.navigationRoute);
         }
       } catch (e) {
         print('Error signing in: $e');

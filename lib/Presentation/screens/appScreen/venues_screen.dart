@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/venue_card.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 
@@ -56,9 +55,6 @@ class VenueScreen extends StatelessWidget {
             },
           ),
         ),
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        activeIcon: 1,
       ),
     );
   }

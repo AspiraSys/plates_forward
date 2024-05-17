@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 
@@ -114,9 +113,6 @@ class VenueDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        activeIcon: 1,
       ),
     );
   }

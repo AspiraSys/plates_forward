@@ -341,10 +341,10 @@ class _AppBarScreenState extends State<AppBarScreen> {
                         size: 20,
                       ),
                       onPressed: () {
-                        widget.isDonatSub
+                        /*widget.isDonatSub
                             ? Navigator.of(context)
                                 .pushNamed(RoutePaths.homeRoute)
-                            : Navigator.of(context).pop();
+                            : Navigator.of(context).pop();*/
                       },
                     ),
                     const SizedBox(width: 4),

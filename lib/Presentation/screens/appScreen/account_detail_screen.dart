@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/utils/app_colors.dart';
@@ -304,7 +303,6 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
           )
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(isProfile: true),
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 
@@ -59,9 +58,6 @@ class DonateSuccessfulScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        activeIcon: 2,
       ),
     );
   }

@@ -5,7 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_sheet.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
@@ -294,9 +293,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }))),
           const SizedBox(height: 16),
         ],
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        isProfile: true,
       ),
     );
   }

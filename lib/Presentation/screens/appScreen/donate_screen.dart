@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
-// import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/main.dart';
 import 'package:plates_forward/models/secret_key.dart';
@@ -488,9 +486,6 @@ StripePayment? stripe;
           ],
         ),
       ]),
-      bottomNavigationBar: const BottomNavBar(
-        activeIcon: 2,
-      ),
     );
   }
 

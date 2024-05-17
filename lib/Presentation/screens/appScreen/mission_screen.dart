@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/venue_card.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 
@@ -280,9 +279,6 @@ class _MissionScreenState extends State<MissionScreen> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        activeIcon: 3,
       ),
     );
   }
