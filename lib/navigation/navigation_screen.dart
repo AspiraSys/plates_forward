@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/donate_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/home_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/mission_screen.dart';
-import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/venues_screen.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
@@ -14,6 +15,9 @@ class NavigationScreen extends StatefulWidget {
     const DonateScreen(),
     const MissionScreen(),
   ];
+  var ctime;
+  var currentIndex = 0;
+  bool canPope = false;
 
   NavigationScreen({super.key});
 
@@ -22,65 +26,149 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class NavigationScreenState extends State<NavigationScreen> {
-  var index = 0;
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: index, children: widget.screens),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              (index == 0)
-                  ? ImageAssets.activeImpactIcon
-                  : ImageAssets.notActiveImpactIcon,
-              width: 32,
-              height: 32,
+    return PopScope(
+      canPop: widget.canPope,
+      onPopInvoked: onBackPressed,
+      /*(bool didPop) async {
+        final bool shouldPop = onBackPressed(context);
+        if(shouldPop){
+          return true;
+        }
+      },*/
+      /*onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+        final bool shouldPop = await _showBackDialog(context) ?? false;
+        if (context.mounted && shouldPop) {
+          Navigator.pop(context);
+        }
+      },*/
+      child: Scaffold(
+        body:
+            IndexedStack(index: widget.currentIndex, children: widget.screens),
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                (widget.currentIndex == 0)
+                    ? ImageAssets.activeImpactIcon
+                    : ImageAssets.notActiveImpactIcon,
+                width: 32,
+                height: 32,
+              ),
+              label: 'Impact',
             ),
-            label: 'Impact',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              (index == 1)
-                  ? ImageAssets.activeLocationIcon
-                  : ImageAssets.notActiveLocationIcon,
-              width: 32,
-              height: 32,
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                (widget.currentIndex == 1)
+                    ? ImageAssets.activeLocationIcon
+                    : ImageAssets.notActiveLocationIcon,
+                width: 32,
+                height: 32,
+              ),
+              label: 'Venues',
             ),
-            label: 'Venues',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              (index == 2)
-                  ? ImageAssets.activeDonateIcon
-                  : ImageAssets.notActiveDonateIcon,
-              width: 32,
-              height: 32,
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                (widget.currentIndex == 2)
+                    ? ImageAssets.activeDonateIcon
+                    : ImageAssets.notActiveDonateIcon,
+                width: 32,
+                height: 32,
+              ),
+              label: 'Donate',
             ),
-            label: 'Donate',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              (index == 3)
-                  ? ImageAssets.activeMissionIcon
-                  : ImageAssets.notActiveMissionIcon,
-              width: 32,
-              height: 32,
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                (widget.currentIndex == 3)
+                    ? ImageAssets.activeMissionIcon
+                    : ImageAssets.notActiveMissionIcon,
+                width: 32,
+                height: 32,
+              ),
+              label: 'Mission',
             ),
-            label: 'Mission',
-          ),
-        ],
-        backgroundColor: AppColor.navBackgroundColor,
-        currentIndex: index,
-        onTap: (index) {
-          setState(() {
-            this.index = index;
-          });
-        },
-        enableFeedback: true,
-        type: BottomNavigationBarType.fixed,
+          ],
+          backgroundColor: AppColor.navBackgroundColor,
+          currentIndex: widget.currentIndex,
+          onTap: (index) {
+            setState(() {
+              widget.currentIndex = index;
+            });
+          },
+          enableFeedback: true,
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
     );
   }
+
+  bool onBackPressed(context) {
+    /// Move to home screen
+    if (widget.currentIndex != 0) {
+      setState(() {
+        widget.currentIndex = 0;
+      });
+      return false;
+    }
+
+    /// Exit app
+    else {
+      DateTime now = DateTime.now();
+      if (widget.ctime == null ||
+          now.difference(widget.ctime) > const Duration(seconds: 2)) {
+        widget.ctime = now;
+        Fluttertoast.showToast(
+            msg: "Press Back Again To Exit",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.white,
+            textColor: AppColor.primaryColor,
+            fontSize: 16.0);
+        return widget.canPope;
+      } else {
+        setState(() {
+          widget.canPope = true;
+        });
+        return widget.canPope;
+      }
+    }
+  }
+/*  Future<bool?> _showBackDialog(BuildContext parContext) {
+    return showDialog<bool>(
+      context: parContext,
+      builder: (BuildContext parContext) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text(
+            'Are you sure you want to leave this page?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(parContext).textTheme.labelLarge,
+              ),
+              child: const Text('Nevermind'),
+              onPressed: () {
+                Navigator.pop(parContext, false);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(parContext).textTheme.labelLarge,
+              ),
+              child: const Text('Leave'),
+              onPressed: () {
+                Navigator.pop(parContext, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }*/
 }
