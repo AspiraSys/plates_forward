@@ -26,10 +26,24 @@ class _ExpansionTileState extends State<ExpansionTiles> {
       return DateFormat('dd/MM/yy').format(dateTime);
     }
 
+
+    if (widget.donateData.isEmpty || widget.orderData.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: AppColor.primaryColor,
+          strokeWidth: 3,
+        ),
+      );
+    }
+
+    int itemCount = widget.donateData.length < widget.orderData.length
+        ? widget.donateData.length
+        : widget.orderData.length;
+
     return ListView.builder(
       physics: const ScrollPhysics(),
       shrinkWrap: true,
-      itemCount: widget.donateData.length,
+      itemCount: itemCount,
       itemBuilder: (context, int index) {
         final donation = widget.donateData[index];
         final ordering = widget.orderData[index];
@@ -42,7 +56,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
         final orders = ordering['lineItems'];
 
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 10),
+          margin: const EdgeInsets.symmetric(vertical: 5),
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(6)),
               color: AppColor.primaryColor),
@@ -161,7 +175,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                               ),
                               RichText(
                                   text: TextSpan(
-                                      text: 'Total',
+                                      text: 'Total ',
                                       style: const TextStyle(
                                           color: AppColor.whiteColor,
                                           fontSize: 12,
@@ -170,7 +184,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                       children: <TextSpan>[
                                     TextSpan(
                                         text:
-                                            '\$${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
+                                            'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
                                         style: const TextStyle(
                                             color: AppColor.whiteColor,
                                             fontSize: 10,
@@ -365,91 +379,92 @@ class _ExpansionTileState extends State<ExpansionTiles> {
               ],
             ),
             children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                width: MediaQuery.of(context).size.width * 0.85,
-                decoration: const BoxDecoration(
-                    border: Border(
-                        top: BorderSide(width: 2, color: AppColor.whiteColor),
-                        bottom:
-                            BorderSide(width: 2, color: AppColor.whiteColor))),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                        child: Text(
-                          'Your Order',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: AppColor.whiteColor,
-                              fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.left,
+              if (ordering != null)
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  decoration: const BoxDecoration(
+                      border: Border(
+                          top: BorderSide(width: 2, color: AppColor.whiteColor),
+                          bottom: BorderSide(
+                              width: 2, color: AppColor.whiteColor))),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          child: Text(
+                            'Your Order',
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: AppColor.whiteColor,
+                                fontWeight: FontWeight.w600),
+                            textAlign: TextAlign.left,
+                          ),
                         ),
-                      ),
-                      for (var donationOrder in orders)
-                        Container(
+                        for (var donationOrder in orders)
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                              bottom: BorderSide(
+                                  width: 1, color: AppColor.greyColor),
+                            )),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      donationOrder['name'].toString(),
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColor.whiteColor,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColor.whiteColor,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: const BoxDecoration(
-                              border: Border(
-                            bottom:
-                                BorderSide(width: 1, color: AppColor.greyColor),
-                          )),
-                          child: Column(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    donationOrder['name'].toString(),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: AppColor.whiteColor,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  Text(
-                                    '\$${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: AppColor.whiteColor,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ],
+                              const Text(
+                                'Total Amount',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColor.whiteColor,
+                                    fontWeight: FontWeight.w600),
                               ),
+                              Text(
+                                'A\$ ${ordering['totalAmount'].toString()}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppColor.whiteColor,
+                                    fontWeight: FontWeight.w600),
+                              )
                             ],
                           ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Total Amount',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColor.whiteColor,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            Text(
-                              '\$${ordering['totalAmount'].toString()}',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColor.whiteColor,
-                                  fontWeight: FontWeight.w600),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 width: MediaQuery.of(context).size.width * 0.6,

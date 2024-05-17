@@ -5,15 +5,20 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'package:plates_forward/models/stripe_model.dart';
 import 'package:plates_forward/stripe/stripe_response_model.dart';
+import 'package:plates_forward/models/secret_key.dart';
 
 class StripePayment {
   Map<String, dynamic>? paymentIntent;
   int amount = 0;
   bool isOpened = false;
   StripeModel stripeModel = StripeModel();
+  final StripeKeys stripeKeys;
 
+StripePayment({required this.stripeKeys});
   Future<StripeResponseModel> stripeMakePayment(
       {required String amount, required String currency}) async {
+          print('in api ${stripeKeys.secretKey}');
+
     try {
       paymentIntent = await createPaymentIntent(amount, currency);
       await Stripe.instance
@@ -35,7 +40,7 @@ class StripePayment {
             customerEphemeralKeySecret: paymentIntent!['ephemeralKey'],
             customerId: paymentIntent!['id'],
             merchantDisplayName: 'PlateItForward',
-            style: ThemeMode.dark,
+            // style: ThemeMode.dark,
           ))
           .then((value) {});
 
@@ -58,7 +63,8 @@ class StripePayment {
       var response = await http.post(
         Uri.parse('https://api.stripe.com/v1/payment_intents'),
         headers: {
-          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
+          // 'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
+          'Authorization': 'Bearer ${stripeKeys.secretKey}',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: body,

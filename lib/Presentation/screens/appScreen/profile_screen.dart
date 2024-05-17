@@ -29,9 +29,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late bool _isLoading = true;
   bool isDeleteLoading = false;
   String imagesUrl = '';
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   String errorText = '';
   String emailController = '';
+  final GlobalKey<_DeleteDialogState> _deleteDialogKey =
+      GlobalKey<_DeleteDialogState>();
 
   @override
   void initState() {
@@ -102,163 +104,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> handleConfirmDelete(BuildContext context) async {
-    String password = passwordController.text;
-
-    if (password.isEmpty) {
-      setState(() {
-        errorText = 'Enter the valid password';
-      });
-    }
-
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      print("User not authenticated");
-      return;
-    }
-
-    String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId != null) {
-      DocumentSnapshot<Map<String, dynamic>> userDetails =
-          await FirebaseFirestore.instance
-              .collection('userSignup')
-              .doc(userId)
-              .get();
-
-      String email = userDetails['email'];
-
-      AuthCredential credential =
-          EmailAuthProvider.credential(email: email, password: password);
-
-      try {
-        await user.reauthenticateWithCredential(credential);
-
-        // If reauthentication is successful, delete the user's account
-        await user.delete();
-        print('deleted');
-        await Future.delayed(const Duration(seconds: 2), () {
-          isDeleteLoading = true;
-          setState(() {
-            isDeleteLoading = false;
-          });
-        });
-        // await deleteUserData(userId);
-        // Navigate to the login page
-        Navigator.pushNamed(context, RoutePaths.loginRoute);
-        setState(() {
-          errorText = '';
-        });
-      } catch (e) {
-        setState(() {
-          errorText = 'Password is invalid';
-        });
-        print('Error: $e');
-      }
-    }
-  }
-
-  // Future<void> deleteUserData(String userId) async {
-  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //   QuerySnapshot collections = await firestore.collectionGroup().get();
-  // for (QueryDocumentSnapshot collection in collections.docs) {
-  //     CollectionReference collectionRef =
-  //         firestore.collection(collection.reference.path);
-  //     QuerySnapshot userDocs =
-  //         await collectionRef.where('userId', isEqualTo: userId).get();
-  //     for (QueryDocumentSnapshot doc in userDocs.docs) {
-  //       await doc.reference.delete();
-  //     }
-  //   }
-  // }
-
-  VoidCallback _handleDelete(BuildContext context) {
-    print("---> $errorText");
-
-    return () async {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColor.navBackgroundColor,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        const Text(
-                          'Please Confirm Your Password',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.primaryColor,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context)
-                                .pushNamed(RoutePaths.profileRoute);
-                          },
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColor.blackColor,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: AppColor.whiteColor,
-                              size: 15,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: InputBox(
-                        labelText: 'Enter password',
-                        inputType: 'password',
-                        inputController: passwordController,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Text(
-                        errorText,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.redColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    ButtonBox(
-                      buttonText: 'Confirm Delete',
-                      fillColor: true,
-                      onPressed: () => handleConfirmDelete(context),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    };
+  void _handleDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return _DeleteDialog(
+          key: _deleteDialogKey,
+          // deleteLoading: (bool state) {
+          //   setState(() {
+          //     isDeleteLoading = state;
+          //   });
+          // },
+        );
+      },
+    );
   }
 
   @override
@@ -269,195 +128,173 @@ class _ProfileScreenState extends State<ProfileScreen> {
         subScreen: true,
         isProfile: true,
       ),
-      body: isDeleteLoading
-          ? const CircularProgress()
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                GestureDetector(
-                  onTap: updateImage,
-                  child: Container(
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.only(top: 50, bottom: 24),
-                      width: 164,
-                      height: 164,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(82),
-                      ),
-                      child: Stack(
-                        children: [
-                          _isLoading
-                              ? Center(
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.8),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const CircularProgressIndicator(
-                                      color: AppColor.primaryColor,
-                                    ),
-                                  ),
-                                )
-                              : Stack(
-                                      children: [
-                                         _profilePictureUrl.isNotEmpty
-                                          ?
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(82),
-                                          child: Image.network(
-                                            _profilePictureUrl,
-                                            width: 164,
-                                            height: 164,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ) :  ClipRRect(
-                                        borderRadius: BorderRadius.circular(82),
-                                        child: Image.asset(
-                                          ImageAssets.placeholderProfile,
-                                          width: 164,
-                                          height: 164,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                        Positioned(
-                                          bottom: 0,
-                                          right: 0,
-                                          child: Container(
-                                            width: 48,
-                                            height: 48,
-                                            decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(6)),
-                                                color: AppColor.primaryColor),
-                                            child: const Icon(
-                                              Icons.camera_alt,
-                                              color: AppColor.whiteColor,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  
-                        ],
-                      )),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GestureDetector(
+            onTap: updateImage,
+            child: Container(
+                alignment: Alignment.center,
+                margin: const EdgeInsets.only(top: 50, bottom: 24),
+                width: 164,
+                height: 164,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(82),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Stack(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Text(
-                        _firstName.toString().toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      _lastName.toString().toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    _isLoading
+                        ? Center(
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.8),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const CircularProgressIndicator(
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                          )
+                        : Stack(
+                            children: [
+                              _profilePictureUrl.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(82),
+                                      child: Image.network(
+                                        _profilePictureUrl,
+                                        width: 164,
+                                        height: 164,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(82),
+                                      child: Image.asset(
+                                        ImageAssets.placeholderProfile,
+                                        width: 164,
+                                        height: 164,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(6)),
+                                      color: AppColor.primaryColor),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: AppColor.whiteColor,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                   ],
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.of(context)
-                      .pushNamed(RoutePaths.accountDetailRoute),
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 74, left: 30),
-                    child: Row(
-                      children: [
-                        Image.asset(ImageAssets.accountIcon,
-                            width: 26, height: 25),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Account Details',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        )
-                      ],
-                    ),
+                )),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Text(
+                  _firstName.toString().toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return BottomSheets(
-                            title: 'Delete Account',
-                            buttonText: 'Confirm Delete',
-                            content:
-                                'Are you sure you want to delete your account? Once deleted, the action cannot be undone.',
-                            handleAction: _handleDelete(context),
-                          );
-                        });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 40, left: 32),
-                    child: Row(
-                      children: [
-                        Image.asset(ImageAssets.deleteIcon,
-                            width: 24, height: 26),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Delete Account',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+              ),
+              Text(
+                _lastName.toString().toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
-                const Spacer(),
-                Center(
-                    child: ButtonBox(
-                        buttonText: 'Log Out',
-                        fillColor: true,
-                        onPressed: () => showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return BottomSheets(
-                                  title: 'LogOut',
-                                  buttonText: 'Confirm',
-                                  content:
-                                      'Are you sure you want to log out of your account?',
-                                  handleAction: () {
-                                    handleLogOut(context);
-                                  });
-                            }))),
-                // GestureDetector(
-                //   onTap: () {
-                //     showModalBottomSheet(
-                //         context: context,
-                //         builder: (BuildContext context) {
-                //           return const BottomSheets(
-                //             title: 'LogOut',
-                //             buttonText: 'Confirm',
-                //             content:
-                //                 'Are you sure you want to log out of your account?',
-                //             handleAction: handleLogOut,
-                //           );
-                //         });
-                //   },
-
-                // ),
-                const SizedBox(height: 16),
-              ],
+              ),
+            ],
+          ),
+          GestureDetector(
+            onTap: () =>
+                Navigator.of(context).pushNamed(RoutePaths.accountDetailRoute),
+            child: Container(
+              margin: const EdgeInsets.only(top: 74, left: 30),
+              child: Row(
+                children: [
+                  Image.asset(ImageAssets.accountIcon, width: 26, height: 25),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      'Account Details',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  )
+                ],
+              ),
             ),
+          ),
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return BottomSheets(
+                      title: 'Delete Account',
+                      buttonText: 'Confirm Delete',
+                      content:
+                          'Are you sure you want to delete your account? Once deleted, the action cannot be undone.',
+                      handleAction: () => _handleDelete(context),
+                    );
+                  });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(top: 40, left: 32),
+              child: Row(
+                children: [
+                  Image.asset(ImageAssets.deleteIcon, width: 24, height: 26),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      'Delete Account',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          Center(
+              child: ButtonBox(
+                  buttonText: 'Log Out',
+                  fillColor: true,
+                  onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return BottomSheets(
+                            title: 'LogOut',
+                            buttonText: 'Confirm',
+                            content:
+                                'Are you sure you want to log out of your account?',
+                            handleAction: () {
+                              handleLogOut(context);
+                            });
+                      }))),
+          const SizedBox(height: 16),
+        ],
+      ),
       bottomNavigationBar: const BottomNavBar(
         isProfile: true,
       ),
@@ -465,74 +302,191 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-// VoidCallback _handleDelete(BuildContext context) {
-//   return () async {
-//     TextEditingController passwordController = TextEditingController();
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return Dialog(
-//           elevation: 0,
-//           backgroundColor: Colors.transparent,
-//           child: Center(
-//             child: Container(
-//               width: MediaQuery.of(context).size.width * 0.8,
-//               padding: const EdgeInsets.all(20),
-//               decoration: BoxDecoration(
-//                 borderRadius: BorderRadius.circular(8),
-//                 color: AppColor.navBackgroundColor,
-//               ),
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   const Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     children: [
-//                       Text(
-//                         'Please Confirm Your Password',
-//                         style: TextStyle(
-//                           fontSize: 16,
-//                           fontWeight: FontWeight.w600,
-//                           color: AppColor.primaryColor,
-//                         ),
-//                       ),
-//                       Icon(
-//                           Icons.close,
-//                           color: AppColor.whiteColor,
-//                           size: 15,
-//                       ),
-//                     ],
-//                   ),
+class _DeleteDialog extends StatefulWidget {
+  // final Function(bool) deleteLoading;
 
-//                   const SizedBox(height: 20),
-//                   Padding(
-//                     padding: const EdgeInsets.symmetric(horizontal: 20),
-//                     child: InputBox(
-//                       labelText: 'Enter password',
-//                       inputType: 'password',
-//                       inputController: passwordController,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 15),
-//                   ButtonBox(
-//                     buttonText: 'Confirm Delete',
-//                     fillColor: true,
-//                     onPressed: () =>
-//                         handleConfirmDelete(passwordController.text, context),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   };
-// }
+  const _DeleteDialog({
+    super.key,
+  });
 
-// Future<void> handleConfirmDelete(BuildContext context) async {
+  @override
+  _DeleteDialogState createState() => _DeleteDialogState();
+}
 
-// }
+class _DeleteDialogState extends State<_DeleteDialog> {
+  bool deleteLoading = false;
+  String? _errorText;
+  final TextEditingController passwordController = TextEditingController();
+
+  void setError(String error) {
+    setState(() {
+      _errorText = error;
+    });
+  }
+
+  Future<void> handleConfirmDelete() async {
+    final String password = passwordController.text;
+
+    setState(() {
+      _errorText = '';
+    });
+
+    if (password.isEmpty) {
+      setState(() {
+        _errorText = 'Enter the valid password';
+      });
+      return;
+    }
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
+      try {
+        DocumentSnapshot<Map<String, dynamic>> userDetails =
+            await FirebaseFirestore.instance
+                .collection('userSignup')
+                .doc(userId)
+                .get();
+
+        String email = userDetails['email'];
+
+        AuthCredential credential = EmailAuthProvider.credential(
+            email: email, password: passwordController.text);
+
+        final result = await user.reauthenticateWithCredential(credential);
+        if (result.user != null) {
+          try {
+            await user.delete();
+            setState(() {
+              deleteLoading = true;
+            });
+            await Future.delayed(const Duration(seconds: 2));
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              RoutePaths.loginRoute,
+              (route) => false,
+            );
+          } catch (e) {
+            setState(() {
+              _errorText = 'Failed to delete user account';
+            });
+          }
+        } else {
+          setState(() {
+            _errorText = 'Invalid user';
+          });
+          return;
+        }
+      } catch (e) {
+        setState(() {
+          _errorText = 'Invalid Password';
+        });
+        return;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+       Dialog(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: AppColor.navBackgroundColor,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          const Text(
+                            'Please Confirm Your Password',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.primaryColor,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pushNamed(RoutePaths.profileRoute);
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColor.blackColor,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: AppColor.whiteColor,
+                                size: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: InputBox(
+                          labelText: 'Enter password',
+                          inputType: 'password',
+                          inputController: passwordController,
+                        ),
+                      ),
+                      if (_errorText != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Text(
+                            _errorText!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.redColor,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 15),
+                      ButtonBox(
+                        buttonText: 'Confirm Delete',
+                        fillColor: true,
+                        onPressed: () => handleConfirmDelete(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+      if (deleteLoading)
+        Positioned.fill(
+          child: Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(color: AppColor.primaryColor,),
+            ),
+          ),
+        ),
+      ]
+      );
+    
+  }
+}
 
 Future<void> handleLogOut(BuildContext context) async {
   showDialog(

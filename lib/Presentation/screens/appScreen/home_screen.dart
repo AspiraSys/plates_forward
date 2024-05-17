@@ -9,12 +9,14 @@ import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
+import 'package:plates_forward/Presentation/helpers/back_navigation_handler.dart';
 import 'package:plates_forward/models/user_activity.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
 import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
+import 'package:plates_forward/utils/app_routes_path.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,6 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> venueMasterData = [];
   List<Map<String, dynamic>> userTransactionData = [];
 
+  @override
+  void initState() {
+    super.initState();
+    checkAndPrintMatchingData().then((_) {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
+
   Future<List<Map<String, dynamic>>> fetchVenueMasterData(
       String locationId) async {
     final CollectionReference venueMasterCollection =
@@ -50,63 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .map((doc) => doc.data() as Map<String, dynamic>)
         .toList();
   }
-
-  // Future<void> checkAndPrintMatchingData() async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   final User? user = FirebaseAuth.instance.currentUser;
-  //   if (user == null) {
-  //     return;
-  //   }
-  //   final String userId = user.uid;
-
-  //   final CollectionReference userTransactionCollection =
-  //       FirebaseFirestore.instance.collection('userTransaction');
-
-  //   QuerySnapshot<Object?> userTransactionQuerySnapshot =
-  //       await userTransactionCollection.get();
-
-  //   List<Map<String, dynamic>> userData = userTransactionQuerySnapshot.docs
-  //       .map((doc) => doc.data() as Map<String, dynamic>)
-  //       .toList();
-
-  //   if (userData.isNotEmpty) {
-  //     List<Map<String, dynamic>> userActivityDataList = userData
-  //         .map((data) => (data['userActivityData'] as List<dynamic>)
-  //             .cast<Map<String, dynamic>>()
-  //             .toList())
-  //         .expand((i) => i)
-  //         .toList();
-
-  //     List<String?> locationIds = userActivityDataList
-  //         .map((activity) => activity['locationId'] as String?)
-  //         .toList()
-  //         .whereType<String>()
-  //         .toList();
-
-  //     for (String? locationId in locationIds) {
-  //       if (locationId != null) {
-  //         final venueData = await fetchVenueMasterData(locationId);
-
-  //         venueMasterData.addAll(venueData);
-  //       } else {
-  //         print('locationId is null');
-  //       }
-  //     }
-
-  //     userTransactionData = userActivityDataList;
-
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
 
   Future<void> checkAndPrintMatchingData() async {
     setState(() {
@@ -150,7 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
-      userTransactionData = userActivityDataList;
+      // List<Map<String, dynamic>> sorData =
+      //     userActivityDataList.reversed.toList();
+
+      // userTransactionData = sorData;
+      List<Map<String, dynamic>> sorData =
+          userActivityDataList.reversed.toList();
+      userTransactionData = sorData;
 
       setState(() {
         isLoading = false;
@@ -163,19 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    checkAndPrintMatchingData().then((_) {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
-
-  @override
   void dispose() {
     super.dispose();
-    // orderController.dispose();
   }
 
   static CollectionReference<Object?> fetchStream(String collection) {
@@ -187,115 +137,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
-    //   List<ListItem> lineItems = result.order?.lineItems?.map((item) {
-    //         return ListItem(
-    //           name: item.name ?? '',
-    //           uid: item.uid ?? '',
-    //           amount: item.basePriceMoney?.amount ?? 0,
-    //           quantity: item.quantity ?? '',
-    //         );
-    //       }).toList() ??
-    //       [];
-
-    //   num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
-
-    //   UserActivityData userActivityData = UserActivityData(
-    //     id: result.order?.id ?? '',
-    //     locationId: result.order?.locationId ?? '',
-    //     createdAt: result.order?.createdAt ?? '',
-    //     totalAmount: totalAmount,
-    //     lineItems: lineItems,
-    //   );
-
-    //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //   final FirebaseAuth auth = FirebaseAuth.instance;
-
-    //   final User? user = auth.currentUser;
-    //   if (user != null) {
-    //     final String userId = user.uid;
-
-    //     await firestore.collection("userTransaction").doc(userId).set({
-    //       'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
-    //     }, SetOptions(merge: true));
-
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         content: Text(
-    //           'Successfully added to Impact',
-    //           style: TextStyle(color: AppColor.whiteColor),
-    //         ),
-    //         duration: Duration(seconds: 3),
-    //       ),
-    //     );
-
-    //     Future.delayed(const Duration(seconds: 3), () {
-    //       Navigator.pop(context);
-    //     });
-    //   } else {
-    //     print("User not authenticated");
-    //   }
-    // }
-
-    // Future<void> handleOrder() async {
-    //   setState(() {
-    //     errorText = '';
-    //     orderState = false;
-    //     isButtonEnable = false;
-    //   });
-
-    //   if (orderController.text.isEmpty) {
-    //     setState(() {
-    //       errorText = 'Invalid order number';
-    //     });
-    //     return;
-    //   }
-
-    //   try {
-    //     final response = await square.retrieveOrder(
-    //         orderId: RetrieveOrderRequest(orderId: orderController.text));
-
-    //     if (response is RetrieveOrderResponse) {
-    //       RetrieveOrderResponse result = response;
-
-    //       final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //       final FirebaseAuth auth = FirebaseAuth.instance;
-    //       final User? user = auth.currentUser;
-
-    //       if (user != null) {
-    //         final String userId = user.uid;
-    //         final DocumentSnapshot<Map<String, dynamic>> existingOrder =
-    //             await firestore.collection("userTransaction").doc(userId).get();
-
-    //         if (existingOrder.exists &&
-    //             existingOrder.data()?['id'] == result.order?.id) {
-    //           setState(() {
-    //             errorText = "Order Id is already in impact";
-    //           });
-    //           return;
-    //         } else {
-    //           await saveUserTransactionData(result);
-    //         }
-    //       }
-    //     } else if (response is Map<String, dynamic> &&
-    //         response.containsKey('errors')) {
-    //       String detail = response['errors'][0]['detail'];
-    //       setState(() {
-    //         errorText = detail;
-    //       });
-    //     } else {
-    //       setState(() {
-    //         errorText = 'Order not found for id ${orderController.text}';
-    //       });
-    //     }
-    //   } catch (e) {
-    //     setState(() {
-    //       errorText = 'An error occurred. Please try again.';
-    //     });
-    //     print('---> Error: $e');
-    //   }
-    // }
-
     int countCityOccurrences(
       List<Map<String, dynamic>> venueMasterData,
       String cityName,
@@ -635,9 +476,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'My Activities',
-                                style: TextStyle(
+                              Text(
+                                'My Activities'.toUpperCase(),
+                                style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
                                     color: AppColor.primaryColor),
@@ -666,9 +507,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: _DialogContent(
                                               key: dialogKey,
                                               updateOrderState: (bool state) {
+                                                // setState(() {
+                                                //   orderState = state;
+                                                //   setState(() {});
+                                                // });
                                                 setState(() {
                                                   orderState = state;
                                                 });
+                                              },
+                                              onSuccess: () {
+                                                checkAndPrintMatchingData();
+                                                setState(() {});
+                                                // checkAndPrintMatchingData();
+                                                // Navigator.of(context).pushNamed(
+                                                //     RoutePaths.homeRoute);
+                                                // checkAndPrintMatchingData();
                                               },
                                             ),
                                           );
@@ -700,16 +553,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        Container(
                           height: orderState
                               ? MediaQuery.of(context).size.height * 0.05
-                              : MediaQuery.of(context).size.height * 0.32,
+                              : MediaQuery.of(context).size.height * 0.29,
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 2),
+                                        vertical: 5, horizontal: 2),
                                     child: isLoading
                                         ? Container(
                                             padding: const EdgeInsets.symmetric(
@@ -739,13 +592,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             : ExpansionTiles(
                                                 donateData: venueMasterData,
                                                 orderData: userTransactionData,
-                                              )
-
-                                    // ExpansionTiles(
-                                    //   donateData: venueMasterData,
-                                    //   orderData: userTransactionData,
-                                    // ),
-                                    )
+                                              ))
                               ],
                             ),
                           ),
@@ -768,8 +615,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           } else {
-                            // final DocumentSnapshot documentSnapshot =
-                            //     snapShot.data!.docs[0];
                             return SingleChildScrollView(
                                 child: Column(
                               children: [
@@ -780,10 +625,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       for (var communityData
                                           in snapShot.data!.docs)
-                                        // if (communityData['parameterId'] ==
-                                        //         'AUS' || communityData['parameterId'] ==
-                                        //     'UKR' || communityData['parameterId'] ==
-                                        //     'SRL' ) ?  :
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 15, horizontal: 20),
@@ -795,48 +636,50 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           child: Row(
                                             children: [
-                                              // for (var communityDatas
-                                              //     in countryImpactApi)
                                               Image.network(
                                                 communityData["parameterImage"],
                                                 width: 50,
                                                 height: 50,
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 20),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      communityData[
-                                                              "parameterValue"]
-                                                          .toString(),
-                                                      style: const TextStyle(
-                                                          fontSize: 30,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          color: AppColor
-                                                              .primaryColor),
-                                                    ),
-                                                    SizedBox(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              .65,
-                                                      child: Text(
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 20),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
                                                         communityData[
-                                                            'parameterName'],
+                                                                "parameterValue"]
+                                                            .toString(),
                                                         style: const TextStyle(
-                                                            fontSize: 14,
+                                                            fontSize: 30,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w400),
+                                                                FontWeight.w700,
+                                                            color: AppColor
+                                                                .primaryColor),
                                                       ),
-                                                    )
-                                                  ],
+                                                      SizedBox(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            .65,
+                                                        child: Text(
+                                                          communityData[
+                                                              'parameterName'],
+                                                          style: const TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
                                               )
                                             ],
@@ -1056,8 +899,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _DialogContent extends StatefulWidget {
   final Function(bool) updateOrderState;
+  final VoidCallback onSuccess;
 
-  const _DialogContent({super.key, required this.updateOrderState});
+  const _DialogContent({
+    super.key,
+    required this.updateOrderState,
+    required this.onSuccess,
+  });
 
   @override
   _DialogContentState createState() => _DialogContentState();
@@ -1113,12 +961,14 @@ class _DialogContentState extends State<_DialogContent> {
             'Successfully added to Impact',
             style: TextStyle(color: AppColor.whiteColor),
           ),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 5),
         ),
       );
 
       Future.delayed(const Duration(seconds: 3), () {
+        widget.updateOrderState(false);
         Navigator.pop(context);
+        // checkAndPrintMatchingData;
       });
     } else {
       print("User not authenticated");
@@ -1135,16 +985,6 @@ class _DialogContentState extends State<_DialogContent> {
       return;
     }
 
-    final String userUid = user.uid;
-    print('User UID: $userUid');
-    print('Order ID: $orderId');
-
-    final DocumentReference userTransactionDoc =
-        FirebaseFirestore.instance.collection('userTransaction').doc(userUid);
-
-    final DocumentSnapshot<Object?> transactionSnapshot =
-        await userTransactionDoc.get();
-
     final response = await square.retrieveOrder(
         orderId: RetrieveOrderRequest(orderId: orderId));
 
@@ -1153,30 +993,61 @@ class _DialogContentState extends State<_DialogContent> {
         errorText = 'Invalid order ID';
       });
       return;
-    } else if (transactionSnapshot.exists) {
-      final QuerySnapshot<Object?> querySnapshot = await transactionSnapshot
-          .reference
-          .collection('userActivityData')
-          .where('id', isEqualTo: orderId)
-          .get();
-      for (var doc in querySnapshot.docs) {
-        var idValue = doc['id'];
-        print('Matched ID: $idValue');
-        setState(() {
-          errorText = 'OrderId is already exists';
-        });
-        return;
-      }
     } else if (response is RetrieveOrderResponse) {
       if (response.errors != null) {
         final errorDetail = response.errors![0].detail;
         setState(() {
           errorText = errorDetail!;
         });
+        return;
       } else {
-        widget.updateOrderState(false);
-        // Proceed with saving user transaction data
-        await saveUserTransactionData(response);
+        final String userUid = user.uid;
+        final CollectionReference userTransactionCollection =
+            FirebaseFirestore.instance.collection('userTransaction');
+
+        DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
+            await userTransactionCollection.doc(userUid).get();
+
+        if (userTransactionDocumentSnapshot.exists) {
+          Map<String, dynamic> userData =
+              userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
+
+          List<Map<String, dynamic>> userActivityDataList =
+              (userData['userActivityData'] as List<dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .toList();
+          bool orderIdFound = false;
+          for (var activity in userActivityDataList) {
+            var idValue = activity['id'];
+            if (idValue == orderId) {
+              orderIdFound = true;
+              break;
+            }
+          }
+          if (orderIdFound) {
+            setState(() {
+              errorText = 'OrderId is already exists';
+            });
+          } else {
+            await saveUserTransactionData(response);
+            _orderController.text = '';
+            setState(() {
+              errorText = '';
+            });
+            widget.onSuccess();
+
+            // setState(() {});
+          }
+        } else {
+          await saveUserTransactionData(response);
+          _orderController.text = '';
+          setState(() {
+            errorText = '';
+          });
+          widget.onSuccess();
+
+          // setState(() {});
+        }
       }
     }
   }
@@ -1241,8 +1112,10 @@ class _DialogContentState extends State<_DialogContent> {
               ),
             ),
             errorText.isNotEmpty
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                ? Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 20),
                     child: Text(
                       errorText,
                       style: const TextStyle(
@@ -1250,7 +1123,7 @@ class _DialogContentState extends State<_DialogContent> {
                         fontWeight: FontWeight.w500,
                         color: AppColor.redColor,
                       ),
-                      textAlign: TextAlign.left,
+                      textAlign: TextAlign.center,
                     ),
                   )
                 : Container(),

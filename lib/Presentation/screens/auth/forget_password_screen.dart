@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
@@ -13,6 +14,61 @@ class ForgetPasswordScreen extends StatefulWidget {
 }
 
 class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
+  final TextEditingController _emailController = TextEditingController();
+
+  String errorText = '';
+  bool successText = false;
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _emailController.dispose();
+  }
+
+  Future<void> _handleSendEmail() async {
+    setState(() {
+      errorText = '';
+      isLoading = true;
+    });
+
+    if (_emailController.text.isEmpty) {
+      setState(() {
+        errorText = "Please fill in the email field";
+        isLoading = false;
+      });
+      return;
+    } else if (!_emailController.text.contains('@')) {
+      setState(() {
+        errorText = 'Please enter a valid email address';
+        isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+
+      setState(() {
+        errorText = 'Succesfully email sent';
+        successText = true;
+      });
+      await Future.delayed(const Duration(seconds: 3));
+      Navigator.of(context).pushNamed(RoutePaths.loginRoute); 
+    } catch (e) {
+      setState(() {
+        errorText =
+            'Failed to send password reset email. Please try again later.';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,17 +78,17 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         children: <Widget>[
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.only(top: 38, bottom: 50),
+            padding: const EdgeInsets.only(top: 38, bottom: 25),
             child: Image.asset(
               ImageAssets.authLogo,
-              width: 157,
-              height: 160,
+             width: 138,
+              height: 140,
               fit: BoxFit.contain,
             ),
           ),
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.only(top: 40, bottom: 24),
+            padding: const EdgeInsets.only(top: 30, bottom: 24),
             child: Text(
               "Reset Password".toUpperCase(),
               style: const TextStyle(
@@ -42,11 +98,49 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               ),
             ),
           ),
+          errorText.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: successText
+                            ? const Color.fromARGB(255, 87, 246, 92)
+                            : const Color.fromARGB(79, 244, 67, 54)),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            errorText = '';
+                          }),
+                          child: Icon(
+                            Icons.close,
+                            size: 24,
+                            color: successText ? const Color.fromARGB(255, 34, 72, 35) : Colors.red,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            errorText,
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: successText ? const Color.fromARGB(255, 34, 72, 35) : Colors.red,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox(),
           Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
             child: const Text(
-              "Please enter your email address, s0 we will send you link to email",
+              "Please enter your email address, so we will send you link to email",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -69,8 +163,8 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
           Container(
             alignment: Alignment.centerLeft,
-            child: const InputBox(
-              inputController: '',
+            child: InputBox(
+              inputController: _emailController,
               labelText: 'Enter your email here',
               inputType: 'email',
             ),
@@ -101,7 +195,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(top: 128),
+            margin: const EdgeInsets.only(top: 48),
             child: const Text(
               "Don't have an account yet?",
               style: TextStyle(
@@ -125,8 +219,6 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       ),
     );
   }
-
-  _handleSendEmail() {}
 
   _handleSignUp() {
     Navigator.of(context).pushNamed(RoutePaths.signupRoute);

@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+// import 'package:flutter/widgets.dart';
+// import 'package:flutter/widgets.dart';
 // import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../models/users_data.dart';
@@ -37,6 +40,12 @@ class SignUpScreenState extends State<SignUpScreen>
   String imagesUrl = '';
   bool checked = false;
 
+@override
+  void initState() {
+    super.initState();
+    // dataTerms();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -45,6 +54,26 @@ class SignUpScreenState extends State<SignUpScreen>
     _emailController.dispose();
     _mobileNumberController.dispose();
   }
+
+  CollectionReference<Object?> fetchStream(String collection) {
+    final CollectionReference collections =
+        FirebaseFirestore.instance.collection(collection);
+
+    return collections;
+  }
+
+  // void dataTerms() {
+  //   fetchStream('Terms&Conditions').snapshots().listen((snapshot) {
+  //     if (snapshot.docs.isNotEmpty) {
+  //       for (var document in snapshot.docs) {
+  //         print('---> ${document.data()}');
+  //       }
+  //     } else {
+  //       print('No documents found in the "Terms&Conditions" collection.');
+  //     }
+  //   });
+  // }
+
 
   Future<void> _pickImage() async {
     final pickedImage =
@@ -74,6 +103,29 @@ class SignUpScreenState extends State<SignUpScreen>
       errorText = '';
     });
 
+    if (!checked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColor.navBackgroundColor,
+          padding: EdgeInsets.symmetric(vertical: 25),
+          content: Text(
+            'Kindly check the privacy and terms & conditions box.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColor.blackColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _mobileNumberController.text.isEmpty ||
@@ -83,17 +135,27 @@ class SignUpScreenState extends State<SignUpScreen>
       });
       return;
     } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
-            .hasMatch(_firstNameController.text) ||
-        RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
-            .hasMatch(_lastNameController.text)) {
+        .hasMatch(_firstNameController.text)) {
       setState(() {
-        errorText = 'Invalid Name';
+        errorText = 'Invalid First Name';
       });
       return;
-    } else if (_firstNameController.text.length > 8 ||
-        _lastNameController.text.length > 8) {
+    } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+        .hasMatch(_lastNameController.text)) {
       setState(() {
-        errorText = 'Please enter at least 8 characters ';
+        errorText = 'Invalid Last Name';
+      });
+      return;
+    } else if (_firstNameController.text.length < 3 ||
+        _firstNameController.text.length > 20) {
+      setState(() {
+        errorText = 'First Name should be between 3 to 20 characters ';
+      });
+      return;
+    } else if (_firstNameController.text.length < 3 ||
+        _firstNameController.text.length > 20) {
+      setState(() {
+        errorText = 'Last Name should be between 3 to 20 characters ';
       });
       return;
     } else if (!_emailController.text.contains('@')) {
@@ -108,19 +170,22 @@ class SignUpScreenState extends State<SignUpScreen>
       return;
     } else if (!validatePasswordStructure(_passwordController.text)) {
       setState(() {
-        errorText = 'Password must contain Uppercase, Special Character';
+        errorText =
+            'Password must contain One Uppercase, One Special Character and Numbers';
       });
       return;
-    } else if (_mobileNumberController.text.length == 10) {
+    } else if (_mobileNumberController.text.length == 8 ||
+        _mobileNumberController.text.length <= 10) {
       setState(() {
-        errorText = 'Please enter at 10 digit of mobile number';
+        errorText = 'Mobile number must be between 10 to 12 digits';
       });
       return;
-    }
+    } else
 
-    setState(() {
-      isLoading = true;
-    });
+      // ignore: curly_braces_in_flow_control_structures
+      setState(() {
+        isLoading = true;
+      });
 
     final isEmailExists =
         await isEmailAlreadyExists(_emailController.text.trim());
@@ -148,15 +213,12 @@ class SignUpScreenState extends State<SignUpScreen>
       });
       _showSuccessDialog();
 
-      // Navigate to login route after a delay
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () {
         Navigator.of(context).pushNamed(RoutePaths.loginRoute);
       });
-      // Navigator.of(context).pushNamed(RoutePaths.loginRoute);
     } catch (e) {
-      print('Error signing up: $e');
       setState(() {
-        errorText = 'An error occurred. Please try again later.';
+        errorText = 'Please ensure you have entered a valid email address';
       });
     } finally {
       setState(() {
@@ -208,12 +270,15 @@ class SignUpScreenState extends State<SignUpScreen>
     showDialog(
       context: context,
       builder: (context) => const AlertDialog(
-        title: Text('Success', style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: AppColor.blackColor
-        ),),
-        content: Text('You have successfully signed up!',
+        title: Text(
+          'Success',
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColor.blackColor),
+        ),
+        content: Text(
+          'You have successfully signed up!',
           style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
@@ -223,6 +288,192 @@ class SignUpScreenState extends State<SignUpScreen>
       ),
     );
   }
+
+  Widget buildPrivacyPolicySubUI(
+      List<QueryDocumentSnapshot<Object?>> briefPolicyDataList) {
+    List<Widget> policyWidgets = [];
+
+    for (var snapshot in briefPolicyDataList) {
+      Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        List<dynamic>? policyList = data['briefPolicyData'];
+
+        if (policyList != null) {
+          for (var policyItem in policyList) {
+            String title = policyItem['title'] ?? '';
+            List<Map<String, dynamic>> subPolicyData =
+                (policyItem['subPolicyData'] as List<dynamic>)
+                    .map((item) => item as Map<String, dynamic>)
+                    .toList();
+            String description = policyItem['description'] ?? '';
+
+            List<Widget> subTitleWidgets = [];
+
+            for (var subPolicyItem in subPolicyData) {
+              String subTitle = subPolicyItem['subTitle'] ?? '';
+              String subDescription = subPolicyItem['subDescription'] ?? '';
+
+              subTitleWidgets.add(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        text: '$subTitle : ',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.blackColor,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: subDescription,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              );
+            }
+
+            policyWidgets.add(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    subTitleWidgets.isNotEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: subTitleWidgets,
+                          )
+                        : const SizedBox.shrink(),
+                    description.isNotEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                description,
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                    const Divider(),
+                  ],
+                ),
+              ),
+            );
+          }
+        }
+      }
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: policyWidgets,
+      ),
+    );
+  }
+
+ Widget buildTermsPolicySubUI(List<dynamic> normsList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: normsList.map((norm) {
+        String title = norm['title'] ?? '';
+        List<dynamic> detailNormList = norm['detailNorm'] ?? [];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ...detailNormList.map((detail) {
+              String subTitle = detail['subTitle'] ?? '';
+              String subDescription = detail['subDescription'] ?? '';
+              Map<String, dynamic> detailDescrip =
+                  detail['detailDescrip'] ?? {};
+
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subTitle,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      subDescription,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    ...detailDescrip.entries.map((entry) {
+                      String value = entry.value ?? '';
+
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 10.0, top: 2.0),
+                        child: Row(
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.circle_rounded,
+                              color: AppColor.blackColor,
+                              size: 4,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -471,25 +722,324 @@ class SignUpScreenState extends State<SignUpScreen>
                               ? AppColor.primaryColor
                               : AppColor.whiteColor,
                         ),
-                        RichText(
-                            text: const TextSpan(
-                                text: 'I agree to your',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColor.blackColor,
-                                ),
-                                children: <TextSpan>[
-                              TextSpan(
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'I agree to your',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: AppColor.blackColor,
+                              ),
+                              children: [
+                                TextSpan(
                                   text: ' privacy policy ',
-                                  style:
-                                      TextStyle(color: AppColor.primaryColor)),
-                              TextSpan(text: 'and'),
-                              TextSpan(
+                                  style: const TextStyle(
+                                      color: AppColor.primaryColor),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            insetPadding: EdgeInsets.symmetric(
+                                              vertical: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.22,
+                                              horizontal: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.1,
+                                            ),
+                                            backgroundColor:
+                                                AppColor.navBackgroundColor,
+                                            contentPadding: EdgeInsets.zero,
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 16,
+                                                      horizontal: 24),
+                                                  child: Text(
+                                                    "Privacy Policy",
+                                                    style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: SingleChildScrollView(
+                                                    child: StreamBuilder<
+                                                        QuerySnapshot>(
+                                                      stream: fetchStream(
+                                                              'privacyPolicySub')
+                                                          .snapshots(),
+                                                      builder:
+                                                          (context, snapShot) {
+                                                        if (!snapShot.hasData) {
+                                                          return const Padding(
+                                                            padding: EdgeInsets.symmetric(vertical: 5),
+                                                            child: Center(
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                color: AppColor
+                                                                    .primaryColor,
+                                                                strokeWidth: 3,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          return Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              for (var policyItem
+                                                                  in snapShot
+                                                                      .data!.docs)
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Container(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          horizontal:
+                                                                              15,
+                                                                          vertical:
+                                                                              10),
+                                                                      child: Text(
+                                                                        policyItem[
+                                                                                'description'] ??
+                                                                            '',
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                AppColor.blackColor),
+                                                                      ),
+                                                                    ),
+                                                                    StreamBuilder<
+                                                                        QuerySnapshot>(
+                                                                      stream: fetchStream(
+                                                                              'privacyPolicy')
+                                                                          .snapshots(),
+                                                                      builder:
+                                                                          (context,
+                                                                              snapshot) {
+                                                                        if (!snapshot
+                                                                            .hasData) {
+                                                                          return Container();
+                                                                        } else {
+                                                                          final briefPolicyDataList = snapshot
+                                                                              .data!
+                                                                              .docs;
+                                                                          return buildPrivacyPolicySubUI(
+                                                                              briefPolicyDataList);
+                                                                        }
+                                                                      },
+                                                                    ),
+                                                                    Container(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              3,
+                                                                          horizontal:
+                                                                              15),
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Expanded(
+                                                                            child:
+                                                                                RichText(
+                                                                              softWrap:
+                                                                                  true,
+                                                                              text:
+                                                                                  TextSpan(
+                                                                                text: policyItem['subTitle'] ?? '',
+                                                                                style: const TextStyle(
+                                                                                  fontSize: 12,
+                                                                                  fontWeight: FontWeight.w600,
+                                                                                  color: AppColor.blackColor,
+                                                                                ),
+                                                                                children: [
+                                                                                  TextSpan(
+                                                                                    text: ' - ${policyItem['SubDescription'] ?? ''}',
+                                                                                    style: const TextStyle(
+                                                                                      fontSize: 12,
+                                                                                      fontWeight: FontWeight.w400,
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    Container(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          vertical:
+                                                                              5,
+                                                                          horizontal:
+                                                                              15),
+                                                                      child: Text(
+                                                                        policyItem[
+                                                                                'description2'] ??
+                                                                            '',
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                AppColor.blackColor),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                            ],
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text("Close",
+                                                      style: TextStyle(
+                                                          color: AppColor
+                                                              .primaryColor)),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                ),
+                                const TextSpan(text: 'and'),
+                                TextSpan(
                                   text: ' terms & conditions. ',
-                                  style:
-                                      TextStyle(color: AppColor.primaryColor))
-                            ])),
+                                  style: const TextStyle(
+                                      color: AppColor.primaryColor),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            insetPadding: EdgeInsets.symmetric(
+                                              vertical: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.22,
+                                              horizontal: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.1,
+                                            ),
+                                            backgroundColor:
+                                                AppColor.navBackgroundColor,
+                                            contentPadding: EdgeInsets.zero,
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 16,
+                                                      horizontal: 24),
+                                                  child: Text(
+                                                    "Terms & Conditions",
+                                                    style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: SingleChildScrollView(
+                                                    child: StreamBuilder<
+                                                        QuerySnapshot>(
+                                                      stream: fetchStream(
+                                                              'Terms&Conditions')
+                                                          .snapshots(),
+                                                      builder:
+                                                          (context, snapShot) {
+                                                        if (!snapShot.hasData) {
+                                                          return const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color: AppColor
+                                                                  .primaryColor,
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          return Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              for (var termsItem
+                                                                  in snapShot
+                                                                      .data!.docs)
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Container(
+                                                                      padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                          horizontal:
+                                                                              15,
+                                                                          vertical:
+                                                                              10),
+                                                                      child: Text(
+                                                                        termsItem[
+                                                                                'description'] ??
+                                                                            '',
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                AppColor.blackColor),
+                                                                      ),
+                                                                    ),
+                                                                    buildTermsPolicySubUI(
+                                                                              termsItem[
+                                                                                'Norms'] ?? [])
+                                                                  ],
+                                                                ),
+                                                            ],
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text("Close", style: TextStyle(color: AppColor.primaryColor)),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -519,8 +1069,8 @@ class SignUpScreenState extends State<SignUpScreen>
                   buttonText: 'Sign up',
                   fillColor: true,
                   onPressed: _handleSignUp,
-                  enabled: checked,
-                  opacityColor: !checked,
+                  // enabled: checked,
+                  // opacityColor: !checked,
                 )),
           ],
         ),

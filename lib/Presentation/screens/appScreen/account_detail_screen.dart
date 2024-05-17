@@ -27,6 +27,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
 
   bool saveText = false;
   bool submit = false;
+  String errorText = '';
 
   @override
   void initState() {
@@ -52,6 +53,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
   }
 
   Future<void> fetchUserDetails() async {
+
     String? userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
@@ -72,11 +74,8 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
   }
 
   Future<void> updateUserDetails() async {
-    // Get the current user's ID
     String? userId = FirebaseAuth.instance.currentUser?.uid;
-    // print('userId of respective user $userId');
     if (userId != null) {
-      // Update user details in Firestore
       int mobileNumber = int.parse(_mobileNumberController.text.trim());
 
       await FirebaseFirestore.instance
@@ -103,6 +102,44 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+           errorText.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(
+                      top: 20, bottom: 0, left: 40, right: 40),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: const Color.fromARGB(79, 244, 67, 54)),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            errorText = '';
+                          }),
+                          child: const Icon(
+                            Icons.close,
+                            size: 24,
+                            color: Colors.red,
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(
+                            errorText,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : const SizedBox(),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(40),
@@ -127,6 +164,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       inputController: _firstNameController,
                       labelText: 'Enter your first name',
                       inputType: 'text',
+                      disabled: !saveText,
                     ),
                   ),
                   Container(
@@ -148,6 +186,8 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       inputController: _lastNameController,
                       labelText: 'Enter your last name',
                       inputType: 'text',
+                      disabled: !saveText,
+
                     ),
                   ),
                   Container(
@@ -191,6 +231,9 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       inputController: _mobileNumberController,
                       labelText: 'Enter your mobile name',
                       inputType: 'phone',
+                      phone: true,
+                      disabled: !saveText,
+
                     ),
                   ),
                   // Container(
@@ -265,7 +308,49 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
     );
   }
 
-  void _handleSave() {
+Future<void> _handleSave() async {
+    setState(() {
+      errorText = '';
+    });
+
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _mobileNumberController.text.isEmpty) {
+      setState(() {
+        errorText = 'Please enter all the fields';
+      });
+      return;
+    } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+        .hasMatch(_firstNameController.text)) {
+      setState(() {
+        errorText = 'Invalid First Name';
+      });
+      return;
+    } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+        .hasMatch(_lastNameController.text)) {
+      setState(() {
+        errorText = 'Invalid Last Name';
+      });
+      return;
+    } else if (_firstNameController.text.length > 8) {
+      setState(() {
+        errorText = 'First Name should be at least 8 characters ';
+      });
+      return;
+    } else if (_lastNameController.text.length > 8) {
+      setState(() {
+        errorText = 'Last Name should be at least 8 characters ';
+      });
+      return;
+    } else if (_mobileNumberController.text.length < 10 ||
+        _mobileNumberController.text.length > 12) {
+      setState(() {
+        errorText = 'Mobile number must be between 10 to 12 digits';
+      });
+      return;
+    } 
+
+    // If there are no errors, set submit to true and run updateUserDetails
     setState(() {
       submit = true;
     });
@@ -280,6 +365,65 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
       });
     });
   }
+
+  // Future<void> _handleSave() async {
+  //   setState(() {
+  //     errorText = '';
+  //   });
+
+  //   if (_firstNameController.text.isEmpty ||
+  //       _lastNameController.text.isEmpty ||
+  //       _mobileNumberController.text.isEmpty
+  //     ) {
+  //     setState(() {
+  //       errorText = 'Please enter all the fields';
+  //     });
+  //     return;
+  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+  //       .hasMatch(_firstNameController.text)) {
+  //     setState(() {
+  //       errorText = 'Invalid First Name';
+  //     });
+  //     return;
+  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+  //       .hasMatch(_lastNameController.text)) {
+  //     setState(() {
+  //       errorText = 'Invalid Last Name';
+  //     });
+  //     return;
+  //   } else if (_firstNameController.text.length > 8) {
+  //     setState(() {
+  //       errorText = 'First Name should be at least 8 characters ';
+  //     });
+  //     return;
+  //   } else if (_lastNameController.text.length > 8) {
+  //     setState(() {
+  //       errorText = 'Last Name should be at least 8 characters ';
+  //     });
+  //     return;
+  //   } 
+  //   else if (_mobileNumberController.text.length == 8 ||
+  //       _mobileNumberController.text.length <= 10) {
+  //     setState(() {
+  //       errorText = 'Mobile number must be between 10 to 12 digits';
+  //     });
+  //     return;
+  //   } else
+  //   // ignore: curly_braces_in_flow_control_structures
+  //   setState(() {
+  //     submit = true;
+  //   });
+    
+  //   // Update user details and set saveText to true
+  //   updateUserDetails().then((_) {
+  //     Future.delayed(const Duration(seconds: 5), () {
+  //       submit = false;
+  //       setState(() {
+  //         saveText = true;
+  //       });
+  //     });
+  //   });
+  // }
   // void _handleSave() {
   //   setState(() {
   //     submit = true;

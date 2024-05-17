@@ -272,7 +272,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
@@ -303,7 +303,8 @@ class AppBarScreen extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppBarScreenState extends State<AppBarScreen> {
-  late ImageProvider<Object> profilePicture;
+  late ImageProvider<Object> profilePicture =
+      const AssetImage(ImageAssets.authLogo);
 
   @override
   void initState() {
@@ -524,10 +525,14 @@ class _AppBarScreenState extends State<AppBarScreen> {
                   onTap: () =>
                       Navigator.of(context).pushNamed(RoutePaths.profileRoute),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: CircleAvatar(
-                      backgroundImage: profilePicture,
-                      radius: 45,
+                    padding: const EdgeInsets.only(right: 20, left: 20),
+                    child: Container(
+                      width: 45,
+                      height: 45,
+                      child: CircleAvatar(
+                        backgroundImage: profilePicture,
+                        backgroundColor: Colors.transparent,
+                      ),
                     ),
                   ),
                 )
@@ -547,15 +552,12 @@ class _AppBarScreenState extends State<AppBarScreen> {
               .doc(userId)
               .get();
 
-      setState(() {
-        String? profilePictureUrl = userDetails['profilePicture'];
-        print('kkk $profilePictureUrl');
-        if (profilePictureUrl != null && profilePictureUrl.isNotEmpty) {
+      String? profilePictureUrl = userDetails['profilePicture'];
+      if (profilePictureUrl != null && profilePictureUrl.isNotEmpty) {
+        setState(() {
           profilePicture = NetworkImage(profilePictureUrl);
-        } else {
-          profilePicture = const AssetImage(ImageAssets.placeholderProfile);
-        }
-      });
+        });
+      }
     }
   }
 }

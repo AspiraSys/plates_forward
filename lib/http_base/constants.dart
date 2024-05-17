@@ -4,13 +4,12 @@ class UrlConstants {
   static const String createPaymentApi = '/v2/payments';
   static const String createOrderApi = '/v2/orders';
 
-
-  static const String token = 'EAAAlzNFMSRpY5BJNBT1ONA3iHunzoeoXCSPh25ebGcpHUjSyEux5iEUeMyftKM4';
+  static String token = '';
   static const String apiVersion = '2024-03-20';
   static const String orderId = 'pvEaMOXnwki8A9nU0GGMiBOPJe4F';
 }
 
-class ExceptionMessage{
+class ExceptionMessage {
   static const String error = 'Error';
   static const String noInternet = 'No internet connection';
   static const String httpError = 'HTTP error occurred';

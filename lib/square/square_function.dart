@@ -11,7 +11,6 @@ import 'package:plates_forward/square/model/create_payment/create_payment_reques
 import 'package:plates_forward/square/model/create_payment/create_payment_response.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
-
 class SquareFunction {
   static const int REQUEST_TIME_OUT = 1;
 
@@ -19,7 +18,6 @@ class SquareFunction {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ${UrlConstants.token}',
   };
-
   // Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
   //   http.Response? response;
   //   try {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
@@ -16,13 +17,19 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  final TextEditingController _emailController =
-      TextEditingController();
-  final TextEditingController _passwordController =
-      TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   String errorText = '';
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check authentication state when the widget initializes
+    // checkAuthState();
+    // fetchStripe();
+  }
 
   @override
   void dispose() {
@@ -30,6 +37,32 @@ class LoginScreenState extends State<LoginScreen>
     _emailController.dispose();
     _passwordController.dispose();
   }
+
+  // Future<void> fetchStripe() async {
+  //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //   QuerySnapshot<Map<String, dynamic>> querySnapshot =
+  //       await firestore.collection('secretKey').get();
+
+  //   if (querySnapshot.docs.isNotEmpty) {
+  //     // Assuming you want to use the first document
+  //     Map<String, dynamic> data = querySnapshot.docs.first.data();
+  //     print('---> $data');
+  //     // setState(() {
+  //     //   stripeKeys = StripeKeys.fromMap(data);
+  //     // });
+  //   } else {
+  //     print("No documents found in 'stripeKeys' collection.");
+  //   }
+  // }
+  
+  // Future<void> checkAuthState() async {
+  //   final User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     // User is already logged in, navigate to HomeScreen
+  //     // navigateToHome();
+  //     Navigator.of(context).pushNamed(RoutePaths.homeRoute);
+  //   }
+  // }
 
   Future<void> _handleSignIn() async {
     setState(() {

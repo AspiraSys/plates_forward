@@ -7,6 +7,8 @@ import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_bar.dart';
 // import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
+import 'package:plates_forward/main.dart';
+import 'package:plates_forward/models/secret_key.dart';
 import 'package:plates_forward/models/stripe_model.dart';
 import 'package:plates_forward/models/user_activity.dart';
 import 'package:plates_forward/stripe/stripe_function.dart';
@@ -28,7 +30,21 @@ class _DonateScreenState extends State<DonateScreen> {
   int selectedIndex = -1;
   bool enable = false;
   String locationId = '';
-  var stripe = StripePayment();
+  // var stripe = StripePayment();
+StripePayment? stripe;
+
+  @override
+  void initState() {
+    super.initState();
+    initializeStripePayment().then((stripePayment) {
+      setState(() {
+        stripe = stripePayment;
+      });
+    }).catchError((error) {
+      print("Error initializing StripePayment: $error");
+      // Handle error gracefully
+    });
+  }
 
   void incrementMeals() {
     setState(() {
@@ -51,6 +67,14 @@ class _DonateScreenState extends State<DonateScreen> {
         FirebaseFirestore.instance.collection(collection);
 
     return collections;
+  }
+
+  Future<StripePayment> initializeStripePayment() async {
+    StripeKeys? stripeKeys = await fetchStripeKeys();
+    if (stripeKeys == null) {
+      throw Exception("Stripe keys not found.");
+    }
+    return StripePayment(stripeKeys: stripeKeys);
   }
 
   @override
@@ -130,7 +154,7 @@ class _DonateScreenState extends State<DonateScreen> {
                       ),
                       RichText(
                           text: TextSpan(
-                              text: '\$',
+                              text: 'A\$ ',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -416,9 +440,9 @@ class _DonateScreenState extends State<DonateScreen> {
                   child: InkWell(
                     onTap: () async {
                       StripeResponseModel result =
-                          await stripe.stripeMakePayment(
+                          await stripe!.stripeMakePayment(
                               amount: (totalCost * 100).toString(),
-                              currency: "USD");
+                              currency: "AUD");
                       if (result.isSuccess) {
                         firebaseDataTrans(result.response);
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -427,7 +451,8 @@ class _DonateScreenState extends State<DonateScreen> {
                         Future.delayed(const Duration(seconds: 2), () {
                           Navigator.of(context)
                               .pushNamed(RoutePaths.donateSuccessRoute);
-                        });
+                        }
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(result.message),

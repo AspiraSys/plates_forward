@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/account_detail_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/donate_screen.dart';
@@ -27,8 +28,18 @@ class AppRouter {
         );
       case RoutePaths.loginRoute:
         return MaterialPageRoute(
-          builder: (context) => const LoginScreen(),
+          builder: (context) {
+            FirebaseAuth auth = FirebaseAuth.instance;
+            User? user = auth.currentUser;
+
+            if (user != null) {
+              return const HomeScreen();
+            } else {
+              return const LoginScreen();
+            }
+          },
         );
+
       case RoutePaths.signupRoute:
         return MaterialPageRoute(
           builder: (context) => const SignUpScreen(),
