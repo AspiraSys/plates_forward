@@ -22,7 +22,6 @@ class LoginScreenState extends State<LoginScreen>
 
   String errorText = '';
   bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -87,7 +86,7 @@ class LoginScreenState extends State<LoginScreen>
         // ignore: unnecessary_null_comparison
         if (userCredential != null) {
           // ignore: use_build_context_synchronously
-          Navigator.of(context).pushNamed(RoutePaths.navigationRoute);
+          Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
         }
       } catch (e) {
         print('Error signing in: $e');
