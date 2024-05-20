@@ -10,6 +10,7 @@ class SplashScreenWithDelay extends StatefulWidget {
   const SplashScreenWithDelay({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SplashScreenWithDelayState createState() => _SplashScreenWithDelayState();
 }
 

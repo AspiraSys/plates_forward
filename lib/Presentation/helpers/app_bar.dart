@@ -344,8 +344,8 @@ class _AppBarScreenState extends State<AppBarScreen> {
                       onPressed: () {
                         /*widget.isDonatSub
                             ? Navigator.of(context)
-                                .pushNamed(RoutePaths.homeRoute)
-                            : Navigator.of(context).pop();*/
+                                .pushNamed(RoutePaths.homeRoute)*/
+                          // Navigator.of(context).pop();
                       },
                     ),
                     const SizedBox(width: 4),

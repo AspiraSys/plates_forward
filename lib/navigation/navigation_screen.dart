@@ -1,17 +1,18 @@
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/donate_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/home_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/mission_screen.dart';
-<<<<<<< HEAD
+// <<<<<<< HEAD
 // import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dart';
-=======
->>>>>>> a4154b423fb04ddd4702ce667db37be6301e9ea3
+// =======
+// >>>>>>> a4154b423fb04ddd4702ce667db37be6301e9ea3.
 import 'package:plates_forward/Presentation/screens/appScreen/venues_screen.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 
+// ignore: must_be_immutable
 class NavigationScreen extends StatefulWidget {
   final screens = [
     const HomeScreen(),
