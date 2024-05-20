@@ -315,7 +315,7 @@ class _AppBarScreenState extends State<AppBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 2, bottom: 3),
+      padding: const EdgeInsets.only(top: 2, bottom: 2),
       height: 100,
       child: AppBar(
         title: Padding(
@@ -327,6 +327,7 @@ class _AppBarScreenState extends State<AppBarScreen> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
         ),
+        
         backgroundColor: AppColor.whiteColor,
         leadingWidth: widget.subScreen ? 100 : 0,
         leading: widget.subScreen

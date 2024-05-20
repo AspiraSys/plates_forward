@@ -162,7 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
       color: Colors.white,
       child: SafeArea(
         child: Scaffold(
-          appBar: const AppBarScreen(title: 'Impact'),
+          appBar: const PreferredSize(
+            preferredSize: Size.fromHeight(70.0),
+            child: AppBarScreen(title: 'Impact')),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: DefaultTabController(

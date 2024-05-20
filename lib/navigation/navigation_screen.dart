@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/donate_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/home_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/mission_screen.dart';
-import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dart';
+// import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/venues_screen.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';

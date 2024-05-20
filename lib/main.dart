@@ -95,9 +95,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:get/get.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/home_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/venues_screen.dart';
+import 'package:plates_forward/depedency_injector.dart';
 import 'package:plates_forward/models/secret_key.dart';
+import 'package:plates_forward/navigation/navigation_screen.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 import 'package:plates_forward/utils/app_router.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -106,6 +109,7 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  DependencyInjection.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -157,11 +161,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Plate It Forward',
       theme: ThemeData(primaryColor: AppColor.primaryColor),
       initialRoute: RoutePaths.splashRoute,
-      onGenerateRoute: AppRouter.navigateRoute,
+      home: NavigationScreen() ,
+      // onGenerateRoute: AppRouter.navigateRoute,
       // home: WillPopScope(
       //   onWillPop: () async {
       //     // Handle back navigation here
