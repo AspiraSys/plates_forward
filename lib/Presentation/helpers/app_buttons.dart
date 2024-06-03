@@ -11,17 +11,15 @@ class ButtonBox extends StatefulWidget {
   final VoidCallback onPressed;
   final bool opacityColor;
   final bool enabled;
-  
 
-  const ButtonBox({
-    super.key,
-    required this.buttonText,
-    required this.fillColor,
-    required this.onPressed,
-    this.isLoading = false,
-    this.opacityColor = false,
-    this.enabled = true
-  });
+  const ButtonBox(
+      {super.key,
+      required this.buttonText,
+      required this.fillColor,
+      required this.onPressed,
+      this.isLoading = false,
+      this.opacityColor = false,
+      this.enabled = true});
 
   @override
   State<ButtonBox> createState() => _ButtonBox();
@@ -44,7 +42,11 @@ class _ButtonBox extends State<ButtonBox> {
           width: 176,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-              color: buttonColor ? widget.opacityColor ? const Color.fromARGB(168, 2, 60, 167) : AppColor.primaryColor : AppColor.whiteColor,
+              color: buttonColor
+                  ? widget.opacityColor
+                      ? const Color.fromARGB(168, 2, 60, 167)
+                      : AppColor.primaryColor
+                  : AppColor.whiteColor,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               border: buttonColor
                   ? null

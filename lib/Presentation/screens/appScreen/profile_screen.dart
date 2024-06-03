@@ -3,12 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_sheet.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
+import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -121,6 +124,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final NetworkController networkController = Get.find<NetworkController>();
+
     return Scaffold(
       appBar: const AppBarScreen(
         title: 'Profile',
@@ -131,7 +136,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           GestureDetector(
-            onTap: updateImage,
+            onTap:
+              networkController.isConnected.value ? updateImage : null
+            ,
             child: Container(
                 alignment: Alignment.center,
                 margin: const EdgeInsets.only(top: 50, bottom: 24),
@@ -224,8 +231,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           GestureDetector(
-            onTap: () =>
-                Navigator.of(context).pushNamed(RoutePaths.accountDetailRoute),
+            onTap: () => networkController.isConnected.value
+                ? Navigator.of(context).pushNamed(RoutePaths.accountDetailRoute)
+                : null,
             child: Container(
               margin: const EdgeInsets.only(top: 74, left: 30),
               child: Row(
@@ -253,7 +261,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buttonText: 'Confirm Delete',
                       content:
                           'Are you sure you want to delete your account? Once deleted, the action cannot be undone.',
-                      handleAction: () => _handleDelete(context),
+                      handleAction: () => networkController.isConnected.value
+                          ? _handleDelete(context)
+                          : null,
                     );
                   });
             },
@@ -288,7 +298,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             content:
                                 'Are you sure you want to log out of your account?',
                             handleAction: () {
-                              handleLogOut(context);
+                              networkController.isConnected.value
+                                  ? handleLogOut(context)
+                                  : null;
                             });
                       }))),
           const SizedBox(height: 16),
@@ -389,98 +401,97 @@ class _DeleteDialogState extends State<_DeleteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-       Dialog(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              child: Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: AppColor.navBackgroundColor,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          const Text(
-                            'Please Confirm Your Password',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.primaryColor,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(RoutePaths.profileRoute);
-                            },
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: AppColor.blackColor,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: AppColor.whiteColor,
-                                size: 15,
-                              ),
-                            ),
-                          ),
-                        ],
+    return Stack(children: [
+      Dialog(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: AppColor.navBackgroundColor,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    const Text(
+                      'Please Confirm Your Password',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.primaryColor,
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: InputBox(
-                          labelText: 'Enter password',
-                          inputType: 'password',
-                          inputController: passwordController,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .pushNamed(RoutePaths.profileRoute);
+                      },
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColor.blackColor,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: AppColor.whiteColor,
+                          size: 15,
                         ),
                       ),
-                      if (_errorText != null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Text(
-                            _errorText!,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.redColor,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 15),
-                      ButtonBox(
-                        buttonText: 'Confirm Delete',
-                        fillColor: true,
-                        onPressed: () => handleConfirmDelete(),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: InputBox(
+                    labelText: 'Enter password',
+                    inputType: 'password',
+                    inputController: passwordController,
                   ),
                 ),
-              ),
+                if (_errorText != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Text(
+                      _errorText!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.redColor,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 15),
+                ButtonBox(
+                  buttonText: 'Confirm Delete',
+                  fillColor: true,
+                  onPressed: () => handleConfirmDelete(),
+                ),
+              ],
             ),
+          ),
+        ),
+      ),
       if (deleteLoading)
         Positioned.fill(
           child: Container(
             color: Colors.black.withOpacity(0.5),
             child: const Center(
-              child: CircularProgressIndicator(color: AppColor.primaryColor,),
+              child: CircularProgressIndicator(
+                color: AppColor.primaryColor,
+              ),
             ),
           ),
         ),
-      ]
-      );
-    
+    ]);
   }
 }
 

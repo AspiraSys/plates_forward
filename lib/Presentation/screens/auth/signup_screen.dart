@@ -7,10 +7,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 // import 'package:flutter/widgets.dart';
 // import 'package:flutter/widgets.dart';
 // import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
+import 'package:plates_forward/square/model/create_user/create_user_request.dart';
+import 'package:plates_forward/square/square_function.dart';
 import '../../../models/users_data.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
@@ -34,16 +39,19 @@ class SignUpScreenState extends State<SignUpScreen>
   final TextEditingController _mobileNumberController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  var square = SquareFunction();
+
   String errorText = '';
   bool isLoading = false;
   File? _pickedImage;
   String imagesUrl = '';
   bool checked = false;
 
-@override
+  @override
   void initState() {
     super.initState();
     // dataTerms();
+    // handleSquare();
   }
 
   @override
@@ -62,6 +70,10 @@ class SignUpScreenState extends State<SignUpScreen>
     return collections;
   }
 
+  // void handleSquare() async {
+  //   // final String orderId = _orderController.text;
+  //   //  final res = square.createUser(emailAddress:_emailController.text );
+  // }
   // void dataTerms() {
   //   fetchStream('Terms&Conditions').snapshots().listen((snapshot) {
   //     if (snapshot.docs.isNotEmpty) {
@@ -73,7 +85,6 @@ class SignUpScreenState extends State<SignUpScreen>
   //     }
   //   });
   // }
-
 
   Future<void> _pickImage() async {
     final pickedImage =
@@ -98,7 +109,15 @@ class SignUpScreenState extends State<SignUpScreen>
     }
   }
 
-  Future<void> _handleSignUp() async {
+Future<void> _handleSignUp() async {
+    final String email = _emailController.text;
+    final String fullName =
+        "${_firstNameController.text} ${_lastNameController.text}";
+    final String givenName = fullName;
+    final res = await square.createUser(
+      emailAddress:
+          CreateUserRequest(emailAddress: email, givenName: givenName),
+    );
     setState(() {
       errorText = '';
     });
@@ -152,8 +171,8 @@ class SignUpScreenState extends State<SignUpScreen>
         errorText = 'First Name should be between 3 to 20 characters ';
       });
       return;
-    } else if (_firstNameController.text.length < 3 ||
-        _firstNameController.text.length > 20) {
+    } else if (_lastNameController.text.length < 3 ||
+        _lastNameController.text.length > 20) {
       setState(() {
         errorText = 'Last Name should be between 3 to 20 characters ';
       });
@@ -174,18 +193,17 @@ class SignUpScreenState extends State<SignUpScreen>
             'Password must contain One Uppercase, One Special Character and Numbers';
       });
       return;
-    } else if (_mobileNumberController.text.length == 8 ||
-        _mobileNumberController.text.length <= 10) {
+    } else if (_mobileNumberController.text.length < 10 ||
+        _mobileNumberController.text.length > 12) {
       setState(() {
         errorText = 'Mobile number must be between 10 to 12 digits';
       });
       return;
-    } else
+    }
 
-      // ignore: curly_braces_in_flow_control_structures
-      setState(() {
-        isLoading = true;
-      });
+    setState(() {
+      isLoading = true;
+    });
 
     final isEmailExists =
         await isEmailAlreadyExists(_emailController.text.trim());
@@ -205,6 +223,15 @@ class SignUpScreenState extends State<SignUpScreen>
         password: _passwordController.text.trim(),
       );
 
+      if (res != null && res is Map && res['errors'] != null) {
+        // Handling the error from Square POS
+        setState(() {
+          errorText = 'Something went wrong with Square POS';
+          isLoading = false;
+        });
+        return;
+      }
+
       final String userId = userCredential.user!.uid;
 
       await addUserDetails(userId);
@@ -219,6 +246,7 @@ class SignUpScreenState extends State<SignUpScreen>
     } catch (e) {
       setState(() {
         errorText = 'Please ensure you have entered a valid email address';
+        isLoading = false;
       });
     } finally {
       setState(() {
@@ -226,6 +254,141 @@ class SignUpScreenState extends State<SignUpScreen>
       });
     }
   }
+
+  // Future<void> _handleSignUp() async {
+  //   final String email = _emailController.text;
+  //   final String fullName =
+  //       "${_firstNameController.text} ' '${_lastNameController.text}";
+  //   final String givenName = fullName;
+  //   final res = await square.createUser(
+  //       emailAddress: CreateUserRequest(emailAddress: email, givenName: givenName));
+  //   setState(() {
+  //     errorText = '';
+  //   });
+
+  //   if (!checked) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         backgroundColor: AppColor.navBackgroundColor,
+  //         padding: EdgeInsets.symmetric(vertical: 25),
+  //         content: Text(
+  //           'Kindly check the privacy and terms & conditions box.',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             color: AppColor.blackColor,
+  //             fontSize: 14,
+  //             fontWeight: FontWeight.w600,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //     return;
+  //   }
+
+  //   if (!mounted) {
+  //     return;
+  //   }
+
+  //   if (_firstNameController.text.isEmpty ||
+  //       _lastNameController.text.isEmpty ||
+  //       _mobileNumberController.text.isEmpty ||
+  //       _emailController.text.isEmpty) {
+  //     setState(() {
+  //       errorText = 'Please enter all the fields';
+  //     });
+  //     return;
+  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+  //       .hasMatch(_firstNameController.text)) {
+  //     setState(() {
+  //       errorText = 'Invalid First Name';
+  //     });
+  //     return;
+  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
+  //       .hasMatch(_lastNameController.text)) {
+  //     setState(() {
+  //       errorText = 'Invalid Last Name';
+  //     });
+  //     return;
+  //   } else if (_firstNameController.text.length < 3 ||
+  //       _firstNameController.text.length > 20) {
+  //     setState(() {
+  //       errorText = 'First Name should be between 3 to 20 characters ';
+  //     });
+  //     return;
+  //   } else if (_firstNameController.text.length < 3 ||
+  //       _firstNameController.text.length > 20) {
+  //     setState(() {
+  //       errorText = 'Last Name should be between 3 to 20 characters ';
+  //     });
+  //     return;
+  //   } else if (!_emailController.text.contains('@')) {
+  //     setState(() {
+  //       errorText = 'Please enter a valid email address';
+  //     });
+  //     return;
+  //   } else if (_passwordController.text.length < 8) {
+  //     setState(() {
+  //       errorText = 'Please enter at least 8 characters for the password';
+  //     });
+  //     return;
+  //   } else if (!validatePasswordStructure(_passwordController.text)) {
+  //     setState(() {
+  //       errorText =
+  //           'Password must contain One Uppercase, One Special Character and Numbers';
+  //     });
+  //     return;
+  //   } else if (_mobileNumberController.text.length == 8 ||
+  //       _mobileNumberController.text.length <= 10) {
+  //     setState(() {
+  //       errorText = 'Mobile number must be between 10 to 12 digits';
+  //     });
+  //     return;
+  //   } else
+
+  //     // ignore: curly_braces_in_flow_control_structures
+  //     setState(() {
+  //       isLoading = true;
+  //     });
+
+  //   final isEmailExists =
+  //       await isEmailAlreadyExists(_emailController.text.trim());
+
+  //   if (isEmailExists) {
+  //     setState(() {
+  //       errorText = 'The email address is already in use';
+  //       isLoading = false;
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     final userCredential =
+  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //       email: _emailController.text.trim(),
+  //       password: _passwordController.text.trim(),
+  //     );
+
+  //     final String userId = userCredential.user!.uid;
+
+  //     await addUserDetails(userId);
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //     _showSuccessDialog();
+
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       Navigator.of(context).pushNamed(RoutePaths.loginRoute);
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       errorText = 'Please ensure you have entered a valid email address';
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   Future<void> addUserDetails(String userId) async {
     UsersData userData = UsersData(
@@ -391,7 +554,7 @@ class SignUpScreenState extends State<SignUpScreen>
     );
   }
 
- Widget buildTermsPolicySubUI(List<dynamic> normsList) {
+  Widget buildTermsPolicySubUI(List<dynamic> normsList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: normsList.map((norm) {
@@ -474,9 +637,10 @@ class SignUpScreenState extends State<SignUpScreen>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final NetworkController networkController = Get.find<NetworkController>();
+
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
       body: Stack(children: [
@@ -549,7 +713,9 @@ class SignUpScreenState extends State<SignUpScreen>
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap: _pickImage,
+                      onTap: () {
+                        networkController.isConnected.value ? _pickImage : null;
+                      },
                       child: Container(
                           alignment: Alignment.center,
                           margin: const EdgeInsets.only(top: 5),
@@ -783,7 +949,10 @@ class SignUpScreenState extends State<SignUpScreen>
                                                           (context, snapShot) {
                                                         if (!snapShot.hasData) {
                                                           return const Padding(
-                                                            padding: EdgeInsets.symmetric(vertical: 5),
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        5),
                                                             child: Center(
                                                               child:
                                                                   CircularProgressIndicator(
@@ -801,7 +970,8 @@ class SignUpScreenState extends State<SignUpScreen>
                                                             children: [
                                                               for (var policyItem
                                                                   in snapShot
-                                                                      .data!.docs)
+                                                                      .data!
+                                                                      .docs)
                                                                 Column(
                                                                   crossAxisAlignment:
                                                                       CrossAxisAlignment
@@ -814,9 +984,9 @@ class SignUpScreenState extends State<SignUpScreen>
                                                                               15,
                                                                           vertical:
                                                                               10),
-                                                                      child: Text(
-                                                                        policyItem[
-                                                                                'description'] ??
+                                                                      child:
+                                                                          Text(
+                                                                        policyItem['description'] ??
                                                                             '',
                                                                         style: const TextStyle(
                                                                             color:
@@ -850,15 +1020,14 @@ class SignUpScreenState extends State<SignUpScreen>
                                                                               3,
                                                                           horizontal:
                                                                               15),
-                                                                      child: Row(
+                                                                      child:
+                                                                          Row(
                                                                         children: [
                                                                           Expanded(
                                                                             child:
                                                                                 RichText(
-                                                                              softWrap:
-                                                                                  true,
-                                                                              text:
-                                                                                  TextSpan(
+                                                                              softWrap: true,
+                                                                              text: TextSpan(
                                                                                 text: policyItem['subTitle'] ?? '',
                                                                                 style: const TextStyle(
                                                                                   fontSize: 12,
@@ -887,9 +1056,9 @@ class SignUpScreenState extends State<SignUpScreen>
                                                                               5,
                                                                           horizontal:
                                                                               15),
-                                                                      child: Text(
-                                                                        policyItem[
-                                                                                'description2'] ??
+                                                                      child:
+                                                                          Text(
+                                                                        policyItem['description2'] ??
                                                                             '',
                                                                         style: const TextStyle(
                                                                             fontSize:
@@ -989,7 +1158,8 @@ class SignUpScreenState extends State<SignUpScreen>
                                                             children: [
                                                               for (var termsItem
                                                                   in snapShot
-                                                                      .data!.docs)
+                                                                      .data!
+                                                                      .docs)
                                                                 Column(
                                                                   crossAxisAlignment:
                                                                       CrossAxisAlignment
@@ -1002,9 +1172,9 @@ class SignUpScreenState extends State<SignUpScreen>
                                                                               15,
                                                                           vertical:
                                                                               10),
-                                                                      child: Text(
-                                                                        termsItem[
-                                                                                'description'] ??
+                                                                      child:
+                                                                          Text(
+                                                                        termsItem['description'] ??
                                                                             '',
                                                                         style: const TextStyle(
                                                                             color:
@@ -1012,8 +1182,8 @@ class SignUpScreenState extends State<SignUpScreen>
                                                                       ),
                                                                     ),
                                                                     buildTermsPolicySubUI(
-                                                                              termsItem[
-                                                                                'Norms'] ?? [])
+                                                                        termsItem['Norms'] ??
+                                                                            [])
                                                                   ],
                                                                 ),
                                                             ],
@@ -1027,7 +1197,10 @@ class SignUpScreenState extends State<SignUpScreen>
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
                                                   },
-                                                  child: const Text("Close", style: TextStyle(color: AppColor.primaryColor)),
+                                                  child: const Text("Close",
+                                                      style: TextStyle(
+                                                          color: AppColor
+                                                              .primaryColor)),
                                                 ),
                                               ],
                                             ),
@@ -1068,7 +1241,11 @@ class SignUpScreenState extends State<SignUpScreen>
                 child: ButtonBox(
                   buttonText: 'Sign up',
                   fillColor: true,
-                  onPressed: _handleSignUp,
+                  onPressed: () {
+                    networkController.isConnected.value
+                        ? _handleSignUp()
+                        : null;
+                  },
                   // enabled: checked,
                   // opacityColor: !checked,
                 )),

@@ -1,4 +1,3 @@
-
 import 'package:uuid/uuid.dart';
 
 class UUIDGenerate {
@@ -6,5 +5,4 @@ class UUIDGenerate {
 
   // Generate a v4 (random) id
   String generateCode() => uuid.v4();
-
 }

@@ -7,5 +7,4 @@ class AppColor {
   static const whiteColor = Colors.white;
   static const redColor = Colors.red;
   static const navBackgroundColor = Color.fromRGBO(248, 250, 229, 1);
-
 }

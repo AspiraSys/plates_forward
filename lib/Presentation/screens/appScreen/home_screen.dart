@@ -1,22 +1,23 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
-import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
-import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
-import 'package:plates_forward/models/user_activity.dart';
-import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
-import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
+import 'package:plates_forward/Presentation/helpers/app_networkError.dart';
+import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
+import 'package:plates_forward/Presentation/helpers/app_refresh.dart';
+import 'package:plates_forward/Presentation/helpers/app_totalOrder.dart';
 import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
+import 'package:plates_forward/Presentation/helpers/app_addOrder.dart';
+import 'package:plates_forward/square/model/search_user/search_user_response.dart';
 
 class HomeScreen extends StatefulWidget {
+  
   const HomeScreen({super.key});
   @override
   // ignore: library_private_types_in_public_api
@@ -28,14 +29,16 @@ class _HomeScreenState extends State<HomeScreen> {
   bool orderState = false;
   bool isButtonEnable = false;
   bool isLoading = false;
+  String? userSquareId;
   final TextEditingController orderController = TextEditingController();
-  final GlobalKey<_DialogContentState> dialogKey =
-      GlobalKey<_DialogContentState>();
+  // final GlobalKey<_AddOrderDialog> dialogKey = GlobalKey<_AddOrderDialog>();
 
   String errorText = '';
   var square = SquareFunction();
   List<Map<String, dynamic>> venueMasterData = [];
   List<Map<String, dynamic>> userTransactionData = [];
+  // ignore: non_constant_identifier_names
+  late final SearchUserModel searchUserModel;
 
   @override
   void initState() {
@@ -45,6 +48,25 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     });
+    squareId();
+  }
+
+  void squareId() {
+    try {
+      if (searchUserModel.customers.isNotEmpty) {
+        setState(() {
+          userSquareId = searchUserModel.customers[0].id;
+        });
+      } else {
+        setState(() {
+          errorText = 'No user found with this email.';
+        });
+      }
+    } catch (error) {
+      setState(() {
+        errorText = 'An error occurred: $error';
+      });
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchVenueMasterData(
@@ -60,6 +82,66 @@ class _HomeScreenState extends State<HomeScreen> {
         .map((doc) => doc.data() as Map<String, dynamic>)
         .toList();
   }
+
+  // Future<void> checkAndPrintMatchingData() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   final User? user = FirebaseAuth.instance.currentUser;
+  //   if (user == null) {
+  //     return;
+  //   }
+  //   final String userId = user.uid;
+
+  //   final CollectionReference userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+
+  //   DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
+  //       await userTransactionCollection.doc(userId).get();
+
+  //   if (userTransactionDocumentSnapshot.exists) {
+  //     Map<String, dynamic> userData =
+  //         userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
+
+  //     List<Map<String, dynamic>> userActivityDataList =
+  //         (userData['userActivityData'] as List<dynamic>)
+  //             .cast<Map<String, dynamic>>()
+  //             .toList();
+
+  //     List<String?> locationIds = userActivityDataList
+  //         .map((activity) => activity['locationId'] as String?)
+  //         .toList()
+  //         .whereType<String>()
+  //         .toList();
+
+  //     for (String? locationId in locationIds) {
+  //       if (locationId != null) {
+  //         final venueData = await fetchVenueMasterData(locationId);
+
+  //         venueMasterData.addAll(venueData);
+  //       } else {
+  //         print('locationId is null');
+  //       }
+  //     }
+
+  //     // List<Map<String, dynamic>> sorData =
+  //     //     userActivityDataList.reversed.toList();
+
+  //     // userTransactionData = sorData;
+  //     List<Map<String, dynamic>> sorData =
+  //         userActivityDataList.reversed.toList();
+  //     userTransactionData = sorData;
+
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   Future<void> checkAndPrintMatchingData() async {
     setState(() {
@@ -93,20 +175,19 @@ class _HomeScreenState extends State<HomeScreen> {
           .whereType<String>()
           .toList();
 
+      // Clear the data before adding new data to avoid duplication
+      venueMasterData.clear();
+      userTransactionData.clear();
+
       for (String? locationId in locationIds) {
         if (locationId != null) {
           final venueData = await fetchVenueMasterData(locationId);
-
           venueMasterData.addAll(venueData);
         } else {
           print('locationId is null');
         }
       }
 
-      // List<Map<String, dynamic>> sorData =
-      //     userActivityDataList.reversed.toList();
-
-      // userTransactionData = sorData;
       List<Map<String, dynamic>> sorData =
           userActivityDataList.reversed.toList();
       userTransactionData = sorData;
@@ -158,13 +239,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
     var theme = Theme.of(context);
 
+    final NetworkController networkController = Get.find<NetworkController>();
+
+    Future<void> refreshData() async {
+      await Future.delayed(const Duration(seconds: 2));
+      await checkAndPrintMatchingData();
+    }
+
     return Container(
       color: Colors.white,
       child: SafeArea(
         child: Scaffold(
           appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(70.0),
-            child: AppBarScreen(title: 'Impact')),
+              preferredSize: Size.fromHeight(70.0),
+              child: AppBarScreen(title: 'Impact')),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: DefaultTabController(
@@ -279,416 +367,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: TabBarView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        Column(
-                          children: [
-                            StreamBuilder(
-                                stream:
-                                    fetchStream('parameterCountryData').snapshots(),
-                                builder: (context,
-                                    AsyncSnapshot<QuerySnapshot> snapShot) {
-                                  if (!snapShot.hasData) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: AppColor.primaryColor,
-                                      ),
-                                    );
-                                  } else {
-                                    List<Map<String, dynamic>> countryData =
-                                        snapShot.data!.docs
-                                            .map((doc) =>
-                                                doc.data() as Map<String, dynamic>)
-                                            .toList();
-                                    int totalCount = calculateTotalCount(
-                                        venueMasterData, countryData);
-
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      width: MediaQuery.of(context).size.width * 8,
-                                      height:
-                                          MediaQuery.of(context).size.height * 0.38,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              for (int index = 0;
-                                                  index <
-                                                      snapShot.data!.docs.length;
-                                                  index += 2)
-                                                Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 20),
-                                                      child: Image.network(
-                                                        snapShot.data!.docs[index]
-                                                            ['countryFlag'],
-                                                        width: 80,
-                                                        height: 46,
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(vertical: 7),
-                                                      child: Text(
-                                                        snapShot.data!.docs[index]
-                                                            ['countryName'],
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
-                                                      style: const TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight: FontWeight.w700,
-                                                        color:
-                                                            AppColor.primaryColor,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
-                                          Container(
-                                            width: 160,
-                                            height: 160,
-                                            decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(80)),
-                                                color: AppColor.primaryColor),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                const Text(
-                                                  'Meals',
-                                                  style: TextStyle(
-                                                      color: AppColor.whiteColor,
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.w400),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Image.asset(
-                                                      ImageAssets.handLeft,
-                                                      width: 20,
-                                                      height: 48,
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 10),
-                                                      child: Text(
-                                                        totalCount.toString(),
-                                                        style: const TextStyle(
-                                                            color:
-                                                                AppColor.whiteColor,
-                                                            fontSize: 40,
-                                                            fontWeight:
-                                                                FontWeight.w700),
-                                                      ),
-                                                    ),
-                                                    Image.asset(
-                                                      ImageAssets.handRight,
-                                                      width: 20,
-                                                      height: 48,
-                                                    )
-                                                  ],
-                                                ),
-                                                const Text(
-                                                  'Donate',
-                                                  style: TextStyle(
-                                                      color: AppColor.whiteColor,
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.w400),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              for (int index = 1;
-                                                  index <
-                                                      snapShot.data!.docs.length;
-                                                  index += 2)
-                                                Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 20),
-                                                      child: Image.network(
-                                                        snapShot.data!.docs[index]
-                                                            ['countryFlag'],
-                                                        width: 80,
-                                                        height: 46,
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(vertical: 7),
-                                                      child: Text(
-                                                        snapShot.data!.docs[index]
-                                                            ['countryName'],
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
-                                                      style: const TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight: FontWeight.w700,
-                                                        color:
-                                                            AppColor.primaryColor,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                }),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'My Activities'.toUpperCase(),
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColor.primaryColor),
-                                  ),
-                                  Container(
-                                    width: 120,
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 5),
-                                    decoration: const BoxDecoration(
-                                        color: AppColor.primaryColor,
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(6))),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        if (mounted) {
-                                          setState(() {
-                                            orderState = true;
-                                            isButtonEnable = true;
-                                          });
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor: Colors.transparent,
-                                                child: _DialogContent(
-                                                  key: dialogKey,
-                                                  updateOrderState: (bool state) {
-                                                    // setState(() {
-                                                    //   orderState = state;
-                                                    //   setState(() {});
-                                                    // });
-                                                    setState(() {
-                                                      orderState = state;
-                                                    });
-                                                  },
-                                                  onSuccess: () {
-                                                    checkAndPrintMatchingData();
-                                                    setState(() {});
-                                                    // checkAndPrintMatchingData();
-                                                    // Navigator.of(context).pushNamed(
-                                                    //     RoutePaths.homeRoute);
-                                                    // checkAndPrintMatchingData();
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }
-                                      },
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Icon(
-                                            Icons.add_circle,
-                                            color: AppColor.whiteColor,
-                                            size: 20,
-                                          ),
-                                          Text(
-                                            'Add Order',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColor.whiteColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            Column(
+                  Expanded(child: Obx(() {
+                    if (!networkController.isConnected.value) {
+                      return const Center(
+                          child: NoDataMessage(
+                        message:
+                            'There is no data, kindly your check Internet Connection',
+                      ));
+                    } else {
+                      return TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          RefreshesIndicator(
+                            onRefresh: refreshData,
+                            child: ListView(
                               children: [
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 2),
-                                    child: isLoading
-                                        ? Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 50),
-                                            child:
-                                                const CircularProgressIndicator(
-                                              color: AppColor.primaryColor,
-                                              strokeWidth: 3,
-                                            ))
-                                        : venueMasterData.isEmpty &&
-                                                userTransactionData.isEmpty
-                                            ? Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 50),
-                                                child: const Text(
-                                                  'No orders yet made!',
-                                                  style: TextStyle(
-                                                    color:
-                                                        AppColor.primaryColor,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    letterSpacing: 2,
-                                                  ),
-                                                ),
-                                              )
-                                            : ExpansionTiles(
-                                              donateData: venueMasterData,
-                                              orderData: userTransactionData,
-                                            ))
-                              ],
-                            )
-                          ],
-                        ),
-                        StreamBuilder(
-                            stream: fetchStream('parameterData').snapshots(),
-                            builder:
-                                (context, AsyncSnapshot<QuerySnapshot> snapShot) {
-                              if (!snapShot.hasData) {
-                                return const Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircularProgressIndicator(
-                                        color: AppColor.primaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return SingleChildScrollView(
-                                    child: Column(
+                                Column(
                                   children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.symmetric(vertical: 5),
-                                      child: Column(
-                                        children: [
-                                          for (var communityData
-                                              in snapShot.data!.docs)
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  vertical: 15, horizontal: 20),
-                                              decoration: const BoxDecoration(
-                                                border: Border(
-                                                    bottom: BorderSide(
-                                                        width: 1,
-                                                        color: AppColor.greyColor)),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Image.network(
-                                                    communityData["parameterImage"],
-                                                    width: 50,
-                                                    height: 50,
-                                                  ),
-                                                  Expanded(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 20),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            communityData[
-                                                                    "parameterValue"]
-                                                                .toString(),
-                                                            style: const TextStyle(
-                                                                fontSize: 30,
-                                                                fontWeight:
-                                                                    FontWeight.w700,
-                                                                color: AppColor
-                                                                    .primaryColor),
-                                                          ),
-                                                          SizedBox(
-                                                            width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width *
-                                                                .65,
-                                                            child: Text(
-                                                              communityData[
-                                                                  'parameterName'],
-                                                              style: const TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
                                     StreamBuilder(
-                                        stream: fetchStream('parameterCountryData')
-                                            .snapshots(),
+                                        stream:
+                                            fetchStream('parameterCountryData')
+                                                .snapshots(),
                                         builder: (context,
-                                            AsyncSnapshot<QuerySnapshot> snapShot) {
+                                            AsyncSnapshot<QuerySnapshot>
+                                                snapShot) {
                                           if (!snapShot.hasData) {
                                             return const Center(
                                               child: CircularProgressIndicator(
@@ -696,152 +398,621 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             );
                                           } else {
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                  vertical: 20),
-                                              child: Column(
+                                            List<Map<String, dynamic>>
+                                                countryData = snapShot
+                                                    .data!.docs
+                                                    .map((doc) => doc.data()
+                                                        as Map<String, dynamic>)
+                                                    .toList();
+                                            int totalCount =
+                                                calculateTotalCount(
+                                                    venueMasterData,
+                                                    countryData);
+
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  8,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.38,
+                                              child: Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
-                                                  for (int index = 0;
-                                                      index <
-                                                          snapShot
-                                                              .data!.docs.length;
-                                                      index += 2)
-                                                    Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(vertical: 1),
-                                                      width: MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.8,
-                                                      decoration: BoxDecoration(
-                                                        border: Border(
-                                                          bottom: index ==
-                                                                  snapShot
-                                                                          .data!
-                                                                          .docs
-                                                                          .length -
-                                                                      2
-                                                              ? BorderSide.none
-                                                              : const BorderSide(
-                                                                  width: 1,
-                                                                  color: AppColor
-                                                                      .greyColor,
-                                                                ),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceAround,
-                                                        children: [
-                                                          Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        top: 20),
-                                                                child:
-                                                                    Image.network(
-                                                                  snapShot.data!
-                                                                              .docs[
-                                                                          index][
-                                                                      'countryFlag'],
-                                                                  width: 80,
-                                                                  height: 46,
-                                                                ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      for (int index = 0;
+                                                          index <
+                                                              snapShot.data!
+                                                                  .docs.length;
+                                                          index += 2)
+                                                        Column(
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 20),
+                                                              child:
+                                                                  Image.network(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index][
+                                                                    'countryFlag'],
+                                                                width: 80,
+                                                                height: 46,
                                                               ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            7),
-                                                                child: Text(
-                                                                  snapShot.data!
-                                                                              .docs[
-                                                                          index][
-                                                                      'countryName'],
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize: 16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                snapShot
-                                                                    .data!
-                                                                    .docs[index][
-                                                                        'parameterValue']
-                                                                    .toString(),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          7),
+                                                              child: Text(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index][
+                                                                    'countryName'],
                                                                 style:
                                                                     const TextStyle(
-                                                                  fontSize: 22,
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 22,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColor
+                                                                    .primaryColor,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    width: 160,
+                                                    height: 160,
+                                                    decoration: const BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    80)),
+                                                        color: AppColor
+                                                            .primaryColor),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        const Text(
+                                                          'Meals',
+                                                          style: TextStyle(
+                                                              color: AppColor
+                                                                  .whiteColor,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Image.asset(
+                                                              ImageAssets
+                                                                  .handLeft,
+                                                              width: 20,
+                                                              height: 48,
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          10),
+                                                              child: Text(
+                                                                totalCount
+                                                                    .toString(),
+                                                                style: const TextStyle(
+                                                                    color: AppColor
+                                                                        .whiteColor,
+                                                                    fontSize:
+                                                                        40,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700),
+                                                              ),
+                                                            ),
+                                                            Image.asset(
+                                                              ImageAssets
+                                                                  .handRight,
+                                                              width: 20,
+                                                              height: 48,
+                                                            )
+                                                          ],
+                                                        ),
+                                                        const Text(
+                                                          'Donate',
+                                                          style: TextStyle(
+                                                              color: AppColor
+                                                                  .whiteColor,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      for (int index = 1;
+                                                          index <
+                                                              snapShot.data!
+                                                                  .docs.length;
+                                                          index += 2)
+                                                        Column(
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 20),
+                                                              child:
+                                                                  Image.network(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index][
+                                                                    'countryFlag'],
+                                                                width: 80,
+                                                                height: 46,
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          7),
+                                                              child: Text(
+                                                                snapShot.data!
+                                                                            .docs[
+                                                                        index][
+                                                                    'countryName'],
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 22,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColor
+                                                                    .primaryColor,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        }),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'My Activities'.toUpperCase(),
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColor.primaryColor),
+                                          ),
+                                          Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                          Container(
+                                            padding: const EdgeInsets.only(right: 10),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                if (mounted) {
+                                                  setState(() {
+                                                    orderState = true;
+                                                    isButtonEnable = true;
+                                                  });
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Dialog(
+                                                        elevation: 0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        child: TotalOrderDialog(
+                                                          updateOrderState:
+                                                              (bool state) {
+                                                            setState(() {
+                                                              orderState =
+                                                                  state;
+                                                            });
+                                                          },
+                                                          onSuccess: () {
+                                                            checkAndPrintMatchingData();
+                                                            setState(() {});
+                                                          },
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                }
+                                              },
+                                              child: const Icon(Icons.data_exploration, color: AppColor.primaryColor, size: 30,))
+                                          ),  
+                                          Container(
+                                            width: 120,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            decoration: const BoxDecoration(
+                                                color: AppColor.primaryColor,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(6))),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                if (mounted) {
+                                                  setState(() {
+                                                    orderState = true;
+                                                    isButtonEnable = true;
+                                                  });
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Dialog(
+                                                        elevation: 0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        child: AddOrderDialog(
+                                                          updateOrderState:
+                                                              (bool state) {
+                                                            setState(() {
+                                                              orderState =
+                                                                  state;
+                                                            });
+                                                          },
+                                                          onSuccess: () {
+                                                            checkAndPrintMatchingData();
+                                                            setState(() {});
+                                                          },
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                }
+                                              },
+                                              child: const Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Icon(
+                                                    Icons.add_circle,
+                                                    color: AppColor.whiteColor,
+                                                    size: 20,
+                                                  ),
+                                                  Text(
+                                                    'Add Order',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color:
+                                                          AppColor.whiteColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                          ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          // height: orderState
+                                          //     ? MediaQuery.of(context)
+                                          //             .size
+                                          //             .height *
+                                          //         0.04
+                                          //     : null,
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 2),
+                                              child: isLoading
+                                                  ? Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 50),
+                                                      child:
+                                                          const CircularProgressIndicator(
+                                                        color: AppColor
+                                                            .primaryColor,
+                                                        strokeWidth: 3,
+                                                      ))
+                                                  : venueMasterData.isEmpty &&
+                                                          userTransactionData
+                                                              .isEmpty
+                                                      ? Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 50),
+                                                          child: const Text(
+                                                            'No orders yet made!',
+                                                            style: TextStyle(
+                                                              color: AppColor
+                                                                  .primaryColor,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              letterSpacing: 2,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : ExpansionTiles(
+                                                          donateData:
+                                                              venueMasterData,
+                                                          orderData:
+                                                              userTransactionData,
+                                                        )),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          StreamBuilder(
+                              stream: fetchStream('parameterData').snapshots(),
+                              builder: (context,
+                                  AsyncSnapshot<QuerySnapshot> snapShot) {
+                                if (!snapShot.hasData) {
+                                  return const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          color: AppColor.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return SingleChildScrollView(
+                                      child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5),
+                                        child: Column(
+                                          children: [
+                                            for (var communityData
+                                                in snapShot.data!.docs)
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 15,
+                                                        horizontal: 20),
+                                                decoration: const BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          width: 1,
+                                                          color: AppColor
+                                                              .greyColor)),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Image.network(
+                                                      communityData[
+                                                          "parameterImage"],
+                                                      width: 50,
+                                                      height: 50,
+                                                    ),
+                                                    Expanded(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 20),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              communityData[
+                                                                      "parameterValue"]
+                                                                  .toString(),
+                                                              style: const TextStyle(
+                                                                  fontSize: 30,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w700,
                                                                   color: AppColor
-                                                                      .primaryColor,
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                              height: 150,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                border: Border(
-                                                                  right: BorderSide(
+                                                                      .primaryColor),
+                                                            ),
+                                                            SizedBox(
+                                                              width: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  .65,
+                                                              child: Text(
+                                                                communityData[
+                                                                    'parameterName'],
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      StreamBuilder(
+                                          stream: fetchStream(
+                                                  'parameterCountryData')
+                                              .snapshots(),
+                                          builder: (context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapShot) {
+                                            if (!snapShot.hasData) {
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: AppColor.primaryColor,
+                                                ),
+                                              );
+                                            } else {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 20),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    for (int index = 0;
+                                                        index <
+                                                            snapShot.data!.docs
+                                                                .length;
+                                                        index += 2)
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 1),
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border(
+                                                            bottom: index ==
+                                                                    snapShot
+                                                                            .data!
+                                                                            .docs
+                                                                            .length -
+                                                                        2
+                                                                ? BorderSide
+                                                                    .none
+                                                                : const BorderSide(
                                                                     width: 1,
                                                                     color: AppColor
                                                                         .greyColor,
                                                                   ),
-                                                                ),
-                                                              )),
-                                                          if (index + 1 <
-                                                              snapShot.data!.docs
-                                                                  .length)
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceAround,
+                                                          children: [
                                                             Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
                                                               children: [
                                                                 Padding(
                                                                   padding:
                                                                       const EdgeInsets
                                                                           .only(
-                                                                          top: 20),
-                                                                  child:
-                                                                      Image.network(
+                                                                          top:
+                                                                              20),
+                                                                  child: Image
+                                                                      .network(
                                                                     snapShot.data!
-                                                                                .docs[
-                                                                            index +
-                                                                                1][
+                                                                            .docs[index]
+                                                                        [
                                                                         'countryFlag'],
                                                                     width: 80,
                                                                     height: 46,
                                                                   ),
                                                                 ),
                                                                 Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .symmetric(
-                                                                          vertical:
-                                                                              7),
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          7),
                                                                   child: Text(
                                                                     snapShot.data!
-                                                                                .docs[
-                                                                            index +
-                                                                                1][
+                                                                            .docs[index]
+                                                                        [
                                                                         'countryName'],
                                                                     style:
                                                                         const TextStyle(
-                                                                      fontSize: 16,
+                                                                      fontSize:
+                                                                          16,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w400,
@@ -851,13 +1022,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 Text(
                                                                   snapShot
                                                                       .data!
-                                                                      .docs[index +
-                                                                              1][
+                                                                      .docs[
+                                                                          index]
+                                                                          [
                                                                           'parameterValue']
                                                                       .toString(),
                                                                   style:
                                                                       const TextStyle(
-                                                                    fontSize: 22,
+                                                                    fontSize:
+                                                                        22,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w700,
@@ -867,21 +1040,100 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 )
                                                               ],
                                                             ),
-                                                        ],
+                                                            Container(
+                                                                height: 150,
+                                                                decoration:
+                                                                    const BoxDecoration(
+                                                                  border:
+                                                                      Border(
+                                                                    right:
+                                                                        BorderSide(
+                                                                      width: 1,
+                                                                      color: AppColor
+                                                                          .greyColor,
+                                                                    ),
+                                                                  ),
+                                                                )),
+                                                            if (index + 1 <
+                                                                snapShot
+                                                                    .data!
+                                                                    .docs
+                                                                    .length)
+                                                              Column(
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            20),
+                                                                    child: Image
+                                                                        .network(
+                                                                      snapShot.data!
+                                                                              .docs[
+                                                                          index +
+                                                                              1]['countryFlag'],
+                                                                      width: 80,
+                                                                      height:
+                                                                          46,
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            7),
+                                                                    child: Text(
+                                                                      snapShot.data!
+                                                                              .docs[
+                                                                          index +
+                                                                              1]['countryName'],
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.w400,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    snapShot
+                                                                        .data!
+                                                                        .docs[
+                                                                            index +
+                                                                                1]
+                                                                            [
+                                                                            'parameterValue']
+                                                                        .toString(),
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          22,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      color: AppColor
+                                                                          .primaryColor,
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        })
-                                  ],
-                                ));
-                              }
-                            })
-                      ],
-                    ),
-                  ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          })
+                                    ],
+                                  ));
+                                }
+                              })
+                        ],
+                      );
+                    }
+                  })),
                 ],
               ),
             ),
@@ -892,245 +1144,275 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _DialogContent extends StatefulWidget {
-  final Function(bool) updateOrderState;
-  final VoidCallback onSuccess;
+// class _DialogContent extends StatefulWidget {
+//   final Function(bool) updateOrderState;
+//   final VoidCallback onSuccess;
 
-  const _DialogContent({
-    super.key,
-    required this.updateOrderState,
-    required this.onSuccess,
-  });
+//   const _DialogContent({
+//     super.key,
+//     required this.updateOrderState,
+//     required this.onSuccess,
+//   });
 
-  @override
-  _DialogContentState createState() => _DialogContentState();
-}
+//   @override
+//   _DialogContentState createState() => _DialogContentState();
+// }
 
-class _DialogContentState extends State<_DialogContent> {
-  final TextEditingController _orderController = TextEditingController();
+// class _DialogContentState extends State<_DialogContent> {
+//   final TextEditingController _orderController = TextEditingController();
 
-  String errorText = '';
-  var square = SquareFunction();
+//   String errorText = '';
+//   var square = SquareFunction();
+//   final Scanner scanner = Scanner();
 
-  @override
-  void dispose() {
-    _orderController.dispose();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     _orderController.dispose();
+//     super.dispose();
+//   }
 
-  Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
-    List<ListItem> lineItems = result.order?.lineItems?.map((item) {
-          return ListItem(
-            name: item.name ?? '',
-            uid: item.uid ?? '',
-            amount: item.basePriceMoney?.amount ?? 0,
-            quantity: item.quantity ?? '',
-          );
-        }).toList() ??
-        [];
+//   Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
+//     List<ListItem> lineItems = result.order?.lineItems?.map((item) {
+//           return ListItem(
+//             name: item.name ?? '',
+//             uid: item.uid ?? '',
+//             amount: item.basePriceMoney?.amount ?? 0,
+//             quantity: item.quantity ?? '',
+//           );
+//         }).toList() ??
+//         [];
 
-    num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
+//     num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
 
-    UserActivityData userActivityData = UserActivityData(
-      id: result.order?.id ?? '',
-      locationId: result.order?.locationId ?? '',
-      createdAt: result.order?.createdAt ?? '',
-      totalAmount: totalAmount,
-      lineItems: lineItems,
-    );
+//     UserActivityData userActivityData = UserActivityData(
+//       id: result.order?.id ?? '',
+//       locationId: result.order?.locationId ?? '',
+//       createdAt: result.order?.createdAt ?? '',
+//       totalAmount: totalAmount,
+//       lineItems: lineItems,
+//     );
 
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final FirebaseAuth auth = FirebaseAuth.instance;
+//     final FirebaseFirestore firestore = FirebaseFirestore.instance;
+//     final FirebaseAuth auth = FirebaseAuth.instance;
 
-    final User? user = auth.currentUser;
-    if (user != null) {
-      final String userId = user.uid;
+//     final User? user = auth.currentUser;
+//     if (user != null) {
+//       final String userId = user.uid;
 
-      await firestore.collection("userTransaction").doc(userId).set({
-        'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
-      }, SetOptions(merge: true));
+//       await firestore.collection("userTransaction").doc(userId).set({
+//         'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
+//       }, SetOptions(merge: true));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Successfully added to Impact',
-            style: TextStyle(color: AppColor.whiteColor),
-          ),
-          duration: Duration(seconds: 5),
-        ),
-      );
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text(
+//             'Successfully added to Impact',
+//             style: TextStyle(color: AppColor.whiteColor),
+//           ),
+//           duration: Duration(seconds: 5),
+//         ),
+//       );
 
-      Future.delayed(const Duration(seconds: 3), () {
-        widget.updateOrderState(false);
-        Navigator.pop(context);
-        // checkAndPrintMatchingData;
-      });
-    } else {
-      print("User not authenticated");
-    }
-  }
+//       Future.delayed(const Duration(seconds: 3), () {
+//         widget.updateOrderState(false);
+//         Navigator.pop(context);
+//         // checkAndPrintMatchingData;
+//       });
+//     } else {
+//       print("User not authenticated");
+//     }
+//   }
 
-  Future<void> handleOrder() async {
-    final String orderId = _orderController.text;
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = auth.currentUser;
+//   Future<void> handleOrder() async {
+//     final String orderId = _orderController.text;
+//     final FirebaseAuth auth = FirebaseAuth.instance;
+//     final User? user = auth.currentUser;
 
-    if (user == null) {
-      print("User not authenticated");
-      return;
-    }
+//     if (user == null) {
+//       print("User not authenticated");
+//       return;
+//     }
 
-    final response = await square.retrieveOrder(
-        orderId: RetrieveOrderRequest(orderId: orderId));
+//     final response = await square.retrieveOrder(
+//         orderId: RetrieveOrderRequest(orderId: orderId));
 
-    if (_orderController.text.isEmpty) {
-      setState(() {
-        errorText = 'Invalid order ID';
-      });
-      return;
-    } else if (response is RetrieveOrderResponse) {
-      if (response.errors != null) {
-        final errorDetail = response.errors![0].detail;
-        setState(() {
-          errorText = errorDetail!;
-        });
-        return;
-      } else {
-        final String userUid = user.uid;
-        final CollectionReference userTransactionCollection =
-            FirebaseFirestore.instance.collection('userTransaction');
+//     if (_orderController.text.isEmpty) {
+//       setState(() {
+//         errorText = 'Invalid order ID';
+//       });
+//       return;
+//     } else if (response is RetrieveOrderResponse) {
+//       if (response.errors != null) {
+//         final errorDetail = response.errors![0].detail;
+//         setState(() {
+//           errorText = errorDetail!;
+//         });
+//         return;
+//       } else {
+//         final String userUid = user.uid;
+//         final CollectionReference userTransactionCollection =
+//             FirebaseFirestore.instance.collection('userTransaction');
 
-        DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
-            await userTransactionCollection.doc(userUid).get();
+//         DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
+//             await userTransactionCollection.doc(userUid).get();
 
-        if (userTransactionDocumentSnapshot.exists) {
-          Map<String, dynamic> userData =
-              userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
+//         if (userTransactionDocumentSnapshot.exists) {
+//           Map<String, dynamic> userData =
+//               userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
 
-          List<Map<String, dynamic>> userActivityDataList =
-              (userData['userActivityData'] as List<dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .toList();
-          bool orderIdFound = false;
-          for (var activity in userActivityDataList) {
-            var idValue = activity['id'];
-            if (idValue == orderId) {
-              orderIdFound = true;
-              break;
-            }
-          }
-          if (orderIdFound) {
-            setState(() {
-              errorText = 'OrderId is already exists';
-            });
-          } else {
-            await saveUserTransactionData(response);
-            _orderController.text = '';
-            setState(() {
-              errorText = '';
-            });
-            widget.onSuccess();
+//           List<Map<String, dynamic>> userActivityDataList =
+//               (userData['userActivityData'] as List<dynamic>)
+//                   .cast<Map<String, dynamic>>()
+//                   .toList();
+//           bool orderIdFound = false;
+//           for (var activity in userActivityDataList) {
+//             var idValue = activity['id'];
+//             if (idValue == orderId) {
+//               orderIdFound = true;
+//               break;
+//             }
+//           }
+//           if (orderIdFound) {
+//             setState(() {
+//               errorText = 'OrderId is already exists';
+//             });
+//           } else {
+//             await saveUserTransactionData(response);
+//             _orderController.text = '';
+//             setState(() {
+//               errorText = '';
+//             });
+//             widget.onSuccess();
 
-            // setState(() {});
-          }
-        } else {
-          await saveUserTransactionData(response);
-          _orderController.text = '';
-          setState(() {
-            errorText = '';
-          });
-          widget.onSuccess();
+//             // setState(() {});
+//           }
+//         } else {
+//           await saveUserTransactionData(response);
+//           _orderController.text = '';
+//           setState(() {
+//             errorText = '';
+//           });
+//           widget.onSuccess();
 
-          // setState(() {});
-        }
-      }
-    }
-  }
+//           // setState(() {});
+//         }
+//       }
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: AppColor.navBackgroundColor,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    'Add your Order'.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.primaryColor,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    if (mounted) {
-                      widget.updateOrderState(false);
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColor.blackColor,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: AppColor.whiteColor,
-                      size: 15,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: InputBox(
-                labelText: 'Enter Receipt / Order Number',
-                inputType: 'text',
-                inputController: _orderController,
-              ),
-            ),
-            errorText.isNotEmpty
-                ? Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 20),
-                    child: Text(
-                      errorText,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColor.redColor,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : Container(),
-            const SizedBox(height: 10),
-            ButtonBox(
-              buttonText: 'Fetch Order',
-              fillColor: true,
-              onPressed: handleOrder,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Container(
+//         width: MediaQuery.of(context).size.width * 0.8,
+//         padding: const EdgeInsets.all(20),
+//         decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(8),
+//           color: AppColor.navBackgroundColor,
+//         ),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Padding(
+//                   padding: const EdgeInsets.only(left: 20),
+//                   child: Text(
+//                     'Add your Order'.toUpperCase(),
+//                     style: const TextStyle(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.w700,
+//                       color: AppColor.primaryColor,
+//                     ),
+//                   ),
+//                 ),
+//                 GestureDetector(
+//                   onTap: () {
+//                     if (mounted) {
+//                       widget.updateOrderState(false);
+//                       Navigator.of(context).pop();
+//                     }
+//                   },
+//                   child: Container(
+//                     width: 20,
+//                     height: 20,
+//                     decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(10),
+//                       color: AppColor.blackColor,
+//                     ),
+//                     child: const Icon(
+//                       Icons.close,
+//                       color: AppColor.whiteColor,
+//                       size: 15,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 20),
+//             Row(
+//               children: [
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(horizontal: 0),
+//                   child: InputBox(
+//                 labelText: 'Enter Receipt / Order Number',
+//                 inputType: 'text',
+//                 inputController: _orderController,
+//               ),
+//                 ) ,
+//                 GestureDetector(
+//                     onTap: () => {scanner.scan(context)},
+//                     child: const Icon(
+//                       Icons.camera_sharp,
+//                       color: AppColor.primaryColor,
+//                       size: 35,
+//                     )), 
+//               ],
+//             ),
+//             // Padding(
+//             //   padding: const EdgeInsets.symmetric(horizontal: 0),
+//             //   child: InputBox(
+//             //     labelText: 'Enter Receipt / Order Number',
+//             //     inputType: 'text',
+//             //     inputController: _orderController,
+//             //   ),
+//             // ),
+//             // Padding(
+//             //   padding: const EdgeInsets.only(right: 0),
+//             //   child: GestureDetector(
+//             //       onTap: () => {scanner.scan(context)},
+//             //       child: const Icon(
+//             //         Icons.camera_sharp,
+//             //         color: AppColor.primaryColor,
+//             //         size: 35,
+//             //       )),
+//             // ),
+//             errorText.isNotEmpty
+//                 ? Container(
+//                     width: MediaQuery.of(context).size.width * 0.7,
+//                     padding: const EdgeInsets.symmetric(
+//                         vertical: 15, horizontal: 20),
+//                     child: Text(
+//                       errorText,
+//                       style: const TextStyle(
+//                         fontSize: 12,
+//                         fontWeight: FontWeight.w500,
+//                         color: AppColor.redColor,
+//                       ),
+//                       textAlign: TextAlign.center,
+//                     ),
+//                   )
+//                 : Container(),
+//             const SizedBox(height: 10),
+//             ButtonBox(
+//               buttonText: 'Fetch Order',
+//               fillColor: true,
+//               onPressed: handleOrder,
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

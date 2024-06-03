@@ -52,7 +52,6 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
   }
 
   Future<void> fetchUserDetails() async {
-
     String? userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
@@ -101,7 +100,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           errorText.isNotEmpty
+          errorText.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.only(
                       top: 20, bottom: 0, left: 40, right: 40),
@@ -186,7 +185,6 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       labelText: 'Enter your last name',
                       inputType: 'text',
                       disabled: !saveText,
-
                     ),
                   ),
                   Container(
@@ -232,7 +230,6 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       inputType: 'phone',
                       phone: true,
                       disabled: !saveText,
-
                     ),
                   ),
                   // Container(
@@ -306,7 +303,7 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
     );
   }
 
-Future<void> _handleSave() async {
+  Future<void> _handleSave() async {
     setState(() {
       errorText = '';
     });
@@ -346,7 +343,7 @@ Future<void> _handleSave() async {
         errorText = 'Mobile number must be between 10 to 12 digits';
       });
       return;
-    } 
+    }
 
     // If there are no errors, set submit to true and run updateUserDetails
     setState(() {
@@ -363,75 +360,4 @@ Future<void> _handleSave() async {
       });
     });
   }
-
-  // Future<void> _handleSave() async {
-  //   setState(() {
-  //     errorText = '';
-  //   });
-
-  //   if (_firstNameController.text.isEmpty ||
-  //       _lastNameController.text.isEmpty ||
-  //       _mobileNumberController.text.isEmpty
-  //     ) {
-  //     setState(() {
-  //       errorText = 'Please enter all the fields';
-  //     });
-  //     return;
-  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
-  //       .hasMatch(_firstNameController.text)) {
-  //     setState(() {
-  //       errorText = 'Invalid First Name';
-  //     });
-  //     return;
-  //   } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
-  //       .hasMatch(_lastNameController.text)) {
-  //     setState(() {
-  //       errorText = 'Invalid Last Name';
-  //     });
-  //     return;
-  //   } else if (_firstNameController.text.length > 8) {
-  //     setState(() {
-  //       errorText = 'First Name should be at least 8 characters ';
-  //     });
-  //     return;
-  //   } else if (_lastNameController.text.length > 8) {
-  //     setState(() {
-  //       errorText = 'Last Name should be at least 8 characters ';
-  //     });
-  //     return;
-  //   } 
-  //   else if (_mobileNumberController.text.length == 8 ||
-  //       _mobileNumberController.text.length <= 10) {
-  //     setState(() {
-  //       errorText = 'Mobile number must be between 10 to 12 digits';
-  //     });
-  //     return;
-  //   } else
-  //   // ignore: curly_braces_in_flow_control_structures
-  //   setState(() {
-  //     submit = true;
-  //   });
-    
-  //   // Update user details and set saveText to true
-  //   updateUserDetails().then((_) {
-  //     Future.delayed(const Duration(seconds: 5), () {
-  //       submit = false;
-  //       setState(() {
-  //         saveText = true;
-  //       });
-  //     });
-  //   });
-  // }
-  // void _handleSave() {
-  //   setState(() {
-  //     submit = true;
-  //   });
-
-  //   Future.delayed(const Duration(seconds: 5), () {
-  //     submit = false;
-  //     setState(() {
-  //       saveText = true;
-  //     });
-  //   });
-  // }
 }

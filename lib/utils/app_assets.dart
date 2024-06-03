@@ -26,13 +26,10 @@ class ImageAssets {
   static const successMealIcon = 'assets/images/Success_Meal_Icon.png';
   static const clockIcon = 'assets/images/ClockCountdown.png';
   static const peopleIcon = 'assets/images/UsersFour.png';
-  static const australiaFlag = 'assets/images/Australia.png';
-  static const ukraineFlag = 'assets/images/Ukraine.png';
-  static const afghanistanFlag = 'assets/images/Afghanistan.png';
-  static const sriLankaFlag = 'assets/images/SriLanka.png';
   static const handRight = 'assets/images/HandRight.png';
   static const handLeft = 'assets/images/HandLeft.png';
   static const bowlMeal = 'assets/images/BowlMeal.png';
+  static const scannerIcon = 'assets/images/barCode_scanner.png';
 
   // icons
   static const sydneyIcon = 'assets/images/SydneyIcon.png';

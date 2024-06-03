@@ -8,9 +8,9 @@ class CreatePaymentRequest {
 
   CreatePaymentRequest(
       {required this.idempotencyKey,
-        required this.sourceId,
-        required this.acceptPartialAuthorization,
-        required this.amountMoney});
+      required this.sourceId,
+      required this.acceptPartialAuthorization,
+      required this.amountMoney});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -21,4 +21,3 @@ class CreatePaymentRequest {
     return data;
   }
 }
-

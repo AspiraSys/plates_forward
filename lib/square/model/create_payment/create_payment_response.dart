@@ -5,7 +5,7 @@ class CreatePaymentResponse {
 
   CreatePaymentResponse.fromJson(Map<String, dynamic> json) {
     payment =
-    json['payment'] != null ? Payment.fromJson(json['payment']) : null;
+        json['payment'] != null ? Payment.fromJson(json['payment']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -41,25 +41,25 @@ class Payment {
 
   Payment(
       {this.id,
-        this.createdAt,
-        this.updatedAt,
-        this.amountMoney,
-        this.status,
-        this.delayDuration,
-        this.sourceType,
-        this.cardDetails,
-        this.locationId,
-        this.orderId,
-        this.riskEvaluation,
-        this.processingFee,
-        this.totalMoney,
-        this.approvedMoney,
-        this.receiptNumber,
-        this.receiptUrl,
-        this.delayAction,
-        this.delayedUntil,
-        this.applicationDetails,
-        this.versionToken});
+      this.createdAt,
+      this.updatedAt,
+      this.amountMoney,
+      this.status,
+      this.delayDuration,
+      this.sourceType,
+      this.cardDetails,
+      this.locationId,
+      this.orderId,
+      this.riskEvaluation,
+      this.processingFee,
+      this.totalMoney,
+      this.approvedMoney,
+      this.receiptNumber,
+      this.receiptUrl,
+      this.delayAction,
+      this.delayedUntil,
+      this.applicationDetails,
+      this.versionToken});
 
   Payment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -121,8 +121,7 @@ class Payment {
       data['risk_evaluation'] = riskEvaluation!.toJson();
     }
     if (processingFee != null) {
-      data['processing_fee'] =
-          processingFee!.map((v) => v.toJson()).toList();
+      data['processing_fee'] = processingFee!.map((v) => v.toJson()).toList();
     }
     if (totalMoney != null) {
       data['total_money'] = totalMoney!.toJson();
@@ -172,12 +171,12 @@ class CardDetails {
 
   CardDetails(
       {this.status,
-        this.card,
-        this.entryMethod,
-        this.cvvStatus,
-        this.avsStatus,
-        this.statementDescription,
-        this.cardPaymentTimeline});
+      this.card,
+      this.entryMethod,
+      this.cvvStatus,
+      this.avsStatus,
+      this.statementDescription,
+      this.cardPaymentTimeline});
 
   CardDetails.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -220,13 +219,13 @@ class Card {
 
   Card(
       {this.cardBrand,
-        this.last4,
-        this.expMonth,
-        this.expYear,
-        this.fingerprint,
-        this.cardType,
-        this.prepaidType,
-        this.bin});
+      this.last4,
+      this.expMonth,
+      this.expYear,
+      this.fingerprint,
+      this.cardType,
+      this.prepaidType,
+      this.bin});
 
   Card.fromJson(Map<String, dynamic> json) {
     cardBrand = json['card_brand'];

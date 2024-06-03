@@ -14,11 +14,9 @@ class StripePayment {
   StripeModel stripeModel = StripeModel();
   final StripeKeys stripeKeys;
 
-StripePayment({required this.stripeKeys});
+  StripePayment({required this.stripeKeys});
   Future<StripeResponseModel> stripeMakePayment(
       {required String amount, required String currency}) async {
-          print('in api ${stripeKeys.secretKey}');
-
     try {
       paymentIntent = await createPaymentIntent(amount, currency);
       await Stripe.instance

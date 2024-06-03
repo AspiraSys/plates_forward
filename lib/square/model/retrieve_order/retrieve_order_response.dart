@@ -18,7 +18,7 @@ class RetrieveOrderResponse {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (order != null) {
       data['order'] = order!.toJson();
-    } else if(errors != null) {
+    } else if (errors != null) {
       data['errors'] = errors!.map((v) => v.toJson()).toList();
     }
     return data;

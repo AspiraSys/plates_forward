@@ -9,8 +9,13 @@ import 'package:plates_forward/square/model/create_order/create_order_request.da
 import 'package:plates_forward/square/model/create_order/create_order_response.dart';
 import 'package:plates_forward/square/model/create_payment/create_payment_request.dart';
 import 'package:plates_forward/square/model/create_payment/create_payment_response.dart';
+import 'package:plates_forward/square/model/create_user/create_user_request.dart';
+import 'package:plates_forward/square/model/create_user/create_user_response.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
+import 'package:plates_forward/square/model/search_user/search_user_request.dart';
+import 'package:plates_forward/square/model/search_user/search_user_response.dart';
+
 class SquareFunction {
   static const int REQUEST_TIME_OUT = 1;
 
@@ -44,17 +49,88 @@ class SquareFunction {
               api: UrlConstants.retrieveOrderApi + orderId.orderId,
               header: header)
           .timeout(const Duration(minutes: REQUEST_TIME_OUT));
-      // debugPrint('res --> ${response?.body ?? ""}');
-      // final jsonResponse = json.decode(response?.body ?? "");
-     
-        // debugPrint('error res --> ${jsonResponse ?? ""}');
-        return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
-      
+      return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
     } catch (error) {
       return ExceptionHandlers.getExceptionString(
           error,
           response?.statusCode ?? 0,
           UrlConstants.retrieveOrderApi + orderId.orderId);
+    }
+  }
+
+  Future<dynamic> createUser({required CreateUserRequest emailAddress}) async {
+    http.Response? response;
+    String body = jsonEncode(emailAddress.toJson());
+    try {
+      response = await HttpBase()
+          .post(api: UrlConstants.createUser, header: header, body: body)
+          .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+
+      final jsonResponse = json.decode(response?.body ?? "");
+
+      if (response?.statusCode == 200) {
+        CustomerResponse customerResponse =
+            CustomerResponse.fromJson(jsonResponse);
+        debugPrint('Parsed Customer Response: ${customerResponse.toJson()}');
+        return customerResponse;
+      } else {
+        debugPrint('Error response --> $jsonResponse');
+        return jsonResponse;
+      }
+    } catch (error) {
+      return ExceptionHandlers.getExceptionString(
+          error, response?.statusCode ?? 0, UrlConstants.createUser);
+    }
+  }
+
+  // Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
+  //   http.Response? response;
+  //   String body = jsonEncode(emailAddress.toJson());
+  //   try {
+  //     response = await HttpBase()
+  //         .post(api: UrlConstants.userSearch, header: header, body: body)
+  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+
+  //     final jsonResponse = json.decode(response?.body ?? "");
+
+  //     if (response?.statusCode == 200) {
+  //       CustomerResponse customerResponse =
+  //           CustomerResponse.fromJson(jsonResponse);
+  //       debugPrint('Parsed Customer Response: ${customerResponse.toJson()}');
+  //       return customerResponse;
+  //     } else {
+  //       debugPrint('Error response --> $jsonResponse');
+  //       return jsonResponse;
+  //     }
+  //   } catch (error) {
+  //     return ExceptionHandlers.getExceptionString(
+  //         error, response?.statusCode ?? 0, UrlConstants.createUser);
+  //   }
+  // }
+
+  Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
+    http.Response? response;
+    String body = jsonEncode(emailAddress.toJson());
+    debugPrint('Request body --> $body');
+    try {
+      response = await HttpBase()
+          .post(api: UrlConstants.searchUser, header: header, body: body)
+          .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+      final jsonResponse = json.decode(response?.body ?? "");
+
+      if (response?.statusCode == 200) {
+        SearchUserModel searchUserModel =
+            SearchUserModel.fromJson(jsonResponse);
+        debugPrint('Parsed Customer Response: ${searchUserModel.toJson()}');
+        return searchUserModel;
+      } else {
+        debugPrint('Error response --> ${response?.body}');
+        return null;
+      }
+    } catch (error) {
+      debugPrint('Exception: ${error.toString()}');
+      return ExceptionHandlers.getExceptionString(
+          error, response?.statusCode ?? 0, UrlConstants.searchUser);
     }
   }
 

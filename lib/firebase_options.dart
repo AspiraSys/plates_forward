@@ -46,7 +46,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '919457662974',
     projectId: 'plates-it-forward',
     authDomain: 'plates-it-forward.firebaseapp.com',
-    databaseURL: 'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'plates-it-forward.appspot.com',
     measurementId: 'G-CG6FLK0X4E',
   );
@@ -56,7 +57,8 @@ class DefaultFirebaseOptions {
     appId: '1:919457662974:android:4b407805abf6aeabb662af',
     messagingSenderId: '919457662974',
     projectId: 'plates-it-forward',
-    databaseURL: 'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'plates-it-forward.appspot.com',
   );
 
@@ -65,9 +67,11 @@ class DefaultFirebaseOptions {
     appId: '1:919457662974:ios:a65d7b89f4ac6fbab662af',
     messagingSenderId: '919457662974',
     projectId: 'plates-it-forward',
-    databaseURL: 'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'plates-it-forward.appspot.com',
-    iosClientId: '919457662974-4ajrc00sirljlmlj3tlga6esh0s66ru3.apps.googleusercontent.com',
+    iosClientId:
+        '919457662974-4ajrc00sirljlmlj3tlga6esh0s66ru3.apps.googleusercontent.com',
     iosBundleId: 'com.plateItForward.app',
   );
 
@@ -76,9 +80,11 @@ class DefaultFirebaseOptions {
     appId: '1:919457662974:ios:a65d7b89f4ac6fbab662af',
     messagingSenderId: '919457662974',
     projectId: 'plates-it-forward',
-    databaseURL: 'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'plates-it-forward.appspot.com',
-    iosClientId: '919457662974-4ajrc00sirljlmlj3tlga6esh0s66ru3.apps.googleusercontent.com',
+    iosClientId:
+        '919457662974-4ajrc00sirljlmlj3tlga6esh0s66ru3.apps.googleusercontent.com',
     iosBundleId: 'com.plateItForward.app',
   );
 
@@ -88,7 +94,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '919457662974',
     projectId: 'plates-it-forward',
     authDomain: 'plates-it-forward.firebaseapp.com',
-    databaseURL: 'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://plates-it-forward-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'plates-it-forward.appspot.com',
     measurementId: 'G-G3WDB3XSEF',
   );

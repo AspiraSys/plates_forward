@@ -1,65 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:plates_forward/utils/app_colors.dart';
-// import 'package:provider/provider.dart';
-// import 'package:plates_forward/utils/app_connectivity.dart';
-
-// class NetworkAwareWidget extends StatefulWidget {
-//   final Widget child;
-
-//   const NetworkAwareWidget({super.key, required this.child});
-
-//   @override
-//   // ignore: library_private_types_in_public_api
-//   _NetworkAwareWidgetState createState() => _NetworkAwareWidgetState();
-// }
-
-// class _NetworkAwareWidgetState extends State<NetworkAwareWidget> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       final connectivityProvider =
-//           Provider.of<ConnectivityProvider>(context, listen: false);
-//       connectivityProvider.addListener(_showConnectivitySnackBar);
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     final connectivityProvider =
-//         Provider.of<ConnectivityProvider>(context, listen: false);
-//     connectivityProvider.removeListener(_showConnectivitySnackBar);
-//     super.dispose();
-//   }
-
-//   void _showConnectivitySnackBar() {
-//     final connectivityProvider =
-//         Provider.of<ConnectivityProvider>(context, listen: false);
-//     if (!connectivityProvider.isConnected) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('No Internet Connection', style: TextStyle(color: AppColor.blackColor, fontSize: 10),),
-//           backgroundColor: AppColor.redColor,
-//           behavior: SnackBarBehavior.floating,
-//           duration: Duration(seconds: 3),
-//         ),
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer<ConnectivityProvider>(
-//       builder: (context, connectivity, child) {
-//         return child!;
-//       },
-//       child: widget.child,
-//     );
-//   }
-// }
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -67,14 +5,17 @@ import 'package:plates_forward/Utils/app_colors.dart';
 
 class NetworkController extends GetxController {
   final Connectivity _connectivity = Connectivity();
+  var isConnected = true.obs;
 
   @override
   void onInit() {
     super.onInit();
     _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _checkInitialConnection();
   }
 
   void _updateConnectionStatus(ConnectivityResult connectivityResult) {
+    isConnected.value = connectivityResult != ConnectivityResult.none;
     if (connectivityResult == ConnectivityResult.none) {
       Get.rawSnackbar(
           messageText: const Text(
@@ -93,5 +34,10 @@ class NetworkController extends GetxController {
         Get.closeCurrentSnackbar();
       }
     }
+  }
+
+  Future<void> _checkInitialConnection() async {
+    var result = await _connectivity.checkConnectivity();
+    isConnected.value = result != ConnectivityResult.none;
   }
 }

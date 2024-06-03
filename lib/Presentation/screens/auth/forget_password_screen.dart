@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
+import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Utils/app_routes_path.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
@@ -19,11 +22,34 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   String errorText = '';
   bool successText = false;
   bool isLoading = false;
+  List<String> allEmails = [];
 
   @override
   void dispose() {
     super.dispose();
     _emailController.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAndPrintEmails();
+  }
+
+  Future<void> _fetchAndPrintEmails() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('userSignup').get();
+
+      List<String> emails =
+          querySnapshot.docs.map((doc) => doc['email'] as String).toList();
+
+      setState(() {
+        allEmails = emails;
+      });
+    } catch (e) {
+      print("Failed to fetch emails: $e");
+    }
   }
 
   Future<void> _handleSendEmail() async {
@@ -46,17 +72,26 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       return;
     }
 
+    if (!allEmails.contains(_emailController.text.trim())) {
+      setState(() {
+        errorText = 'There is no such email registered, kindly try again';
+        isLoading = false;
+      });
+      return;
+    }
+
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: _emailController.text.trim(),
       );
 
       setState(() {
-        errorText = 'Succesfully email sent';
+        errorText = 'Successfully email sent';
         successText = true;
       });
+
       await Future.delayed(const Duration(seconds: 3));
-      Navigator.of(context).pushNamed(RoutePaths.loginRoute); 
+      Navigator.of(context).pushNamed('/login');
     } catch (e) {
       setState(() {
         errorText =
@@ -71,6 +106,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final NetworkController networkController = Get.find<NetworkController>();
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
       body: ListView(
@@ -81,7 +117,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             padding: const EdgeInsets.only(top: 38, bottom: 25),
             child: Image.asset(
               ImageAssets.authLogo,
-             width: 138,
+              width: 138,
               height: 140,
               fit: BoxFit.contain,
             ),
@@ -107,7 +143,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6),
                         color: successText
-                            ? const Color.fromARGB(255, 87, 246, 92)
+                            ? const Color.fromARGB(255, 31, 86, 33)
                             : const Color.fromARGB(79, 244, 67, 54)),
                     child: Row(
                       children: [
@@ -118,16 +154,21 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                           child: Icon(
                             Icons.close,
                             size: 24,
-                            color: successText ? const Color.fromARGB(255, 34, 72, 35) : Colors.red,
+                            color: successText
+                                ? const Color.fromARGB(255, 34, 72, 35)
+                                : Colors.red,
                           ),
                         ),
                         Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
                           padding: const EdgeInsets.only(left: 10),
                           child: Text(
                             errorText,
                             style: TextStyle(
                                 fontSize: 16,
-                                color: successText ? const Color.fromARGB(255, 34, 72, 35) : Colors.red,
+                                color: successText
+                                    ? const Color.fromARGB(255, 34, 72, 35)
+                                    : Colors.red,
                                 fontWeight: FontWeight.w500),
                           ),
                         )
@@ -176,7 +217,9 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   buttonText: 'Send',
                   fillColor: true,
                   onPressed: () {
-                    _handleSendEmail();
+                    networkController.isConnected.value
+                        ? _handleSendEmail()
+                        : null;
                   })),
           GestureDetector(
             onTap: () => Navigator.of(context).pushNamed(RoutePaths.loginRoute),

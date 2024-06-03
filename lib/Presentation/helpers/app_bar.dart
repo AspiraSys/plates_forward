@@ -272,8 +272,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// import 'package:plates_forward/Presentation/screens/appScreen/home_screen.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -305,7 +305,7 @@ class AppBarScreen extends StatefulWidget implements PreferredSizeWidget {
 class _AppBarScreenState extends State<AppBarScreen> {
   late ImageProvider<Object> profilePicture =
       const AssetImage(ImageAssets.authLogo);
-
+    
   @override
   void initState() {
     super.initState();
@@ -327,7 +327,6 @@ class _AppBarScreenState extends State<AppBarScreen> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
         ),
-        
         backgroundColor: AppColor.whiteColor,
         leadingWidth: widget.subScreen ? 100 : 0,
         leading: widget.subScreen
@@ -342,10 +341,24 @@ class _AppBarScreenState extends State<AppBarScreen> {
                         size: 20,
                       ),
                       onPressed: () {
-                        /*widget.isDonatSub
-                            ? Navigator.of(context)
-                                .pushNamed(RoutePaths.homeRoute)*/
-                          // Navigator.of(context).pop();
+                        // // widget.isDonatSub
+                        // //     ? Navigator.of(context).pushNamed(RoutePaths.navigationRoute)
+                        // Navigator.of(context).pop();
+                        // if (Navigator.canPop(context)) {
+                        //   Navigator.of(context).pop();
+                        // } else {
+                        //   Navigator.of(context)
+                        //       .pushNamed(RoutePaths.navigationRoute);
+                        // }
+                        if (widget.isDonatSub) {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              RoutePaths.navigationRoute, (route) => false);
+                        } else if (Navigator.canPop(context)) {
+                          Navigator.of(context).pop();
+                        } else {
+                          Navigator.of(context)
+                              .pushNamed(RoutePaths.navigationRoute);
+                        }
                       },
                     ),
                     const SizedBox(width: 4),
@@ -527,7 +540,7 @@ class _AppBarScreenState extends State<AppBarScreen> {
                       Navigator.of(context).pushNamed(RoutePaths.profileRoute),
                   child: Padding(
                     padding: const EdgeInsets.only(right: 20, left: 20),
-                    child: Container(
+                    child: SizedBox(
                       width: 45,
                       height: 45,
                       child: CircleAvatar(
@@ -559,6 +572,9 @@ class _AppBarScreenState extends State<AppBarScreen> {
           profilePicture = NetworkImage(profilePictureUrl);
         });
       }
+      print('data of pp ${userDetails['profilePicture']}');
+
     }
+
   }
 }

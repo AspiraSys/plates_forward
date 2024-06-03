@@ -35,20 +35,20 @@ class Order {
 
   Order(
       {this.id,
-        this.locationId,
-        this.createdAt,
-        this.updatedAt,
-        this.state,
-        this.version,
-        this.totalTaxMoney,
-        this.totalDiscountMoney,
-        this.totalTipMoney,
-        this.totalMoney,
-        this.totalServiceChargeMoney,
-        this.netAmounts,
-        this.source,
-        this.customerId,
-        this.netAmountDueMoney});
+      this.locationId,
+      this.createdAt,
+      this.updatedAt,
+      this.state,
+      this.version,
+      this.totalTaxMoney,
+      this.totalDiscountMoney,
+      this.totalTipMoney,
+      this.totalMoney,
+      this.totalServiceChargeMoney,
+      this.netAmounts,
+      this.source,
+      this.customerId,
+      this.netAmountDueMoney});
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -75,8 +75,7 @@ class Order {
     netAmounts = json['net_amounts'] != null
         ? NetAmounts.fromJson(json['net_amounts'])
         : null;
-    source =
-    json['source'] != null ? Source.fromJson(json['source']) : null;
+    source = json['source'] != null ? Source.fromJson(json['source']) : null;
     customerId = json['customer_id'];
     netAmountDueMoney = json['net_amount_due_money'] != null
         ? TotalTaxMoney.fromJson(json['net_amount_due_money'])
@@ -104,8 +103,7 @@ class Order {
       data['total_money'] = totalMoney!.toJson();
     }
     if (totalServiceChargeMoney != null) {
-      data['total_service_charge_money'] =
-          totalServiceChargeMoney!.toJson();
+      data['total_service_charge_money'] = totalServiceChargeMoney!.toJson();
     }
     if (netAmounts != null) {
       data['net_amounts'] = netAmounts!.toJson();
@@ -149,10 +147,10 @@ class NetAmounts {
 
   NetAmounts(
       {this.totalMoney,
-        this.taxMoney,
-        this.discountMoney,
-        this.tipMoney,
-        this.serviceChargeMoney});
+      this.taxMoney,
+      this.discountMoney,
+      this.tipMoney,
+      this.serviceChargeMoney});
 
   NetAmounts.fromJson(Map<String, dynamic> json) {
     totalMoney = json['total_money'] != null

@@ -57,4 +57,3 @@ class _SplashScreenWithDelayState extends State<SplashScreenWithDelay> {
     });
   }
 }
-

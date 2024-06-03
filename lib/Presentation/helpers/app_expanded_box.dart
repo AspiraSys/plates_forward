@@ -26,7 +26,6 @@ class _ExpansionTileState extends State<ExpansionTiles> {
       return DateFormat('dd/MM/yy').format(dateTime);
     }
 
-
     if (widget.donateData.isEmpty || widget.orderData.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
@@ -49,14 +48,14 @@ class _ExpansionTileState extends State<ExpansionTiles> {
         itemBuilder: (context, int index) {
           final donation = widget.donateData[index];
           final ordering = widget.orderData[index];
-      
+
           final images = donation['venueImage'];
           final secondaryImages = donation['secondaryVenueImage'];
           final title = donation['venueName'];
           final title2 = donation['secondaryVenueName'];
           final date = formatDate(ordering['createdAt'].toString());
           final orders = ordering['lineItems'];
-      
+
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 5),
             decoration: const BoxDecoration(
@@ -65,10 +64,12 @@ class _ExpansionTileState extends State<ExpansionTiles> {
             child: ExpansionTile(
               trailing: orders.length <= 1 ? const SizedBox.shrink() : null,
               enabled: orders.length <= 1 ? false : true,
-              iconColor:
-                  orders.length < 1 ? AppColor.primaryColor : AppColor.whiteColor,
-              collapsedIconColor:
-                  orders.length < 1 ? AppColor.primaryColor : AppColor.whiteColor,
+              iconColor: orders.length < 1
+                  ? AppColor.primaryColor
+                  : AppColor.whiteColor,
+              collapsedIconColor: orders.length < 1
+                  ? AppColor.primaryColor
+                  : AppColor.whiteColor,
               textColor: AppColor.whiteColor,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -151,8 +152,9 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                 ),
                                 RichText(
                                     text: TextSpan(
-                                        text: int.parse(donationOrder['quantity'])
-                                            .toString(),
+                                        text:
+                                            int.parse(donationOrder['quantity'])
+                                                .toString(),
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
@@ -336,13 +338,15 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                                     height: 24,
                                                   ),
                                                   const Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text("WhatsApp",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w500)),
+                                                                FontWeight
+                                                                    .w500)),
                                                   ),
                                                 ],
                                               ),
@@ -354,13 +358,15 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                                     height: 24,
                                                   ),
                                                   const Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text("Message",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w500)),
+                                                                FontWeight
+                                                                    .w500)),
                                                   ),
                                                 ],
                                               ),
@@ -388,7 +394,8 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                     width: MediaQuery.of(context).size.width * 0.85,
                     decoration: const BoxDecoration(
                         border: Border(
-                            top: BorderSide(width: 2, color: AppColor.whiteColor),
+                            top: BorderSide(
+                                width: 2, color: AppColor.whiteColor),
                             bottom: BorderSide(
                                 width: 2, color: AppColor.whiteColor))),
                     child: Padding(
@@ -416,7 +423,8 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                     width: 1, color: AppColor.greyColor),
                               )),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment:

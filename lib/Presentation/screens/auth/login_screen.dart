@@ -1,11 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
+import 'package:plates_forward/Presentation/helpers/app_controller.dart';
+import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Utils/app_assets.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
+import 'package:plates_forward/square/model/create_user/create_user_response.dart';
+import 'package:plates_forward/square/model/search_user/search_user_request.dart';
+import 'package:plates_forward/square/model/search_user/search_user_response.dart';
+import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,8 +24,10 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  final TextEditingController _emailController = TextEditingController(text: 'high@yopmail.com');
-  final TextEditingController _passwordController = TextEditingController(text: 'Jam1999@');
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  var square = SquareFunction();
 
   String errorText = '';
   bool isLoading = false;
@@ -37,73 +46,117 @@ class LoginScreenState extends State<LoginScreen>
     _passwordController.dispose();
   }
 
-  // Future<void> fetchStripe() async {
-  //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //   QuerySnapshot<Map<String, dynamic>> querySnapshot =
-  //       await firestore.collection('secretKey').get();
-
-  //   if (querySnapshot.docs.isNotEmpty) {
-  //     // Assuming you want to use the first document
-  //     Map<String, dynamic> data = querySnapshot.docs.first.data();
-  //     print('---> $data');
-  //     // setState(() {
-  //     //   stripeKeys = StripeKeys.fromMap(data);
-  //     // });
-  //   } else {
-  //     print("No documents found in 'stripeKeys' collection.");
-  //   }
-  // }
-  
-  // Future<void> checkAuthState() async {
-  //   final User? user = FirebaseAuth.instance.currentUser;
-  //   if (user != null) {
-  //     // User is already logged in, navigate to HomeScreen
-  //     // navigateToHome();
-  //     Navigator.of(context).pushNamed(RoutePaths.homeRoute);
-  //   }
-  // }
-
   Future<void> _handleSignIn() async {
+    final String email = _emailController.text;
+    final res = await square.searchUser(
+      emailAddress: SearchUserRequest(emailAddress: email),
+    );
+
     setState(() {
       errorText = '';
     });
 
-    if (_emailController.text == '' || _passwordController.text == "") {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         errorText = "Please fill the fields";
       });
-    } else {
-      setState(() {
-        isLoading = true;
-      });
-      try {
-        final UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+      return;
+    }
 
-        // ignore: unnecessary_null_comparison
-        if (userCredential != null) {
-          // ignore: use_build_context_synchronously
-          Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
+    if (res != null && res is Map && res['errors'] != null) {
+      setState(() {
+        errorText = 'Something went wrong with Square POS';
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // ignore: unnecessary_null_comparison
+      if (userCredential != null) {
+        // Check if the response is valid and store the user ID
+        if (res is SearchUserModel && res.customers.isNotEmpty) {
+          Get.find<UserController>().setUserSquareId(res.customers[0].id);
+        } else {
+          setState(() {
+            errorText = 'Something went wrong with Square POS.';
+          });
         }
-      } catch (e) {
-        print('Error signing in: $e');
-        setState(() {
-          errorText = 'Invalid User Credentials';
-        });
-      } finally {
-        await Future.delayed(const Duration(seconds: 3));
-        setState(() {
-          isLoading = false;
-        });
+
+        Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
       }
+    } catch (e) {
+      print('Error signing in: $e');
+      setState(() {
+        errorText = 'Invalid User Credentials';
+      });
+    } finally {
+      await Future.delayed(const Duration(seconds: 3));
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
+  // Future<void> _handleSignIn() async {
+
+  //   final String email = _emailController.text;
+  //   final res = await square.searchUser(
+  //     emailAddress: SearchUserRequest(emailAddress: email),
+  //   );
+
+  //   setState(() {
+  //     errorText = '';
+  //   });
+
+  //   if (_emailController.text == '' || _passwordController.text == "") {
+  //     setState(() {
+  //       errorText = "Please fill the fields";
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = true;
+  //     });
+  //     try {
+  //       final UserCredential userCredential =
+  //           await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //         email: _emailController.text.trim(),
+  //         password: _passwordController.text.trim(),
+  //       );
+
+  //       // ignore: unnecessary_null_comparison
+  //       if (userCredential != null) {
+  //         // ignore: use_build_context_synchronously
+  //         Navigator.of(context)
+  //             .pushReplacementNamed(RoutePaths.navigationRoute);
+  //       }
+  //     } catch (e) {
+  //       print('Error signing in: $e');
+  //       setState(() {
+  //         errorText = 'Invalid User Credentials';
+  //       });
+  //     } finally {
+  //       await Future.delayed(const Duration(seconds: 3));
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
+    final NetworkController networkController = Get.find<NetworkController>();
+
     return Scaffold(
         backgroundColor: AppColor.whiteColor,
         body: Stack(children: [
@@ -215,7 +268,9 @@ class LoginScreenState extends State<LoginScreen>
                       buttonText: 'Log In',
                       fillColor: true,
                       onPressed: () {
-                        _handleSignIn();
+                        networkController.isConnected.value
+                            ? _handleSignIn()
+                            : null;
                       })),
               GestureDetector(
                 onTap: () => Navigator.of(context)

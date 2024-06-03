@@ -4,6 +4,9 @@ class UrlConstants {
   static const String createPaymentApi = '/v2/payments';
   static const String createOrderApi = '/v2/orders';
 
+  static const String createUser = '/v2/customers';
+  static const String searchUser = '/v2/customers/search';
+
   static String token = '';
   static const String apiVersion = '2024-03-20';
   static const String orderId = 'pvEaMOXnwki8A9nU0GGMiBOPJe4F';
