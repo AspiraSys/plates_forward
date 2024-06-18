@@ -361,7 +361,7 @@ class _AppBarScreenState extends State<AppBarScreen> {
                         }
                       },
                     ),
-                    const SizedBox(width: 4),
+                    //const SizedBox(width: 4),
                     const Text(
                       "Back",
                       style: TextStyle(

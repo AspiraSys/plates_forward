@@ -33,11 +33,7 @@ class _MissionScreenState extends State<MissionScreen> {
     final NetworkController networkController = Get.find<NetworkController>();
 
     return Scaffold(
-        appBar: const AppBarScreen(
-          title: '',
-          isMission: true,
-          subScreen: true,
-        ),
+        appBar: const AppBarScreen(title: 'Mission'),
         body: Obx(() {
           if (!networkController.isConnected.value) {
             return const Center(

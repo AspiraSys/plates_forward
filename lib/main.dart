@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Plate It Forward',
       theme: ThemeData(primaryColor: AppColor.primaryColor),
       initialRoute: RoutePaths.splashRoute,

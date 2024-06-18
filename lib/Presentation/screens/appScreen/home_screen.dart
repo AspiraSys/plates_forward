@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
@@ -409,87 +411,85 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     venueMasterData,
                                                     countryData);
 
-                                            return Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 15),
+                                            return SizedBox(
                                               width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  8,
+                                                  .size
+                                                  .width,
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height *
                                                   0.38,
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      for (int index = 0;
-                                                          index <
-                                                              snapShot.data!
-                                                                  .docs.length;
-                                                          index += 2)
-                                                        Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      top: 20),
-                                                              child:
-                                                                  Image.network(
-                                                                snapShot.data!
-                                                                            .docs[
-                                                                        index][
-                                                                    'countryFlag'],
-                                                                width: 80,
-                                                                height: 46,
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          7),
-                                                              child: Text(
-                                                                snapShot.data!
-                                                                            .docs[
-                                                                        index][
-                                                                    'countryName'],
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        for (int index = 0;
+                                                            index <
+                                                                snapShot
+                                                                    .data!
+                                                                    .docs
+                                                                    .length;
+                                                            index += 2)
+                                                          Column(
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            20),
+                                                                child: Image
+                                                                    .network(
+                                                                  snapShot.data!
+                                                                              .docs[
+                                                                          index]
+                                                                      [
+                                                                      'countryFlag'],
+                                                                  height: 46,
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                              '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 22,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                color: AppColor
-                                                                    .primaryColor,
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            7),
+                                                                child: Text(
+                                                                  snapShot.data!
+                                                                              .docs[
+                                                                          index]
+                                                                      [
+                                                                      'countryName'],
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                  ),
+                                                                ),
                                                               ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                    ],
+                                                              Text(
+                                                                '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 22,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color: AppColor
+                                                                      .primaryColor,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                   Container(
                                                     width: 160,
@@ -497,8 +497,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     decoration: const BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius.all(
-                                                                Radius.circular(
-                                                                    80)),
+                                                                Radius
+                                                                    .circular(
+                                                                        80)),
                                                         color: AppColor
                                                             .primaryColor),
                                                     child: Column(
@@ -528,11 +529,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               height: 48,
                                                             ),
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          10),
+                                                              padding: const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      10),
                                                               child: Text(
                                                                 totalCount
                                                                     .toString(),
@@ -567,198 +567,223 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ],
                                                     ),
                                                   ),
-                                                  Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      for (int index = 1;
-                                                          index <
-                                                              snapShot.data!
-                                                                  .docs.length;
-                                                          index += 2)
-                                                        Column(
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      top: 20),
-                                                              child:
-                                                                  Image.network(
-                                                                snapShot.data!
-                                                                            .docs[
-                                                                        index][
-                                                                    'countryFlag'],
-                                                                width: 80,
-                                                                height: 46,
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          7),
-                                                              child: Text(
-                                                                snapShot.data!
-                                                                            .docs[
-                                                                        index][
-                                                                    'countryName'],
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        for (int index = 1;
+                                                            index <
+                                                                snapShot
+                                                                    .data!
+                                                                    .docs
+                                                                    .length;
+                                                            index += 2)
+                                                          Column(
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            20),
+                                                                child: Image
+                                                                    .network(
+                                                                  snapShot.data!
+                                                                              .docs[
+                                                                          index]
+                                                                      [
+                                                                      'countryFlag'],
+                                                                  height: 46,
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                              '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 22,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                color: AppColor
-                                                                    .primaryColor,
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            7),
+                                                                child: Text(
+                                                                  snapShot.data!
+                                                                              .docs[
+                                                                          index]
+                                                                      [
+                                                                      'countryName'],
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                  ),
+                                                                ),
                                                               ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                    ],
+                                                              Text(
+                                                                '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 22,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color: AppColor
+                                                                      .primaryColor,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ],
                                               ),
                                             );
                                           }
                                         }),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'My Activities'.toUpperCase(),
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColor.primaryColor),
-                                          ),
-                                          Row(
-                                          mainAxisAlignment:
+                                    Row(
+                                      mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'My Activities'.toUpperCase(),
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColor.primaryColor),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                          Container(
-                                            padding: const EdgeInsets.only(right: 10),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                if (mounted) {
-                                                  setState(() {
-                                                    orderState = true;
-                                                    isButtonEnable = true;
-                                                  });
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: TotalOrderDialog(
-                                                          updateOrderState:
-                                                              (bool state) {
-                                                            setState(() {
-                                                              orderState =
-                                                                  state;
-                                                            });
+                                            Container(
+                                                padding:
+                                                    const EdgeInsets.only(
+                                                        right: 10),
+                                                child: GestureDetector(
+                                                    onTap: () {
+                                                      if (mounted) {
+                                                        setState(() {
+                                                          orderState = true;
+                                                          isButtonEnable =
+                                                              true;
+                                                        });
+                                                        showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              (BuildContext
+                                                                  context) {
+                                                            return Dialog(
+                                                              elevation: 0,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              child:
+                                                                  TotalOrderDialog(
+                                                                updateOrderState:
+                                                                    (bool
+                                                                        state) {
+                                                                  setState(
+                                                                      () {
+                                                                    orderState =
+                                                                        state;
+                                                                  });
+                                                                },
+                                                                onSuccess:
+                                                                    () {
+                                                                  checkAndPrintMatchingData();
+                                                                  setState(
+                                                                      () {});
+                                                                },
+                                                              ),
+                                                            );
                                                           },
-                                                          onSuccess: () {
-                                                            checkAndPrintMatchingData();
-                                                            setState(() {});
-                                                          },
-                                                        ),
-                                                      );
+                                                        );
+                                                      }
                                                     },
-                                                  );
-                                                }
-                                              },
-                                              child: const Icon(Icons.data_exploration, color: AppColor.primaryColor, size: 30,))
-                                          ),  
-                                          Container(
-                                            width: 120,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            decoration: const BoxDecoration(
-                                                color: AppColor.primaryColor,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(6))),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                if (mounted) {
-                                                  setState(() {
-                                                    orderState = true;
-                                                    isButtonEnable = true;
-                                                  });
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: AddOrderDialog(
-                                                          updateOrderState:
-                                                              (bool state) {
-                                                            setState(() {
-                                                              orderState =
-                                                                  state;
-                                                            });
-                                                          },
-                                                          onSuccess: () {
-                                                            checkAndPrintMatchingData();
-                                                            setState(() {});
-                                                          },
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                }
-                                              },
-                                              child: const Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Icon(
-                                                    Icons.add_circle,
-                                                    color: AppColor.whiteColor,
-                                                    size: 20,
-                                                  ),
-                                                  Text(
-                                                    'Add Order',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
+                                                    child: const Icon(
+                                                      Icons.data_exploration,
+                                                      color: AppColor
+                                                          .primaryColor,
+                                                      size: 30,
+                                                    ))),
+                                            Container(
+                                              width: 120,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5),
+                                              decoration: const BoxDecoration(
+                                                  color:
+                                                      AppColor.primaryColor,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              6))),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  if (mounted) {
+                                                    setState(() {
+                                                      orderState = true;
+                                                      isButtonEnable = true;
+                                                    });
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return Dialog(
+                                                          elevation: 0,
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          child:
+                                                              AddOrderDialog(
+                                                            updateOrderState:
+                                                                (bool state) {
+                                                              setState(() {
+                                                                orderState =
+                                                                    state;
+                                                              });
+                                                            },
+                                                            onSuccess: () {
+                                                              checkAndPrintMatchingData();
+                                                              setState(() {});
+                                                            },
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                },
+                                                child: const Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.add_circle,
                                                       color:
                                                           AppColor.whiteColor,
+                                                      size: 20,
                                                     ),
-                                                  ),
-                                                ],
+                                                    Text(
+                                                      'Add Order',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColor
+                                                            .whiteColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          )
+                                            )
                                           ],
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                     Column(
                                       children: [
@@ -1367,7 +1392,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //                       Icons.camera_sharp,
 //                       color: AppColor.primaryColor,
 //                       size: 35,
-//                     )), 
+//                     )),
 //               ],
 //             ),
 //             // Padding(
