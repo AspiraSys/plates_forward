@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plates_forward/Utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
@@ -221,168 +222,170 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.share,
-                      size: 20,
-                      color: AppColor.whiteColor,
-                    ),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return BottomSheet(
-                            backgroundColor: AppColor.navBackgroundColor,
-                            onClosing: () {},
-                            builder: (BuildContext context) {
-                              return SizedBox(
-                                height: 350,
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 40, horizontal: 10),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        const Text(
-                                          'Spread the goodness!',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 42, vertical: 10),
-                                          child: Text(
-                                            'Share your donation with friends and inspire them to join in!',
+                  Expanded(
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.share,
+                        size: 20,
+                        color: AppColor.whiteColor,
+                      ),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return BottomSheet(
+                              backgroundColor: AppColor.navBackgroundColor,
+                              onClosing: () {},
+                              builder: (BuildContext context) {
+                                return SizedBox(
+                                  height: 350,
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 40, horizontal: 10),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          const Text(
+                                            'Spread the goodness!',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w400),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700),
                                           ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            const Column(
-                                              children: [
-                                                Icon(
-                                                  Icons.facebook,
-                                                  color: AppColor.primaryColor,
-                                                  size: 24,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  child: Text("Facebook",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500)),
-                                                ),
-                                              ],
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 42, vertical: 10),
+                                            child: Text(
+                                              'Share your donation with friends and inspire them to join in!',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w400),
                                             ),
-                                            Column(
-                                              children: [
-                                                Image.asset(
-                                                  ImageAssets.threadIcon,
-                                                  width: 24,
-                                                  height: 24,
-                                                ),
-                                                const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  child: Text("Twitter",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500)),
-                                                ),
-                                              ],
-                                            ),
-                                            const Column(
-                                              children: [
-                                                Icon(
-                                                  Icons.telegram,
-                                                  color: AppColor.primaryColor,
-                                                  size: 24,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  child: Text("Telegram",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500)),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 70),
-                                          child: Row(
+                                          ),
+                                          Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
                                             children: [
-                                              Column(
+                                              const Column(
                                                 children: [
-                                                  Image.asset(
-                                                    ImageAssets.whatsappIcon,
-                                                    width: 24,
-                                                    height: 24,
+                                                  Icon(
+                                                    Icons.facebook,
+                                                    color: AppColor.primaryColor,
+                                                    size: 24,
                                                   ),
-                                                  const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 10),
-                                                    child: Text("WhatsApp",
+                                                  Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                    child: Text("Facebook",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500)),
+                                                                FontWeight.w500)),
                                                   ),
                                                 ],
                                               ),
                                               Column(
                                                 children: [
                                                   Image.asset(
-                                                    ImageAssets.messageIcon,
+                                                    ImageAssets.threadIcon,
                                                     width: 24,
                                                     height: 24,
                                                   ),
                                                   const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 10),
-                                                    child: Text("Message",
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                    child: Text("Twitter",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .w500)),
+                                                                FontWeight.w500)),
                                                   ),
+                                                ],
+                                              ),
+                                              const Column(
+                                                children: [
+                                                  Icon(
+                                                    Icons.telegram,
+                                                    color: AppColor.primaryColor,
+                                                    size: 24,
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                    child: Text("Telegram",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w500)),
+                                                  )
                                                 ],
                                               ),
                                             ],
                                           ),
-                                        )
-                                      ],
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 70),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      ImageAssets.whatsappIcon,
+                                                      width: 24,
+                                                      height: 24,
+                                                    ),
+                                                    const Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 10),
+                                                      child: Text("WhatsApp",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500)),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      ImageAssets.messageIcon,
+                                                      width: 24,
+                                                      height: 24,
+                                                    ),
+                                                    const Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 10),
+                                                      child: Text("Message",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

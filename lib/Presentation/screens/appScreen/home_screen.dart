@@ -670,32 +670,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           isButtonEnable =
                                                               true;
                                                         });
-                                                        showDialog(
-                                                          context: context,
-                                                          builder:
-                                                              (BuildContext
-                                                                  context) {
+                                                        showDialog(context: context,
+                                                          builder: (BuildContext context) {
                                                             return Dialog(
                                                               elevation: 0,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              child:
-                                                                  TotalOrderDialog(
-                                                                updateOrderState:
-                                                                    (bool
-                                                                        state) {
-                                                                  setState(
-                                                                      () {
-                                                                    orderState =
-                                                                        state;
+                                                              backgroundColor: Colors.transparent,
+                                                              child: TotalOrderDialog(
+                                                                updateOrderState: (bool state) {
+                                                                  setState(() {
+                                                                    orderState = state;
                                                                   });
                                                                 },
-                                                                onSuccess:
-                                                                    () {
+                                                                onSuccess: () {
                                                                   checkAndPrintMatchingData();
-                                                                  setState(
-                                                                      () {});
+                                                                  setState(() {});
                                                                 },
                                                               ),
                                                             );
@@ -734,16 +722,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           context) {
                                                         return Dialog(
                                                           elevation: 0,
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          child:
-                                                              AddOrderDialog(
-                                                            updateOrderState:
-                                                                (bool state) {
+                                                          backgroundColor: Colors.transparent,
+                                                          child: AddOrderDialog(
+                                                            updateOrderState: (bool state) {
                                                               setState(() {
-                                                                orderState =
-                                                                    state;
+                                                                orderState = state;
                                                               });
                                                             },
                                                             onSuccess: () {

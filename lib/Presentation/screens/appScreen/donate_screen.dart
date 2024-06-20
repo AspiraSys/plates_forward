@@ -130,7 +130,7 @@ class _DonateScreenState extends State<DonateScreen> {
                                               168, 2, 60, 167),
                                       size: 30),
                                 ),
-                                const SizedBox(width: 30),
+                                const SizedBox(width: 10),
                                 Image.asset(
                                   ImageAssets.mealIcon,
                                   width: 50,
@@ -146,7 +146,7 @@ class _DonateScreenState extends State<DonateScreen> {
                                         color: AppColor.primaryColor),
                                   ),
                                 ),
-                                const SizedBox(width: 30),
+                                const SizedBox(width: 10),
                                 GestureDetector(
                                   onTap: incrementMeals,
                                   child: const Icon(Icons.add_box,

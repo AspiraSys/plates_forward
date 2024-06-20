@@ -102,7 +102,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
     final User? user = auth.currentUser;
 
     if (user == null) {
-      print("User not authenticated");
+      debugPrint("User not authenticated");
       return;
     }
 
@@ -187,7 +187,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
   Widget build(BuildContext context) {
     final UserController userController = Get.find<UserController>();
     debugPrint('the id ${userController.userSquareId.value}');
-    print('uuuu $locationId');
+    debugPrint('uuuu $locationId');
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -202,17 +202,15 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width * 0.6,
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Expanded(
-                    child: Text(
-                      'Select the location to fetch'.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.primaryColor,
-                      ),
+                  child: Text(
+                    'Select the location to fetch'.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.primaryColor,
                     ),
                   ),
                 ),
