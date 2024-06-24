@@ -97,7 +97,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
   //   }
   // }
 
-  Future<void> handleOrder() async {
+  Future<void> handleTotalOrder() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
 
@@ -106,6 +106,9 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
       return;
     }
 
+    final UserController userController = Get.find<UserController>();
+    debugPrint('the id ${userController.userSquareId.value}');
+    print('uuuu $locationId');
     
     // final response = await square.retrieveOrder(
     //     orderId: RetrieveOrderRequest(orderId: orderId));
@@ -185,9 +188,6 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final UserController userController = Get.find<UserController>();
-    debugPrint('the id ${userController.userSquareId.value}');
-    debugPrint('uuuu $locationId');
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
@@ -205,10 +205,10 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.6,
                   child: Text(
-                    'Select the location to fetch'.toUpperCase(),
+                    'Select the location to fetch Order'.toUpperCase(),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColor.primaryColor,
                     ),
@@ -381,7 +381,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
             ButtonBox(
               buttonText: 'Total Order',
               fillColor: true,
-              onPressed: handleOrder,
+              onPressed: handleTotalOrder,
             ),
           ],
         ),

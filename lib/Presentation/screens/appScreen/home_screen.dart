@@ -6,20 +6,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
+import 'package:plates_forward/Presentation/helpers/app_controller.dart';
 import 'package:plates_forward/Presentation/helpers/app_expanded_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_networkError.dart';
 import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Presentation/helpers/app_refresh.dart';
 import 'package:plates_forward/Presentation/helpers/app_totalOrder.dart';
+import 'package:plates_forward/models/user_activity.dart';
+import 'package:plates_forward/square/model/search_order/search_order_date_request.dart';
+import 'package:plates_forward/square/model/search_order/search_order_request.dart';
 import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 import 'package:plates_forward/Presentation/helpers/app_addOrder.dart';
 import 'package:plates_forward/square/model/search_user/search_user_response.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  
   const HomeScreen({super.key});
   @override
   // ignore: library_private_types_in_public_api
@@ -31,14 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
   bool orderState = false;
   bool isButtonEnable = false;
   bool isLoading = false;
-  String? userSquareId;
+  // String? userSquareId;
   final TextEditingController orderController = TextEditingController();
+  String? customerId;
   // final GlobalKey<_AddOrderDialog> dialogKey = GlobalKey<_AddOrderDialog>();
 
   String errorText = '';
   var square = SquareFunction();
   List<Map<String, dynamic>> venueMasterData = [];
   List<Map<String, dynamic>> userTransactionData = [];
+  List<String> locationId = [];
   // ignore: non_constant_identifier_names
   late final SearchUserModel searchUserModel;
 
@@ -50,25 +57,32 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     });
-    squareId();
+    // squareId();
   }
 
-  void squareId() {
-    try {
-      if (searchUserModel.customers.isNotEmpty) {
-        setState(() {
-          userSquareId = searchUserModel.customers[0].id;
-        });
-      } else {
-        setState(() {
-          errorText = 'No user found with this email.';
-        });
-      }
-    } catch (error) {
-      setState(() {
-        errorText = 'An error occurred: $error';
-      });
-    }
+  // void squareId() {
+  //   try {
+  //     if (searchUserModel.customers.isNotEmpty) {
+  //       setState(() {
+  //         userSquareId = searchUserModel.customers[0].id;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         errorText = 'No user found with this email.';
+  //       });
+  //     }
+  //   } catch (error) {
+  //     setState(() {
+  //       errorText = 'An error occurred: $error';
+  //     });
+  //   }
+  // }
+
+  Future<void> _loadCustomerId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = prefs.getString('customerID');
+    });
   }
 
   Future<List<Map<String, dynamic>>> fetchVenueMasterData(
@@ -214,6 +228,487 @@ class _HomeScreenState extends State<HomeScreen> {
         FirebaseFirestore.instance.collection(collection);
 
     return collections;
+  }
+
+  // handleTotal() {
+  //   // final FirebaseAuth auth = FirebaseAuth.instance;
+  //   // final User? user = auth.currentUser;
+
+  //   // if (user == null) {
+  //   //   print("User not authenticated");
+  //   //   return;
+  //   // }
+  //   if (venueMasterData.isEmpty) {
+  //     print('Venue master data is empty');
+  //     return;
+  //   }
+
+  //   // Filter active venues
+  //   List<String> activeLocationIds = venueMasterData
+  //       .where((venue) => venue['isActive'] == true)
+  //       .map((venue) => venue['locationId'] as String)
+  //       .toList();
+
+  //   // Now you have a list of active locationIds
+  //   print('Active Location IDs: $activeLocationIds');
+
+  //   final UserController userController = Get.find<UserController>();
+  //   debugPrint('the id ${userController.userSquareId.value}');
+  //   // print('uuuu $locationId');
+  // }
+
+  // Future<void> handleTotal() async {
+  //   await _loadCustomerId();
+  //   final venueMasterCollection =
+  //       FirebaseFirestore.instance.collection('venueMaster');
+  //   final QuerySnapshot venueMasterSnapshot = await venueMasterCollection.get();
+
+  //   final List<Map<String, dynamic>> venueMasterData = venueMasterSnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   final List<String> activeLocationIds = venueMasterData
+  //       .where((venue) => venue['isActive'] == 1)
+  //       .map((venue) => venue['locationId'] as String)
+  //       .toList();
+
+  //   // locationId.addAll(activeLocationIds);
+  //   print('---> $activeLocationIds');
+  //   print('---><----- $customerId');
+
+  //   if (customerId != null) {
+  //     for (String location in activeLocationIds) {
+  //       final resp = await searchOrders(
+  //           request: SearchOrderRequest(
+  //               customerId: customerId!, locationId: location));
+
+  //       if (resp != null) {
+  //         final activities = parseOrdersResponse(resp);
+  //         await storeUserActivities(activities);
+  //         checkAndPrintMatchingData().then((_) {
+  //           setState(() {
+  //             isLoading = false;
+  //           });
+  //         });
+  //       } else {
+  //         print('Error in fetching orders');
+  //       }
+  //     }
+  //   }
+  // }
+
+  // Future<Map<String, dynamic>?> searchOrders(
+  //     {required SearchOrderRequest request}) async {
+  //   final res = await square.searchOrders(
+  //       customerId: request, locationId: request.locationId);
+  //   if (res != null) {
+  //     return res;
+  //   } else {
+  //     print('Error in fetching orders');
+  //   }
+  //   return null;
+  // }
+
+  // List<UserActivityData> parseOrdersResponse(Map<String, dynamic> response) {
+  //   List<UserActivityData> activities = [];
+  //   if (response['orders'] != null) {
+  //     for (var order in response['orders']) {
+  //       List<ListItem> lineItems = [];
+  //       for (var item in order['line_items']) {
+  //         lineItems.add(ListItem(
+  //           name: item['name'],
+  //           uid: item['uid'],
+  //           amount: item['total_money']['amount'],
+  //           quantity: item['quantity'],
+  //         ));
+  //       }
+  //       activities.add(UserActivityData(
+  //         id: order['id'],
+  //         locationId: order['location_id'],
+  //         createdAt: order['created_at'],
+  //         totalAmount: order['total_money']['amount'],
+  //         lineItems: lineItems,
+  //         type: 0
+  //       ));
+  //     }
+  //   }
+  //   return activities;
+  // }
+
+  // Future<List<UserActivityData>> fetchExistingActivities(String userId) async {
+  //   final userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+  //   final userDoc = await userTransactionCollection.doc(userId).get();
+
+  //   if (userDoc.exists) {
+  //     final data = userDoc.data();
+  //     if (data != null && data['userActivityData'] != null) {
+  //       return (data['userActivityData'] as List<dynamic>)
+  //           .map((item) => UserActivityData.fromJson(item))
+  //           .toList();
+  //     }
+  //   }
+  //   return [];
+  // }
+
+  // Future<void> storeUserActivities(List<UserActivityData> newActivities) async {
+  //   final FirebaseAuth auth = FirebaseAuth.instance;
+  //   final User? user = auth.currentUser;
+  //   if (user == null) {
+  //     print("User not authenticated");
+  //     return;
+  //   }
+  //   final String userUid = user.uid;
+
+  //   final existingActivities = await fetchExistingActivities(userUid);
+  //   final newUniqueActivities = newActivities.where((newActivity) {
+  //     return !existingActivities
+  //         .any((existingActivity) => existingActivity.id == newActivity.id);
+  //   }).toList();
+
+  //   if (newUniqueActivities.isEmpty) {
+  //     print("No new activities to add.");
+  //     const snackBar = SnackBar(
+  //       content: Text('No new activities to add. It is upto date'),
+  //     );
+  //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //     return;
+  //   }
+
+  //   final userTransactionCollection =
+  //       FirebaseFirestore.instance.collection('userTransaction');
+  //   final userDoc = userTransactionCollection.doc(userUid);
+
+  //   final userData = {
+  //     'userActivityData': FieldValue.arrayUnion(
+  //         newUniqueActivities.map((activity) => activity.toJson()).toList()),
+  //   };
+
+  //   await userDoc.set(userData, SetOptions(merge: true));
+
+  //   // final duplicates = newActivities.where((activity) {
+  //   //   return existingActivities
+  //   //       .any((existingActivity) => existingActivity.id == activity.id);
+  //   // }).toList();
+
+  //   // if (newUniqueActivities.isEmpty) {
+  //   //   const snackBar = SnackBar(
+  //   //     content: Text('No new activities to add. It is upto date'),
+  //   //   );
+  //   //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //   // }
+  // }
+
+  // Future<void> handleTotal() async {
+  //   await _loadCustomerId();
+  //   final venueMasterCollection =
+  //       FirebaseFirestore.instance.collection('venueMaster');
+  //   final QuerySnapshot venueMasterSnapshot = await venueMasterCollection.get();
+
+  //   final List<Map<String, dynamic>> venueMasterData = venueMasterSnapshot.docs
+  //       .map((doc) => doc.data() as Map<String, dynamic>)
+  //       .toList();
+
+  //   final List<String> activeLocationIds = venueMasterData
+  //       .where((venue) => venue['isActive'] == 1)
+  //       .map((venue) => venue['locationId'] as String)
+  //       .toList();
+
+  //   // Print active locations and customer ID
+  //   print('---> $activeLocationIds');
+  //   print('---><----- $customerId');
+
+  //   if (customerId != null) {
+  //     // Fetch existing activities to determine the latest createdAt date
+  //     final existingActivities = await fetchExistingActivities(customerId!);
+  //     DateTime? latestCreatedAt;
+
+  //     if (existingActivities.isNotEmpty) {
+  //       final latestActivity = existingActivities
+  //           .where((activity) => activity.type == 0)
+  //           .reduce((a, b) =>
+  //               DateTime.parse(a.createdAt).isAfter(DateTime.parse(b.createdAt))
+  //                   ? a
+  //                   : b);
+  //       latestCreatedAt = DateTime.parse(latestActivity.createdAt);
+  //     }
+
+  //     for (String location in activeLocationIds) {
+  //       final resp = await searchOrders(
+  //         request: SearchOrderRequest(
+  //           customerId: customerId!,
+  //           locationId: location,
+  //           startAt: latestCreatedAt
+  //               !.toIso8601String(),
+  //         ),
+  //       );
+
+  //       if (resp != null) {
+  //         final activities = parseOrdersResponse(resp);
+  //         await storeUserActivities(activities);
+  //         checkAndPrintMatchingData().then((_) {
+  //           setState(() {
+  //             isLoading = false;
+  //           });
+  //         });
+  //       } else {
+  //         print('Error in fetching orders');
+  //       }
+  //     }
+  //   }
+  // }
+
+  Future<void> handleTotal() async {
+    await _loadCustomerId();
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user == null) {
+      print("User not authenticated");
+      return;
+    }
+
+    final String userUid = user.uid;
+
+    final venueMasterCollection =
+        FirebaseFirestore.instance.collection('venueMaster');
+    final QuerySnapshot venueMasterSnapshot = await venueMasterCollection.get();
+
+    final List<Map<String, dynamic>> venueMasterData = venueMasterSnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    final List<String> activeLocationIds = venueMasterData
+        .where((venue) => venue['isActive'] == 1)
+        .map((venue) => venue['locationId'] as String)
+        .toList();
+
+    // Print active locations and customer ID
+    print('---> $activeLocationIds');
+    print('---><----- $customerId');
+
+    if (customerId != null) {
+      // Fetch existing activities to determine the latest createdAt date
+      final existingActivities = await fetchExistingActivities(userUid);
+      DateTime? latestCreatedAt;
+
+      if (userTransactionData.isEmpty) {
+        for (String location in activeLocationIds) {
+          final resp = await callSearchOrders(
+            request: SearchOrderRequest(
+              customerId: customerId!,
+              locationId: location,
+            ),
+          );
+
+          if (resp != null) {
+            final activities = parseOrdersResponse(resp);
+            if (activities.isEmpty) {
+              _showNoOrdersSnackbar();
+            } else {
+              await storeUserActivities(activities);
+              checkAndPrintMatchingData().then((_) {
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+              });
+            }
+          } else {
+            print('Error in fetching orders');
+          }
+        }
+      } else {
+        final latestActivity = existingActivities
+            .where((activity) => activity.type == 0)
+            .reduce((a, b) =>
+                DateTime.parse(a.createdAt).isAfter(DateTime.parse(b.createdAt))
+                    ? a
+                    : b);
+        latestCreatedAt = DateTime.parse(latestActivity.createdAt);
+        for (String location in activeLocationIds) {
+          final resp = await callSearchOrdersWithDate(
+            request: SearchOrderRequestWithDate(
+              customerId: customerId!,
+              locationId: location,
+              startAt: latestCreatedAt.toIso8601String(),
+            ),
+          );
+          if (resp != null) {
+            final activities = parseOrdersResponse(resp);
+            if (activities.isEmpty) {
+              _showNoOrdersSnackbar();
+            } else {
+              await storeUserActivities(activities);
+              checkAndPrintMatchingData().then((_) {
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+              });
+            }
+          } else {
+            print('Error in fetching orders');
+          }
+        }
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>?> callSearchOrders(
+      {required SearchOrderRequest request}) async {
+    final res = await square.searchOrders(
+      request: request,
+    );
+
+    if (res != null) {
+      return res;
+    } else {
+      print('Error in fetching orders');
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> callSearchOrdersWithDate(
+      {required SearchOrderRequestWithDate request}) async {
+    final res = await square.searchOrdersWithDate(
+      request: request,
+    );
+
+    if (res != null) {
+      return res;
+    } else {
+      print('Error in fetching orders');
+    }
+    return null;
+  }
+
+  // Future<Map<String, dynamic>?> searchOrders(
+  //     {required SearchOrderRequest request}) async {
+  //   final res = await square.searchOrders(
+  //       customerId: request, locationId: request.locationId, startAt: request);
+  //   if (res != null) {
+  //     return res;
+  //   } else {
+  //     print('Error in fetching orders');
+  //   }
+  //   return null;
+  // }
+
+  List<UserActivityData> parseOrdersResponse(Map<String, dynamic> response) {
+    List<UserActivityData> activities = [];
+    if (response['orders'] != null) {
+      for (var order in response['orders']) {
+        List<ListItem> lineItems = [];
+        for (var item in order['line_items']) {
+          lineItems.add(ListItem(
+            name: item['name'],
+            uid: item['uid'],
+            amount: item['total_money']['amount'],
+            quantity: item['quantity'],
+          ));
+        }
+        activities.add(UserActivityData(
+          id: order['id'],
+          locationId: order['location_id'],
+          createdAt: order['created_at'],
+          totalAmount: order['total_money']['amount'],
+          lineItems: lineItems,
+          type: 0,
+        ));
+      }
+    }
+    return activities;
+  }
+
+  Future<List<UserActivityData>> fetchExistingActivities(String userId) async {
+    final userTransactionCollection =
+        FirebaseFirestore.instance.collection('userTransaction');
+    final userDoc = await userTransactionCollection.doc(userId).get();
+
+    if (userDoc.exists) {
+      final data = userDoc.data();
+      if (data != null && data['userActivityData'] != null) {
+        return (data['userActivityData'] as List<dynamic>)
+            .map((item) => UserActivityData.fromJson(item))
+            .toList();
+      }
+    }
+    return [];
+  }
+
+  Future<void> storeUserActivities(List<UserActivityData> newActivities) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    if (user == null) {
+      print("User not authenticated");
+      return;
+    }
+    final String userUid = user.uid;
+
+    final existingActivities = await fetchExistingActivities(userUid);
+    final newUniqueActivities = newActivities.where((newActivity) {
+      return !existingActivities
+          .any((existingActivity) => existingActivity.id == newActivity.id);
+    }).toList();
+
+    if (newUniqueActivities.isEmpty) {
+      print("No new activities to add.");
+      const snackBar = SnackBar(
+        content: Text('No new activities to add. It is up to date'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+
+    final userTransactionCollection =
+        FirebaseFirestore.instance.collection('userTransaction');
+    final userDoc = userTransactionCollection.doc(userUid);
+
+    final userData = {
+      'userActivityData': FieldValue.arrayUnion(
+          newUniqueActivities.map((activity) => activity.toJson()).toList()),
+    };
+
+    await userDoc.set(userData, SetOptions(merge: true));
+    await storeSyncData(newUniqueActivities);
+  }
+
+  Future<void> storeSyncData(List<UserActivityData> newActivities) async {
+    if (customerId == null) {
+      print('No customerId available for syncing data.');
+      return;
+    }
+
+    final orderSyncCollection =
+        FirebaseFirestore.instance.collection('orderSync');
+
+    try {
+      // Prepare the data to store
+      final syncData = {
+        'lastSync': FieldValue.serverTimestamp(),
+        'activities':
+            newActivities.map((activity) => activity.toJson()).toList(),
+      };
+
+      // Use the customerId as the document ID in the 'orderSync' collection
+      await orderSyncCollection
+          .doc(customerId)
+          .set(syncData, SetOptions(merge: true));
+
+      print('Data synchronized successfully for customerId: $customerId');
+    } catch (e) {
+      print('Failed to sync data for customerId: $customerId. Error: $e');
+    }
+  }
+
+  void _showNoOrdersSnackbar() {
+    const snackBar = SnackBar(
+      content: Text('There are no orders made yet.'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -643,184 +1138,158 @@ class _HomeScreenState extends State<HomeScreen> {
                                             );
                                           }
                                         }),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'My Activities'.toUpperCase(),
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.primaryColor),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                                padding:
-                                                    const EdgeInsets.only(
-                                                        right: 10),
-                                                child: GestureDetector(
-                                                    onTap: () {
-                                                      if (mounted) {
-                                                        setState(() {
-                                                          orderState = true;
-                                                          isButtonEnable =
-                                                              true;
-                                                        });
-                                                        showDialog(context: context,
-                                                          builder: (BuildContext context) {
-                                                            return Dialog(
-                                                              elevation: 0,
-                                                              backgroundColor: Colors.transparent,
-                                                              child: TotalOrderDialog(
-                                                                updateOrderState: (bool state) {
-                                                                  setState(() {
-                                                                    orderState = state;
-                                                                  });
-                                                                },
-                                                                onSuccess: () {
-                                                                  checkAndPrintMatchingData();
-                                                                  setState(() {});
-                                                                },
-                                                              ),
-                                                            );
-                                                          },
-                                                        );
-                                                      }
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.data_exploration,
-                                                      color: AppColor
-                                                          .primaryColor,
-                                                      size: 30,
-                                                    ))),
-                                            Container(
-                                              width: 120,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 5),
-                                              decoration: const BoxDecoration(
-                                                  color:
-                                                      AppColor.primaryColor,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              6))),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  if (mounted) {
-                                                    setState(() {
-                                                      orderState = true;
-                                                      isButtonEnable = true;
-                                                    });
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return Dialog(
-                                                          elevation: 0,
-                                                          backgroundColor: Colors.transparent,
-                                                          child: AddOrderDialog(
-                                                            updateOrderState: (bool state) {
-                                                              setState(() {
-                                                                orderState = state;
-                                                              });
-                                                            },
-                                                            onSuccess: () {
-                                                              checkAndPrintMatchingData();
-                                                              setState(() {});
-                                                            },
-                                                          ),
-                                                        );
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'My Activities'.toUpperCase(),
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColor.primaryColor),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 10),
+                                                  child: GestureDetector(
+                                                      onTap: () {
+                                                        handleTotal();
                                                       },
-                                                    );
-                                                  }
-                                                },
-                                                child: const Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.add_circle,
-                                                      color:
-                                                          AppColor.whiteColor,
-                                                      size: 20,
-                                                    ),
-                                                    Text(
-                                                      'Add Order',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
+                                                      child: const Icon(
+                                                        Icons.data_exploration,
                                                         color: AppColor
-                                                            .whiteColor,
+                                                            .primaryColor,
+                                                        size: 30,
+                                                      ))),
+                                              Container(
+                                                width: 120,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 5),
+                                                decoration: const BoxDecoration(
+                                                    color:
+                                                        AppColor.primaryColor,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                6))),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    if (mounted) {
+                                                      setState(() {
+                                                        orderState = true;
+                                                        isButtonEnable = true;
+                                                      });
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return Dialog(
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            child:
+                                                                AddOrderDialog(
+                                                              updateOrderState:
+                                                                  (bool state) {
+                                                                setState(() {
+                                                                  orderState =
+                                                                      state;
+                                                                });
+                                                              },
+                                                              onSuccess: () {
+                                                                checkAndPrintMatchingData();
+                                                                setState(() {});
+                                                              },
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    }
+                                                  },
+                                                  child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.add_circle,
+                                                        color:
+                                                            AppColor.whiteColor,
+                                                        size: 20,
                                                       ),
-                                                    ),
-                                                  ],
+                                                      Text(
+                                                        'Add Order',
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColor
+                                                              .whiteColor,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ],
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     Column(
                                       children: [
                                         Container(
-                                          // height: orderState
-                                          //     ? MediaQuery.of(context)
-                                          //             .size
-                                          //             .height *
-                                          //         0.04
-                                          //     : null,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.35,
                                           child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 2),
-                                              child: isLoading
-                                                  ? Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 50),
-                                                      child:
-                                                          const CircularProgressIndicator(
-                                                        color: AppColor
-                                                            .primaryColor,
-                                                        strokeWidth: 3,
-                                                      ))
-                                                  : venueMasterData.isEmpty &&
-                                                          userTransactionData
-                                                              .isEmpty
-                                                      ? Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical: 50),
-                                                          child: const Text(
-                                                            'No orders yet made!',
-                                                            style: TextStyle(
-                                                              color: AppColor
-                                                                  .primaryColor,
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              letterSpacing: 2,
-                                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5, horizontal: 2),
+                                            child: isLoading
+                                                ? const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color:
+                                                          AppColor.primaryColor,
+                                                      strokeWidth: 3,
+                                                    ),
+                                                  )
+                                                : venueMasterData.isEmpty &&
+                                                        userTransactionData
+                                                            .isEmpty
+                                                    ? const Center(
+                                                        child: Text(
+                                                          'No orders yet made!',
+                                                          style: TextStyle(
+                                                            color: AppColor
+                                                                .primaryColor,
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            letterSpacing: 2,
                                                           ),
-                                                        )
-                                                      : ExpansionTiles(
-                                                          donateData:
-                                                              venueMasterData,
-                                                          orderData:
-                                                              userTransactionData,
-                                                        )),
-                                        )
+                                                        ),
+                                                      )
+                                                    : ExpansionTiles(
+                                                        donateData:
+                                                            venueMasterData,
+                                                        orderData:
+                                                            userTransactionData,
+                                                      ),
+                                          ),
+                                        ),
                                       ],
                                     )
                                   ],

@@ -15,6 +15,7 @@ import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -506,8 +507,12 @@ Future<void> handleLogOut(BuildContext context) async {
 
   try {
     await FirebaseAuth.instance.signOut();
-    await Future.delayed(const Duration(seconds: 2));
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('customerID');
+    
+    await Future.delayed(const Duration(seconds: 2));
+    
     Navigator.pushNamedAndRemoveUntil(
       // ignore: use_build_context_synchronously
       context,

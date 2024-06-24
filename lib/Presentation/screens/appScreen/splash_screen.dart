@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_colors.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreenWithDelay extends StatefulWidget {
   const SplashScreenWithDelay({super.key});

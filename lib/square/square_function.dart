@@ -13,6 +13,8 @@ import 'package:plates_forward/square/model/create_user/create_user_request.dart
 import 'package:plates_forward/square/model/create_user/create_user_response.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
 import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
+import 'package:plates_forward/square/model/search_order/search_order_date_request.dart';
+import 'package:plates_forward/square/model/search_order/search_order_request.dart';
 import 'package:plates_forward/square/model/search_user/search_user_request.dart';
 import 'package:plates_forward/square/model/search_user/search_user_response.dart';
 
@@ -71,7 +73,7 @@ class SquareFunction {
       if (response?.statusCode == 200) {
         CustomerResponse customerResponse =
             CustomerResponse.fromJson(jsonResponse);
-        debugPrint('Parsed Customer Response: ${customerResponse.toJson()}');
+        debugPrint('Parsed Customer Responsedd: ${customerResponse.toJson()}');
         return customerResponse;
       } else {
         debugPrint('Error response --> $jsonResponse');
@@ -111,7 +113,7 @@ class SquareFunction {
   Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
     http.Response? response;
     String body = jsonEncode(emailAddress.toJson());
-    debugPrint('Request body --> $body');
+    // debugPrint('Request body --> $body');
     try {
       response = await HttpBase()
           .post(api: UrlConstants.searchUser, header: header, body: body)
@@ -121,7 +123,7 @@ class SquareFunction {
       if (response?.statusCode == 200) {
         SearchUserModel searchUserModel =
             SearchUserModel.fromJson(jsonResponse);
-        debugPrint('Parsed Customer Response: ${searchUserModel.toJson()}');
+        debugPrint('Parsed Customer Response of search: ${searchUserModel.toJson()}');
         return searchUserModel;
       } else {
         debugPrint('Error response --> ${response?.body}');
@@ -131,6 +133,83 @@ class SquareFunction {
       debugPrint('Exception: ${error.toString()}');
       return ExceptionHandlers.getExceptionString(
           error, response?.statusCode ?? 0, UrlConstants.searchUser);
+    }
+  }
+
+  // Future<dynamic> searchOrders({required SearchOrderRequest customerId, required String locationId, required SearchOrderRequest startAt }) async {
+  //   http.Response? response;
+  //   String body = jsonEncode(customerId.toJson());
+  //   // debugPrint('Request body --> $body');
+  //   try {
+  //     response = await HttpBase()
+  //         .post(api: UrlConstants.searchOrder, header: header, body: body)
+  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+  //     final jsonResponse = json.decode(response?.body ?? "");
+
+  //     if (response?.statusCode == 200) {
+  //       // SearchUserModel searchUserModel =
+  //       //     SearchUserModel.fromJson(jsonResponse);
+  //     //  debugPrint('Parsed Customer Response: $jsonResponse');
+  //       return jsonResponse;
+  //     } else {
+  //       debugPrint('Error response --> ${response?.body}');
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     debugPrint('Exception: ${error.toString()}');
+  //     return ExceptionHandlers.getExceptionString(
+  //         error, response?.statusCode ?? 0, UrlConstants.searchOrder);
+  //   }
+  // }
+  Future<dynamic> searchOrders({
+    required SearchOrderRequest request,
+  }) async {
+    http.Response? response;
+    String body = jsonEncode(request.toJson());
+
+    try {
+      response = await HttpBase()
+          .post(api: UrlConstants.searchOrder, header: header, body: body)
+          .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+      final jsonResponse = json.decode(response?.body ?? "");
+
+      if (response?.statusCode == 200) {
+        print('in actual resp $jsonResponse');
+        return jsonResponse;
+      } else {
+        debugPrint('Error response --> ${response?.body}');
+        return null;
+      }
+    } catch (error) {
+      debugPrint('Exception: ${error.toString()}');
+      return ExceptionHandlers.getExceptionString(
+          error, response?.statusCode ?? 0, UrlConstants.searchOrder);
+    }
+  }
+
+  Future<dynamic> searchOrdersWithDate({
+    required SearchOrderRequestWithDate request,
+  }) async {
+    http.Response? response;
+    String body = jsonEncode(request.toJson());
+
+    try {
+      response = await HttpBase()
+          .post(api: UrlConstants.searchOrder, header: header, body: body)
+          .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+      final jsonResponse = json.decode(response?.body ?? "");
+
+      if (response?.statusCode == 200) {
+        // print('---> of date $jsonResponse');
+        return jsonResponse;
+      } else {
+        debugPrint('Error response --> ${response?.body}');
+        return null;
+      }
+    } catch (error) {
+      debugPrint('Exception: ${error.toString()}');
+      return ExceptionHandlers.getExceptionString(
+          error, response?.statusCode ?? 0, UrlConstants.searchOrder);
     }
   }
 

@@ -155,7 +155,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                             Icons.close,
                             size: 24,
                             color: successText
-                                ? const Color.fromARGB(255, 34, 72, 35)
+                                ? AppColor.whiteColor
                                 : Colors.red,
                           ),
                         ),
@@ -167,7 +167,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                             style: TextStyle(
                                 fontSize: 16,
                                 color: successText
-                                    ? const Color.fromARGB(255, 34, 72, 35)
+                                    ? AppColor.whiteColor
                                     : Colors.red,
                                 fontWeight: FontWeight.w500),
                           ),

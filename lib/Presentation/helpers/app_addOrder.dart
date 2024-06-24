@@ -61,6 +61,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
       createdAt: result.order?.createdAt ?? '',
       totalAmount: totalAmount,
       lineItems: lineItems,
+      type: 0
     );
 
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
