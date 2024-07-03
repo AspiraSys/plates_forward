@@ -440,6 +440,7 @@ class _DonateScreenState extends State<DonateScreen> {
           createdAt: stripeData['createdAt'] ?? '',
           totalAmount: stripeData['totalAmount'] ?? 0,
           lineItems: lineItems,
+          method: 'donation',
           type: 1
         );
         // UserActivityData userTransactionData = UserActivityData{

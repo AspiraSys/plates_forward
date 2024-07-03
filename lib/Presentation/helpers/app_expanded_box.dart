@@ -56,6 +56,9 @@ class _ExpansionTileState extends State<ExpansionTiles> {
           final title2 = donation['secondaryVenueName'];
           final date = formatDate(ordering['createdAt'].toString());
           final orders = ordering['lineItems'];
+          final method = ordering['method'];
+
+          print('--> ${ordering['method']}');
 
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 5),
@@ -63,12 +66,12 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                 borderRadius: BorderRadius.all(Radius.circular(6)),
                 color: AppColor.primaryColor),
             child: ExpansionTile(
-              trailing: orders.length <= 1 ? const SizedBox.shrink() : null,
-              enabled: orders.length <= 1 ? false : true,
-              iconColor: orders.length < 1
+              trailing: method == 'donation' ? const SizedBox.shrink() : null,
+              enabled: method == 'donation' ? false : true,
+              iconColor: method == 'donation'
                   ? AppColor.primaryColor
                   : AppColor.whiteColor,
-              collapsedIconColor: orders.length < 1
+              collapsedIconColor: method == 'donation'
                   ? AppColor.primaryColor
                   : AppColor.whiteColor,
               textColor: AppColor.whiteColor,
@@ -106,7 +109,8 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Text(
-                                '${title.toString()} Social',
+                                method == 'donation' ? 
+                                '${title.toString()} Donation' : '${title.toString()} Social',
                                 style: const TextStyle(
                                     color: AppColor.whiteColor,
                                     fontSize: 16,
@@ -131,7 +135,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                             ],
                           ),
                         ),
-                        if (orders != null && orders.length <= 1)
+                        if (orders != null && method == 'donation')
                           for (var donationOrder in orders)
                             Row(
                               children: [
@@ -273,17 +277,20 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                                 children: [
                                                   Icon(
                                                     Icons.facebook,
-                                                    color: AppColor.primaryColor,
+                                                    color:
+                                                        AppColor.primaryColor,
                                                     size: 24,
                                                   ),
                                                   Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text("Facebook",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w500)),
+                                                                FontWeight
+                                                                    .w500)),
                                                   ),
                                                 ],
                                               ),
@@ -295,13 +302,15 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                                     height: 24,
                                                   ),
                                                   const Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text("Twitter",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w500)),
+                                                                FontWeight
+                                                                    .w500)),
                                                   ),
                                                 ],
                                               ),
@@ -309,17 +318,20 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                                 children: [
                                                   Icon(
                                                     Icons.telegram,
-                                                    color: AppColor.primaryColor,
+                                                    color:
+                                                        AppColor.primaryColor,
                                                     size: 24,
                                                   ),
                                                   Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text("Telegram",
                                                         style: TextStyle(
                                                             fontSize: 14,
                                                             fontWeight:
-                                                                FontWeight.w500)),
+                                                                FontWeight
+                                                                    .w500)),
                                                   )
                                                 ],
                                               ),
@@ -434,12 +446,19 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        donationOrder['name'].toString(),
+                                        '${donationOrder['name'].toString()}',
                                         style: const TextStyle(
                                             fontSize: 14,
                                             color: AppColor.whiteColor,
                                             fontWeight: FontWeight.w600),
                                       ),
+                                      // Text(
+                                      //   'A\$ ${(donationOrder['amount'])}',
+                                      //   style: const TextStyle(
+                                      //       fontSize: 14,
+                                      //       color: AppColor.whiteColor,
+                                      //       fontWeight: FontWeight.w600),
+                                      // ),
                                       Text(
                                         'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
                                         style: const TextStyle(

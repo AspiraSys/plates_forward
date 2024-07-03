@@ -6,6 +6,7 @@ class UserActivityData {
     required this.totalAmount,
     required this.lineItems,
     required this.type,
+    this.method = '',
   });
 
   late String id;
@@ -14,11 +15,13 @@ class UserActivityData {
   late num totalAmount;
   late List<ListItem> lineItems;
   late num type;
+  late String method;
 
   UserActivityData.fromJson(Map<String, dynamic> json)
       : id = json['id'] ?? '',
         locationId = json['locationId'] ?? '',
         createdAt = json['createdAt'] ?? '',
+        method = json['method'] ?? '',
         totalAmount = json['totalAmount'] ?? 0,
         type = json['type'] ?? 0,
         lineItems = (json['lineItems'] as List)
@@ -32,6 +35,7 @@ class UserActivityData {
       'createdAt': createdAt,
       'totalAmount': totalAmount,
       'type': type,
+      'method': method,
       'lineItems': lineItems.map((item) => item.toJson()).toList(),
     };
   }
