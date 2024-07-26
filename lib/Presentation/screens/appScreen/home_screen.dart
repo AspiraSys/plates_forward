@@ -915,12 +915,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       .height *
                                                   0.38,
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Expanded(
                                                     flex: 1,
                                                     child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         for (int index = 0;
                                                             index <
@@ -986,80 +990,140 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ],
                                                     ),
                                                   ),
-                                                  Container(
-                                                    width: 160,
-                                                    height: 160,
-                                                    decoration: const BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius
-                                                                    .circular(
-                                                                        80)),
-                                                        color: AppColor
-                                                            .primaryColor),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
-                                                      children: [
-                                                        const Text(
-                                                          'Meals',
-                                                          style: TextStyle(
-                                                              color: AppColor
-                                                                  .whiteColor,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Image.asset(
-                                                              ImageAssets
-                                                                  .handLeft,
-                                                              width: 20,
-                                                              height: 48,
-                                                            ),
-                                                            Padding(
-                                                              padding: const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      10),
-                                                              child: Text(
-                                                                totalCount
-                                                                    .toString(),
-                                                                style: const TextStyle(
-                                                                    color: AppColor
-                                                                        .whiteColor,
-                                                                    fontSize:
-                                                                        40,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      if (mounted) {
+                                                        setState(() {
+                                                          orderState = true;
+                                                          isButtonEnable = true;
+                                                        });
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return Dialog(
+                                                              elevation: 0,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              child:
+                                                                  AddOrderDialog(
+                                                                updateOrderState:
+                                                                    (bool
+                                                                        state) {
+                                                                  setState(() {
+                                                                    orderState =
+                                                                        state;
+                                                                  });
+                                                                },
+                                                                onSuccess: () {
+                                                                  checkAndPrintMatchingData();
+                                                                  setState(
+                                                                      () {});
+                                                                },
                                                               ),
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      width: 160,
+                                                      height: 160,
+                                                      decoration: const BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          80)),
+                                                          color: AppColor
+                                                              .primaryColor),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          const Text(
+                                                            'Meals',
+                                                            style: TextStyle(
+                                                                color: AppColor
+                                                                    .whiteColor,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Image.asset(
+                                                                ImageAssets
+                                                                    .handLeft,
+                                                                width: 20,
+                                                                height: 48,
+                                                              ),
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        10),
+                                                                child: Text(
+                                                                  totalCount
+                                                                      .toString(),
+                                                                  style: const TextStyle(
+                                                                      color: AppColor
+                                                                          .whiteColor,
+                                                                      fontSize:
+                                                                          40,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700),
+                                                                ),
+                                                              ),
+                                                              Image.asset(
+                                                                ImageAssets
+                                                                    .handRight,
+                                                                width: 20,
+                                                                height: 48,
+                                                              )
+                                                            ],
+                                                          ),
+                                                          Container(
+                                                            child: const Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsets
+                                                                      .only(
+                                                                          right:
+                                                                              5),
+                                                                  child: Text(
+                                                                    'Donate',
+                                                                    style: TextStyle(
+                                                                        color: AppColor
+                                                                            .whiteColor,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.w400),
+                                                                  ),
+                                                                ),
+                                                                Icon(
+                                                                  Icons
+                                                                      .add_circle,
+                                                                  color: AppColor
+                                                                      .whiteColor,
+                                                                  size: 15,
+                                                                ),
+                                                              ],
                                                             ),
-                                                            Image.asset(
-                                                              ImageAssets
-                                                                  .handRight,
-                                                              width: 20,
-                                                              height: 48,
-                                                            )
-                                                          ],
-                                                        ),
-                                                        const Text(
-                                                          'Donate',
-                                                          style: TextStyle(
-                                                              color: AppColor
-                                                                  .whiteColor,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
-                                                        )
-                                                      ],
+                                                          )
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                   Expanded(

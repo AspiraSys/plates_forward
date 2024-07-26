@@ -46,6 +46,7 @@ class SignUpScreenState extends State<SignUpScreen>
   File? _pickedImage;
   String imagesUrl = '';
   bool checked = false;
+  bool isButtonEnabled = true;
 
   @override
   void initState() {
@@ -109,16 +110,9 @@ class SignUpScreenState extends State<SignUpScreen>
     }
   }
 
-Future<void> _handleSignUp() async {
-    final String email = _emailController.text;
-    final String fullName =
-        "${_firstNameController.text} ${_lastNameController.text}";
-    final String givenName = fullName;
-    final res = await square.createUser(
-      emailAddress:
-          CreateUserRequest(emailAddress: email, givenName: givenName),
-    );
+  Future<void> _handleSignUp() async {
     setState(() {
+      isButtonEnabled = false;
       errorText = '';
     });
 
@@ -151,52 +145,61 @@ Future<void> _handleSignUp() async {
         _emailController.text.isEmpty) {
       setState(() {
         errorText = 'Please enter all the fields';
+        isButtonEnabled = true;
       });
       return;
     } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
         .hasMatch(_firstNameController.text)) {
       setState(() {
         errorText = 'Invalid First Name';
+        isButtonEnabled = true;
       });
       return;
     } else if (RegExp(r'[0-9!@#\$%^&*(),.?":{}|<>]')
         .hasMatch(_lastNameController.text)) {
       setState(() {
         errorText = 'Invalid Last Name';
+        isButtonEnabled = true;
       });
       return;
     } else if (_firstNameController.text.length < 3 ||
         _firstNameController.text.length > 20) {
       setState(() {
         errorText = 'First Name should be between 3 to 20 characters ';
+        isButtonEnabled = true;
       });
       return;
-    } else if (_lastNameController.text.length < 3 ||
+    } else if (_lastNameController.text.length < 2 ||
         _lastNameController.text.length > 20) {
       setState(() {
         errorText = 'Last Name should be between 3 to 20 characters ';
+        isButtonEnabled = true;
       });
       return;
     } else if (!_emailController.text.contains('@')) {
       setState(() {
         errorText = 'Please enter a valid email address';
+        isButtonEnabled = true;
       });
       return;
     } else if (_passwordController.text.length < 8) {
       setState(() {
         errorText = 'Please enter at least 8 characters for the password';
+        isButtonEnabled = true;
       });
       return;
     } else if (!validatePasswordStructure(_passwordController.text)) {
       setState(() {
         errorText =
             'Password must contain One Uppercase, One Special Character and Numbers';
+        isButtonEnabled = true;
       });
       return;
     } else if (_mobileNumberController.text.length < 10 ||
         _mobileNumberController.text.length > 12) {
       setState(() {
         errorText = 'Mobile number must be between 10 to 12 digits';
+        isButtonEnabled = true;
       });
       return;
     }
@@ -212,6 +215,7 @@ Future<void> _handleSignUp() async {
       setState(() {
         errorText = 'The email address is already in use';
         isLoading = false;
+        isButtonEnabled = true;
       });
       return;
     }
@@ -223,11 +227,21 @@ Future<void> _handleSignUp() async {
         password: _passwordController.text.trim(),
       );
 
+      final String email = _emailController.text;
+      final String fullName =
+          "${_firstNameController.text} ${_lastNameController.text}";
+      final String givenName = fullName;
+      final res = await square.createUser(
+        emailAddress:
+            CreateUserRequest(emailAddress: email, givenName: givenName),
+      );
+
       if (res != null && res is Map && res['errors'] != null) {
         // Handling the error from Square POS
         setState(() {
           errorText = 'Something went wrong with Square POS';
           isLoading = false;
+          isButtonEnabled = true;
         });
         return;
       }
@@ -247,10 +261,12 @@ Future<void> _handleSignUp() async {
       setState(() {
         errorText = 'Please ensure you have entered a valid email address';
         isLoading = false;
+        isButtonEnabled = true;
       });
     } finally {
       setState(() {
         isLoading = false;
+        isButtonEnabled = true;
       });
     }
   }
@@ -1239,16 +1255,23 @@ Future<void> _handleSignUp() async {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.only(top: 20, bottom: 20),
                 child: ButtonBox(
-                  buttonText: 'Sign up',
-                  fillColor: true,
-                  onPressed: () {
-                    networkController.isConnected.value
-                        ? _handleSignUp()
-                        : null;
-                  },
-                  // enabled: checked,
-                  // opacityColor: !checked,
-                )),
+                    buttonText: 'Sign up',
+                    fillColor: true,
+                    onPressed: () {
+                      networkController.isConnected.value
+                          ? isButtonEnabled
+                              ? _handleSignUp()
+                              : null
+                          : null;
+                    }
+                    // () {
+                    //   networkController.isConnected.value
+                    //       ? _handleSignUp()
+                    //       : null;
+                    // },
+                    // enabled: checked,
+                    // opacityColor: !checked,
+                    )),
           ],
         ),
         if (isLoading) const CircularProgress()

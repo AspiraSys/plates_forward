@@ -119,7 +119,21 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
           errorText = errorDetail!;
         });
         return;
-      } else {
+      } else if (response.order == null) {
+        // If there is no data in the order, show a Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'There is no data in the orderId',
+              style: TextStyle(color: AppColor.whiteColor),
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+      
+      else {
         final String userUid = user.uid;
         final CollectionReference userTransactionCollection =
             FirebaseFirestore.instance.collection('userTransaction');
