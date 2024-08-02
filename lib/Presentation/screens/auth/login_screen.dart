@@ -111,7 +111,7 @@ class LoginScreenState extends State<LoginScreen>
     } catch (e) {
       print('Error signing in: $e');
       setState(() {
-        errorText = 'Invalid User Credentials';
+        errorText = 'Email or Password is incorrect';
       });
     } finally {
       await Future.delayed(const Duration(seconds: 3));
@@ -390,7 +390,7 @@ class LoginScreenState extends State<LoginScreen>
             children: <Widget>[
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 38, bottom: 25),
+                padding: const EdgeInsets.only(top: 38, bottom: 15),
                 child: Image.asset(
                   ImageAssets.authLogo,
                   width: 138,
@@ -400,7 +400,7 @@ class LoginScreenState extends State<LoginScreen>
               ),
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 30, bottom: 24),
+                padding: const EdgeInsets.only(top: 30, bottom: 15),
                 child: Text(
                   "Sign In".toUpperCase(),
                   style: const TextStyle(
@@ -412,7 +412,7 @@ class LoginScreenState extends State<LoginScreen>
               ),
               errorText.isNotEmpty
                   ? Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 10),
+                      padding: const EdgeInsets.only(top: 0, bottom: 10),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 15),
@@ -515,7 +515,7 @@ class LoginScreenState extends State<LoginScreen>
               ),
               Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 48),
+                padding: const EdgeInsets.only(top: 25),
                 child: const Text(
                   "Don't have an account yet?",
                   style: TextStyle(

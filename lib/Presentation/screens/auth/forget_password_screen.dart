@@ -74,7 +74,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
     if (!allEmails.contains(_emailController.text.trim())) {
       setState(() {
-        errorText = 'There is no such email registered, kindly try again';
+        errorText = 'If the provided email is registered, a link will be sent';
         isLoading = false;
       });
       return;
@@ -124,7 +124,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.only(top: 30, bottom: 24),
+            padding: const EdgeInsets.only(top: 8, bottom: 24),
             child: Text(
               "Reset Password".toUpperCase(),
               style: const TextStyle(
@@ -136,7 +136,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
           errorText.isNotEmpty
               ? Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 10),
+                  padding: const EdgeInsets.only(top: 0, bottom: 10),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 15),
@@ -181,7 +181,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
             child: const Text(
-              "Please enter your email address, so we will send you link to email",
+              "Please enter your email for a reset link to be sent",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -238,7 +238,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
           Container(
             alignment: Alignment.center,
-            margin: const EdgeInsets.only(top: 48),
+            margin: const EdgeInsets.only(top: 25),
             child: const Text(
               "Don't have an account yet?",
               style: TextStyle(

@@ -142,7 +142,7 @@ class SignUpScreenState extends State<SignUpScreen>
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _mobileNumberController.text.isEmpty ||
-        _emailController.text.isEmpty) {
+        _emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         errorText = 'Please enter all the fields';
         isButtonEnabled = true;
@@ -660,9 +660,8 @@ class SignUpScreenState extends State<SignUpScreen>
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
       body: Stack(children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+        ListView(
+          children: <Widget>[
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.only(top: 38, bottom: 20),
@@ -675,7 +674,7 @@ class SignUpScreenState extends State<SignUpScreen>
             ),
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 20, bottom: 0),
+              padding: const EdgeInsets.only(top: 10, bottom: 4),
               child: Text(
                 "Sign Up".toUpperCase(),
                 style: const TextStyle(
@@ -734,7 +733,7 @@ class SignUpScreenState extends State<SignUpScreen>
                       },
                       child: Container(
                           alignment: Alignment.center,
-                          margin: const EdgeInsets.only(top: 5),
+                          margin: const EdgeInsets.only(top: 2),
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
@@ -785,18 +784,24 @@ class SignUpScreenState extends State<SignUpScreen>
                           )),
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 20),
-                      padding: const EdgeInsets.only(left: 15),
-                      child: const Text(
-                        "First Name",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(left: 15),
+                        child: RichText(
+                            text: const TextSpan(
+                          text: 'First Name',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' * ',
+                              style: TextStyle(color: AppColor.redColor),
+                            )
+                          ],
+                        ))),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: InputBox(
@@ -806,18 +811,24 @@ class SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 15),
-                      padding: const EdgeInsets.only(left: 15),
-                      child: const Text(
-                        "Last Name",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(top: 15),
+                        padding: const EdgeInsets.only(left: 15),
+                        child: RichText(
+                            text: const TextSpan(
+                          text: 'Last Name',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' * ',
+                              style: TextStyle(color: AppColor.redColor),
+                            )
+                          ],
+                        ))),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: InputBox(
@@ -827,18 +838,24 @@ class SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 15),
-                      padding: const EdgeInsets.only(left: 15),
-                      child: const Text(
-                        "Email",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(top: 15),
+                        padding: const EdgeInsets.only(left: 15),
+                        child: RichText(
+                            text: const TextSpan(
+                          text: 'Email',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' * ',
+                              style: TextStyle(color: AppColor.redColor),
+                            )
+                          ],
+                        ))),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: InputBox(
@@ -848,18 +865,24 @@ class SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 15),
-                      padding: const EdgeInsets.only(left: 15),
-                      child: const Text(
-                        "Mobile Number",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(top: 15),
+                        padding: const EdgeInsets.only(left: 15),
+                        child: RichText(
+                            text: const TextSpan(
+                          text: 'Mobile Number',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' * ',
+                              style: TextStyle(color: AppColor.redColor),
+                            )
+                          ],
+                        ))),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: InputBox(
@@ -870,18 +893,24 @@ class SignUpScreenState extends State<SignUpScreen>
                       ),
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: const EdgeInsets.only(top: 15),
-                      padding: const EdgeInsets.only(left: 15),
-                      child: const Text(
-                        "Password",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(top: 15),
+                        padding: const EdgeInsets.only(left: 15),
+                        child: RichText(
+                            text: const TextSpan(
+                          text: 'Password',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' * ',
+                              style: TextStyle(color: AppColor.redColor),
+                            )
+                          ],
+                        ))),
                     Container(
                       alignment: Alignment.centerLeft,
                       child: InputBox(
@@ -1272,8 +1301,14 @@ class SignUpScreenState extends State<SignUpScreen>
                     // enabled: checked,
                     // opacityColor: !checked,
                     )),
+         
           ],
         ),
+        // Column(
+        //   crossAxisAlignment: CrossAxisAlignment.stretch,
+        //   children: [
+        //      ],
+        // ),
         if (isLoading) const CircularProgress()
       ]),
     );

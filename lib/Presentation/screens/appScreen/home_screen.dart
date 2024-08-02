@@ -966,7 +966,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   style:
                                                                       const TextStyle(
                                                                     fontSize:
-                                                                        16,
+                                                                        14,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -977,7 +977,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
                                                                 style:
                                                                     const TextStyle(
-                                                                  fontSize: 22,
+                                                                  fontSize: 20,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w700,
@@ -1028,14 +1028,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       }
                                                     },
                                                     child: Container(
-                                                      width: 160,
-                                                      height: 160,
+                                                      width: 144,
+                                                      height: 144,
                                                       decoration: const BoxDecoration(
                                                           borderRadius:
                                                               BorderRadius.all(
                                                                   Radius
                                                                       .circular(
-                                                                          80)),
+                                                                          72)),
                                                           color: AppColor
                                                               .primaryColor),
                                                       child: Column(
@@ -1048,7 +1048,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             style: TextStyle(
                                                                 color: AppColor
                                                                     .whiteColor,
-                                                                fontSize: 16,
+                                                                fontSize: 14,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400),
@@ -1061,8 +1061,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               Image.asset(
                                                                 ImageAssets
                                                                     .handLeft,
-                                                                width: 20,
-                                                                height: 48,
+                                                                width: 16,
+                                                                height: 45,
                                                               ),
                                                               Padding(
                                                                 padding: const EdgeInsets
@@ -1076,7 +1076,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                       color: AppColor
                                                                           .whiteColor,
                                                                       fontSize:
-                                                                          40,
+                                                                          35,
                                                                       fontWeight:
                                                                           FontWeight
                                                                               .w700),
@@ -1085,8 +1085,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               Image.asset(
                                                                 ImageAssets
                                                                     .handRight,
-                                                                width: 20,
-                                                                height: 48,
+                                                                width: 16,
+                                                                height: 45,
                                                               )
                                                             ],
                                                           ),
@@ -1107,7 +1107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         color: AppColor
                                                                             .whiteColor,
                                                                         fontSize:
-                                                                            16,
+                                                                            14,
                                                                         fontWeight:
                                                                             FontWeight.w400),
                                                                   ),
@@ -1173,7 +1173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   style:
                                                                       const TextStyle(
                                                                     fontSize:
-                                                                        16,
+                                                                        14,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -1184,7 +1184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 '${countCityOccurrences(venueMasterData, snapShot.data!.docs[index]['countryName'])}',
                                                                 style:
                                                                     const TextStyle(
-                                                                  fontSize: 22,
+                                                                  fontSize: 20,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w700,
