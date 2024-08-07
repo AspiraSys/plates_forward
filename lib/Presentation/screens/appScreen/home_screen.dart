@@ -1096,28 +1096,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   MainAxisAlignment
                                                                       .center,
                                                               children: [
-                                                                Padding(
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          right:
-                                                                              5),
-                                                                  child: Text(
-                                                                    'Donate',
-                                                                    style: TextStyle(
-                                                                        color: AppColor
-                                                                            .whiteColor,
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.w400),
-                                                                  ),
-                                                                ),
+                                                                // Padding(
+                                                                //   padding: EdgeInsets
+                                                                //       .only(
+                                                                //           right:
+                                                                //               5),
+                                                                //   child: Text(
+                                                                //     'Donate',
+                                                                //     style: TextStyle(
+                                                                //         color: AppColor
+                                                                //             .whiteColor,
+                                                                //         fontSize:
+                                                                //             14,
+                                                                //         fontWeight:
+                                                                //             FontWeight.w400),
+                                                                //   ),
+                                                                // ),
                                                                 Icon(
                                                                   Icons
                                                                       .add_circle,
                                                                   color: AppColor
                                                                       .whiteColor,
-                                                                  size: 15,
+                                                                  size: 22,
                                                                 ),
                                                               ],
                                                             ),

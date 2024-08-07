@@ -504,7 +504,7 @@ class LoginScreenState extends State<LoginScreen>
                   alignment: Alignment.center,
                   padding: const EdgeInsets.only(top: 24),
                   child: const Text(
-                    "Forget password",
+                    "Forgot password",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

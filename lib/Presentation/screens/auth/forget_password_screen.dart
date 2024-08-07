@@ -75,6 +75,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     if (!allEmails.contains(_emailController.text.trim())) {
       setState(() {
         errorText = 'If the provided email is registered, a link will be sent';
+        successText = true;
         isLoading = false;
       });
       return;
@@ -86,7 +87,7 @@ class ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       );
 
       setState(() {
-        errorText = 'Successfully email sent';
+        errorText = 'If the provided email is registered, a link will be sent';
         successText = true;
       });
 
