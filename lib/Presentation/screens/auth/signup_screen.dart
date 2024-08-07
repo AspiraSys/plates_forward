@@ -142,7 +142,8 @@ class SignUpScreenState extends State<SignUpScreen>
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _mobileNumberController.text.isEmpty ||
-        _emailController.text.isEmpty || _passwordController.text.isEmpty) {
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
       setState(() {
         errorText = 'Please enter all the fields';
         isButtonEnabled = true;
@@ -658,659 +659,1292 @@ class SignUpScreenState extends State<SignUpScreen>
     final NetworkController networkController = Get.find<NetworkController>();
 
     return Scaffold(
-      backgroundColor: AppColor.whiteColor,
-      body: Stack(children: [
-        ListView(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 38, bottom: 20),
-              child: Image.asset(
-                ImageAssets.authLogo,
-                width: 138,
-                height: 140,
-                fit: BoxFit.contain,
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 10, bottom: 4),
-              child: Text(
-                "Sign Up".toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Color.fromRGBO(2, 60, 167, 1),
-                ),
-              ),
-            ),
-            errorText.isNotEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(
-                        top: 20, bottom: 5, left: 10, right: 10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          color: const Color.fromARGB(79, 244, 67, 54)),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => setState(() {
-                              errorText = '';
-                            }),
-                            child: const Icon(
-                              Icons.close,
-                              size: 24,
-                              color: Colors.red,
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(
-                              errorText,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(30),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        networkController.isConnected.value ? _pickImage : null;
-                      },
-                      child: Container(
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.only(top: 2),
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(60),
-                            border: Border.all(
-                              color: AppColor.primaryColor,
-                              width: 2,
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              _pickedImage != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(60),
-                                      child: Image.file(
-                                        _pickedImage!,
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(60),
-                                      child: Image.asset(
-                                        ImageAssets.placeholderProfile,
-                                        width: 120,
-                                        height: 120,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 35,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      color: AppColor.primaryColor),
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    color: AppColor.whiteColor,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(top: 20),
-                        padding: const EdgeInsets.only(left: 15),
-                        child: RichText(
-                            text: const TextSpan(
-                          text: 'First Name',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' * ',
-                              style: TextStyle(color: AppColor.redColor),
-                            )
-                          ],
-                        ))),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: InputBox(
-                        inputController: _firstNameController,
-                        labelText: 'Enter your first name',
-                        inputType: 'text',
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(top: 15),
-                        padding: const EdgeInsets.only(left: 15),
-                        child: RichText(
-                            text: const TextSpan(
-                          text: 'Last Name',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' * ',
-                              style: TextStyle(color: AppColor.redColor),
-                            )
-                          ],
-                        ))),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: InputBox(
-                        inputController: _lastNameController,
-                        labelText: 'Enter your last name',
-                        inputType: 'text',
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(top: 15),
-                        padding: const EdgeInsets.only(left: 15),
-                        child: RichText(
-                            text: const TextSpan(
-                          text: 'Email',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' * ',
-                              style: TextStyle(color: AppColor.redColor),
-                            )
-                          ],
-                        ))),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: InputBox(
-                        inputController: _emailController,
-                        labelText: 'Enter your email here',
-                        inputType: 'email',
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(top: 15),
-                        padding: const EdgeInsets.only(left: 15),
-                        child: RichText(
-                            text: const TextSpan(
-                          text: 'Mobile Number',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' * ',
-                              style: TextStyle(color: AppColor.redColor),
-                            )
-                          ],
-                        ))),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: InputBox(
-                        inputController: _mobileNumberController,
-                        labelText: 'Enter your mobile name',
-                        inputType: 'phone',
-                        phone: true,
-                      ),
-                    ),
-                    Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(top: 15),
-                        padding: const EdgeInsets.only(left: 15),
-                        child: RichText(
-                            text: const TextSpan(
-                          text: 'Password',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' * ',
-                              style: TextStyle(color: AppColor.redColor),
-                            )
-                          ],
-                        ))),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: InputBox(
-                          inputController: _passwordController,
-                          labelText: 'Enter your password here',
-                          inputType: 'password'),
-                    ),
-                    Row(
-                      children: [
-                        const Padding(
-                            padding: EdgeInsets.only(top: 20, bottom: 20)),
-                        Checkbox(
-                          value: checked,
-                          onChanged: (newValue) {
-                            setState(() {
-                              checked = newValue!;
-                            });
-                          },
-                          activeColor: checked
-                              ? AppColor.primaryColor
-                              : AppColor.whiteColor,
-                        ),
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              text: 'I agree to your',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: AppColor.blackColor,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: ' privacy policy ',
-                                  style: const TextStyle(
-                                      color: AppColor.primaryColor),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            insetPadding: EdgeInsets.symmetric(
-                                              vertical: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.22,
-                                              horizontal: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.1,
-                                            ),
-                                            backgroundColor:
-                                                AppColor.navBackgroundColor,
-                                            contentPadding: EdgeInsets.zero,
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 16,
-                                                      horizontal: 24),
-                                                  child: Text(
-                                                    "Privacy Policy",
-                                                    style: TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: SingleChildScrollView(
-                                                    child: StreamBuilder<
-                                                        QuerySnapshot>(
-                                                      stream: fetchStream(
-                                                              'privacyPolicySub')
-                                                          .snapshots(),
-                                                      builder:
-                                                          (context, snapShot) {
-                                                        if (!snapShot.hasData) {
-                                                          return const Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        5),
-                                                            child: Center(
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                color: AppColor
-                                                                    .primaryColor,
-                                                                strokeWidth: 3,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          return Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              for (var policyItem
-                                                                  in snapShot
-                                                                      .data!
-                                                                      .docs)
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              15,
-                                                                          vertical:
-                                                                              10),
-                                                                      child:
-                                                                          Text(
-                                                                        policyItem['description'] ??
-                                                                            '',
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                AppColor.blackColor),
-                                                                      ),
-                                                                    ),
-                                                                    StreamBuilder<
-                                                                        QuerySnapshot>(
-                                                                      stream: fetchStream(
-                                                                              'privacyPolicy')
-                                                                          .snapshots(),
-                                                                      builder:
-                                                                          (context,
-                                                                              snapshot) {
-                                                                        if (!snapshot
-                                                                            .hasData) {
-                                                                          return Container();
-                                                                        } else {
-                                                                          final briefPolicyDataList = snapshot
-                                                                              .data!
-                                                                              .docs;
-                                                                          return buildPrivacyPolicySubUI(
-                                                                              briefPolicyDataList);
-                                                                        }
-                                                                      },
-                                                                    ),
-                                                                    Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          vertical:
-                                                                              3,
-                                                                          horizontal:
-                                                                              15),
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child:
-                                                                                RichText(
-                                                                              softWrap: true,
-                                                                              text: TextSpan(
-                                                                                text: policyItem['subTitle'] ?? '',
-                                                                                style: const TextStyle(
-                                                                                  fontSize: 12,
-                                                                                  fontWeight: FontWeight.w600,
-                                                                                  color: AppColor.blackColor,
-                                                                                ),
-                                                                                children: [
-                                                                                  TextSpan(
-                                                                                    text: ' - ${policyItem['SubDescription'] ?? ''}',
-                                                                                    style: const TextStyle(
-                                                                                      fontSize: 12,
-                                                                                      fontWeight: FontWeight.w400,
-                                                                                    ),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          vertical:
-                                                                              5,
-                                                                          horizontal:
-                                                                              15),
-                                                                      child:
-                                                                          Text(
-                                                                        policyItem['description2'] ??
-                                                                            '',
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                12,
-                                                                            color:
-                                                                                AppColor.blackColor),
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("Close",
-                                                      style: TextStyle(
-                                                          color: AppColor
-                                                              .primaryColor)),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                ),
-                                const TextSpan(text: 'and'),
-                                TextSpan(
-                                  text: ' terms & conditions. ',
-                                  style: const TextStyle(
-                                      color: AppColor.primaryColor),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            insetPadding: EdgeInsets.symmetric(
-                                              vertical: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.22,
-                                              horizontal: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.1,
-                                            ),
-                                            backgroundColor:
-                                                AppColor.navBackgroundColor,
-                                            contentPadding: EdgeInsets.zero,
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 16,
-                                                      horizontal: 24),
-                                                  child: Text(
-                                                    "Terms & Conditions",
-                                                    style: TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: SingleChildScrollView(
-                                                    child: StreamBuilder<
-                                                        QuerySnapshot>(
-                                                      stream: fetchStream(
-                                                              'Terms&Conditions')
-                                                          .snapshots(),
-                                                      builder:
-                                                          (context, snapShot) {
-                                                        if (!snapShot.hasData) {
-                                                          return const Center(
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              color: AppColor
-                                                                  .primaryColor,
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          return Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              for (var termsItem
-                                                                  in snapShot
-                                                                      .data!
-                                                                      .docs)
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              15,
-                                                                          vertical:
-                                                                              10),
-                                                                      child:
-                                                                          Text(
-                                                                        termsItem['description'] ??
-                                                                            '',
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                AppColor.blackColor),
-                                                                      ),
-                                                                    ),
-                                                                    buildTermsPolicySubUI(
-                                                                        termsItem['Norms'] ??
-                                                                            [])
-                                                                  ],
-                                                                ),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("Close",
-                                                      style: TextStyle(
-                                                          color: AppColor
-                                                              .primaryColor)),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () =>
-                  Navigator.of(context).pushNamed(RoutePaths.loginRoute),
-              child: Container(
+        backgroundColor: AppColor.whiteColor,
+        body: Stack(children: [
+          ListView(
+            padding:
+                const EdgeInsets.only(top: 20, right: 30, left: 30, bottom: 5),
+            children: <Widget>[
+              Container(
                 alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 4, bottom: 10),
-                child: const Text(
-                  "Return to SignIn",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                padding: const EdgeInsets.only(top: 38, bottom: 15),
+                child: Image.asset(
+                  ImageAssets.authLogo,
+                  width: 138,
+                  height: 140,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 10, bottom: 4),
+                child: Text(
+                  "Sign Up".toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
                     color: Color.fromRGBO(2, 60, 167, 1),
                   ),
                 ),
               ),
-            ),
-            Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                child: ButtonBox(
-                    buttonText: 'Sign up',
-                    fillColor: true,
-                    onPressed: () {
-                      networkController.isConnected.value
-                          ? isButtonEnabled
-                              ? _handleSignUp()
-                              : null
-                          : null;
-                    }
-                    // () {
-                    //   networkController.isConnected.value
-                    //       ? _handleSignUp()
-                    //       : null;
-                    // },
-                    // enabled: checked,
-                    // opacityColor: !checked,
-                    )),
-         
-          ],
-        ),
-        // Column(
-        //   crossAxisAlignment: CrossAxisAlignment.stretch,
-        //   children: [
-        //      ],
-        // ),
-        if (isLoading) const CircularProgress()
-      ]),
-    );
+              errorText.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(
+                          top: 20, bottom: 5, left: 10, right: 10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            color: const Color.fromARGB(79, 244, 67, 54)),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => setState(() {
+                                errorText = '';
+                              }),
+                              child: const Icon(
+                                Icons.close,
+                                size: 24,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                errorText,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
+              GestureDetector(
+                onTap: () {
+                  networkController.isConnected.value ? _pickImage() : null;
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.only(top: 20, bottom: 10),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: AppColor.navBackgroundColor,
+                          borderRadius: BorderRadius.circular(60),
+                          border: Border.all(
+                            color: AppColor.primaryColor,
+                            width: 2,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: _pickedImage != null
+                              ? Image.file(
+                                  _pickedImage!,
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  ImageAssets.placeholderProfile,
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.contain,
+                                ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 35,
+                          height: 35,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: AppColor.primaryColor,
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: AppColor.whiteColor,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(left: 15),
+                  child: RichText(
+                      text: const TextSpan(
+                    text: 'First Name',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: ' * ',
+                        style: TextStyle(color: AppColor.redColor),
+                      )
+                    ],
+                  ))),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: InputBox(
+                  inputController: _firstNameController,
+                  labelText: 'Enter your first name',
+                  inputType: 'text',
+                ),
+              ),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(left: 15),
+                  child: RichText(
+                      text: const TextSpan(
+                    text: 'Last Name',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: ' * ',
+                        style: TextStyle(color: AppColor.redColor),
+                      )
+                    ],
+                  ))),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: InputBox(
+                  inputController: _lastNameController,
+                  labelText: 'Enter your last name',
+                  inputType: 'text',
+                ),
+              ),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(left: 15),
+                  child: RichText(
+                      text: const TextSpan(
+                    text: 'Email',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: ' * ',
+                        style: TextStyle(color: AppColor.redColor),
+                      )
+                    ],
+                  ))),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: InputBox(
+                  inputController: _emailController,
+                  labelText: 'Enter your email here',
+                  inputType: 'email',
+                ),
+              ),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(left: 15),
+                  child: RichText(
+                      text: const TextSpan(
+                    text: 'Mobile Number',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: ' * ',
+                        style: TextStyle(color: AppColor.redColor),
+                      )
+                    ],
+                  ))),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: InputBox(
+                  inputController: _mobileNumberController,
+                  labelText: 'Enter your mobile name',
+                  inputType: 'phone',
+                  phone: true,
+                ),
+              ),
+              Container(
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(top: 15),
+                  padding: const EdgeInsets.only(left: 15),
+                  child: RichText(
+                      text: const TextSpan(
+                    text: 'Password',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: ' * ',
+                        style: TextStyle(color: AppColor.redColor),
+                      )
+                    ],
+                  ))),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: InputBox(
+                    inputController: _passwordController,
+                    labelText: 'Enter your password here',
+                    inputType: 'password'),
+              ),
+              Row(
+                children: [
+                  const Padding(padding: EdgeInsets.only(top: 20, bottom: 20)),
+                  Checkbox(
+                    value: checked,
+                    onChanged: (newValue) {
+                      setState(() {
+                        checked = newValue!;
+                      });
+                    },
+                    activeColor:
+                        checked ? AppColor.primaryColor : AppColor.whiteColor,
+                  ),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'I agree to your',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColor.blackColor,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: ' privacy policy ',
+                            style:
+                                const TextStyle(color: AppColor.primaryColor),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      insetPadding: EdgeInsets.symmetric(
+                                        vertical:
+                                            MediaQuery.of(context).size.height *
+                                                0.22,
+                                        horizontal:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                      ),
+                                      backgroundColor:
+                                          AppColor.navBackgroundColor,
+                                      contentPadding: EdgeInsets.zero,
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 16, horizontal: 24),
+                                            child: Text(
+                                              "Privacy Policy",
+                                              style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child:
+                                                  StreamBuilder<QuerySnapshot>(
+                                                stream: fetchStream(
+                                                        'privacyPolicySub')
+                                                    .snapshots(),
+                                                builder: (context, snapShot) {
+                                                  if (!snapShot.hasData) {
+                                                    return const Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5),
+                                                      child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: AppColor
+                                                              .primaryColor,
+                                                          strokeWidth: 3,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        for (var policyItem
+                                                            in snapShot
+                                                                .data!.docs)
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15,
+                                                                    vertical:
+                                                                        10),
+                                                                child: Text(
+                                                                  policyItem[
+                                                                          'description'] ??
+                                                                      '',
+                                                                  style: const TextStyle(
+                                                                      color: AppColor
+                                                                          .blackColor),
+                                                                ),
+                                                              ),
+                                                              StreamBuilder<
+                                                                  QuerySnapshot>(
+                                                                stream: fetchStream(
+                                                                        'privacyPolicy')
+                                                                    .snapshots(),
+                                                                builder: (context,
+                                                                    snapshot) {
+                                                                  if (!snapshot
+                                                                      .hasData) {
+                                                                    return Container();
+                                                                  } else {
+                                                                    final briefPolicyDataList =
+                                                                        snapshot
+                                                                            .data!
+                                                                            .docs;
+                                                                    return buildPrivacyPolicySubUI(
+                                                                        briefPolicyDataList);
+                                                                  }
+                                                                },
+                                                              ),
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical: 3,
+                                                                    horizontal:
+                                                                        15),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child:
+                                                                          RichText(
+                                                                        softWrap:
+                                                                            true,
+                                                                        text:
+                                                                            TextSpan(
+                                                                          text: policyItem['subTitle'] ??
+                                                                              '',
+                                                                          style:
+                                                                              const TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                            color:
+                                                                                AppColor.blackColor,
+                                                                          ),
+                                                                          children: [
+                                                                            TextSpan(
+                                                                              text: ' - ${policyItem['SubDescription'] ?? ''}',
+                                                                              style: const TextStyle(
+                                                                                fontSize: 12,
+                                                                                fontWeight: FontWeight.w400,
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical: 5,
+                                                                    horizontal:
+                                                                        15),
+                                                                child: Text(
+                                                                  policyItem[
+                                                                          'description2'] ??
+                                                                      '',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: AppColor
+                                                                          .blackColor),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Close",
+                                                style: TextStyle(
+                                                    color:
+                                                        AppColor.primaryColor)),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                          ),
+                          const TextSpan(text: 'and'),
+                          TextSpan(
+                            text: ' terms & conditions. ',
+                            style:
+                                const TextStyle(color: AppColor.primaryColor),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      insetPadding: EdgeInsets.symmetric(
+                                        vertical:
+                                            MediaQuery.of(context).size.height *
+                                                0.22,
+                                        horizontal:
+                                            MediaQuery.of(context).size.width *
+                                                0.1,
+                                      ),
+                                      backgroundColor:
+                                          AppColor.navBackgroundColor,
+                                      contentPadding: EdgeInsets.zero,
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 16, horizontal: 24),
+                                            child: Text(
+                                              "Terms & Conditions",
+                                              style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child:
+                                                  StreamBuilder<QuerySnapshot>(
+                                                stream: fetchStream(
+                                                        'Terms&Conditions')
+                                                    .snapshots(),
+                                                builder: (context, snapShot) {
+                                                  if (!snapShot.hasData) {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: AppColor
+                                                            .primaryColor,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        for (var termsItem
+                                                            in snapShot
+                                                                .data!.docs)
+                                                          Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Container(
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        15,
+                                                                    vertical:
+                                                                        10),
+                                                                child: Text(
+                                                                  termsItem[
+                                                                          'description'] ??
+                                                                      '',
+                                                                  style: const TextStyle(
+                                                                      color: AppColor
+                                                                          .blackColor),
+                                                                ),
+                                                              ),
+                                                              buildTermsPolicySubUI(
+                                                                  termsItem[
+                                                                          'Norms'] ??
+                                                                      [])
+                                                            ],
+                                                          ),
+                                                      ],
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Close",
+                                                style: TextStyle(
+                                                    color:
+                                                        AppColor.primaryColor)),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: () =>
+                    Navigator.of(context).pushNamed(RoutePaths.loginRoute),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.only(top: 4, bottom: 10),
+                  child: const Text(
+                    "Return to SignIn",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color.fromRGBO(2, 60, 167, 1),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: ButtonBox(
+                      buttonText: 'Sign up',
+                      fillColor: true,
+                      onPressed: () {
+                        networkController.isConnected.value
+                            ? isButtonEnabled
+                                ? _handleSignUp()
+                                : null
+                            : null;
+                      }
+                      // () {
+                      //   networkController.isConnected.value
+                      //       ? _handleSignUp()
+                      //       : null;
+                      // },
+                      // enabled: checked,
+                      // opacityColor: !checked,
+                      )),
+            ],
+          ),
+          if (isLoading) const CircularProgress()
+        ])
+
+        // Stack(children: [
+        //   ListView(
+        //     children: <Widget>[
+        //       Container(
+        //         alignment: Alignment.center,
+        //         padding: const EdgeInsets.only(top: 38, bottom: 20),
+        //         child: Image.asset(
+        //           ImageAssets.authLogo,
+        //           width: 138,
+        //           height: 140,
+        //           fit: BoxFit.contain,
+        //         ),
+        //       ),
+        //       Container(
+        //         alignment: Alignment.center,
+        //         padding: const EdgeInsets.only(top: 10, bottom: 4),
+        //         child: Text(
+        //           "Sign Up".toUpperCase(),
+        //           style: const TextStyle(
+        //             fontSize: 24,
+        //             fontWeight: FontWeight.w700,
+        //             color: Color.fromRGBO(2, 60, 167, 1),
+        //           ),
+        //         ),
+        //       ),
+        //       errorText.isNotEmpty
+        //           ? Padding(
+        //               padding: const EdgeInsets.only(
+        //                   top: 20, bottom: 5, left: 10, right: 10),
+        //               child: Container(
+        //                 padding: const EdgeInsets.symmetric(
+        //                     vertical: 10, horizontal: 15),
+        //                 decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(6),
+        //                     color: const Color.fromARGB(79, 244, 67, 54)),
+        //                 child: Row(
+        //                   children: [
+        //                     GestureDetector(
+        //                       onTap: () => setState(() {
+        //                         errorText = '';
+        //                       }),
+        //                       child: const Icon(
+        //                         Icons.close,
+        //                         size: 24,
+        //                         color: Colors.red,
+        //                       ),
+        //                     ),
+        //                     Container(
+        //                       width: MediaQuery.of(context).size.width * 0.8,
+        //                       padding: const EdgeInsets.only(left: 10),
+        //                       child: Text(
+        //                         errorText,
+        //                         style: const TextStyle(
+        //                             fontSize: 16,
+        //                             color: Colors.red,
+        //                             fontWeight: FontWeight.w500),
+        //                       ),
+        //                     )
+        //                   ],
+        //                 ),
+        //               ),
+        //             )
+        //           : const SizedBox(),
+        //       Expanded(
+        //         child: SingleChildScrollView(
+        //           padding: const EdgeInsets.all(30),
+        //           child: Column(
+        //             children: [
+        //               GestureDetector(
+        //                 onTap: () {
+        //                   networkController.isConnected.value ? _pickImage : null;
+        //                 },
+        //                 child: Container(
+        //                     alignment: Alignment.center,
+        //                     margin: const EdgeInsets.only(top: 2),
+        //                     width: 120,
+        //                     height: 120,
+        //                     decoration: BoxDecoration(
+        //                       borderRadius: BorderRadius.circular(60),
+        //                       border: Border.all(
+        //                         color: AppColor.primaryColor,
+        //                         width: 2,
+        //                       ),
+        //                     ),
+        //                     child: Stack(
+        //                       children: [
+        //                         _pickedImage != null
+        //                             ? ClipRRect(
+        //                                 borderRadius: BorderRadius.circular(60),
+        //                                 child: Image.file(
+        //                                   _pickedImage!,
+        //                                   width: 120,
+        //                                   height: 120,
+        //                                   fit: BoxFit.cover,
+        //                                 ),
+        //                               )
+        //                             : ClipRRect(
+        //                                 borderRadius: BorderRadius.circular(60),
+        //                                 child: Image.asset(
+        //                                   ImageAssets.placeholderProfile,
+        //                                   width: 120,
+        //                                   height: 120,
+        //                                   fit: BoxFit.contain,
+        //                                 ),
+        //                               ),
+        //                         Positioned(
+        //                           bottom: 0,
+        //                           right: 0,
+        //                           child: Container(
+        //                             width: 35,
+        //                             height: 35,
+        //                             decoration: BoxDecoration(
+        //                                 borderRadius: BorderRadius.circular(100),
+        //                                 color: AppColor.primaryColor),
+        //                             child: const Icon(
+        //                               Icons.camera_alt,
+        //                               color: AppColor.whiteColor,
+        //                               size: 20,
+        //                             ),
+        //                           ),
+        //                         ),
+        //                       ],
+        //                     )),
+        //               ),
+        //               Container(
+        //                   alignment: Alignment.centerLeft,
+        //                   margin: const EdgeInsets.only(top: 20),
+        //                   padding: const EdgeInsets.only(left: 15),
+        //                   child: RichText(
+        //                       text: const TextSpan(
+        //                     text: 'First Name',
+        //                     style: TextStyle(
+        //                       fontSize: 16,
+        //                       fontWeight: FontWeight.w600,
+        //                       color: Colors.black,
+        //                     ),
+        //                     children: [
+        //                       TextSpan(
+        //                         text: ' * ',
+        //                         style: TextStyle(color: AppColor.redColor),
+        //                       )
+        //                     ],
+        //                   ))),
+        //               Container(
+        //                 alignment: Alignment.centerLeft,
+        //                 child: InputBox(
+        //                   inputController: _firstNameController,
+        //                   labelText: 'Enter your first name',
+        //                   inputType: 'text',
+        //                 ),
+        //               ),
+        //               Container(
+        //                   alignment: Alignment.centerLeft,
+        //                   margin: const EdgeInsets.only(top: 15),
+        //                   padding: const EdgeInsets.only(left: 15),
+        //                   child: RichText(
+        //                       text: const TextSpan(
+        //                     text: 'Last Name',
+        //                     style: TextStyle(
+        //                       fontSize: 16,
+        //                       fontWeight: FontWeight.w600,
+        //                       color: Colors.black,
+        //                     ),
+        //                     children: [
+        //                       TextSpan(
+        //                         text: ' * ',
+        //                         style: TextStyle(color: AppColor.redColor),
+        //                       )
+        //                     ],
+        //                   ))),
+        //               Container(
+        //                 alignment: Alignment.centerLeft,
+        //                 child: InputBox(
+        //                   inputController: _lastNameController,
+        //                   labelText: 'Enter your last name',
+        //                   inputType: 'text',
+        //                 ),
+        //               ),
+        //               Container(
+        //                   alignment: Alignment.centerLeft,
+        //                   margin: const EdgeInsets.only(top: 15),
+        //                   padding: const EdgeInsets.only(left: 15),
+        //                   child: RichText(
+        //                       text: const TextSpan(
+        //                     text: 'Email',
+        //                     style: TextStyle(
+        //                       fontSize: 16,
+        //                       fontWeight: FontWeight.w600,
+        //                       color: Colors.black,
+        //                     ),
+        //                     children: [
+        //                       TextSpan(
+        //                         text: ' * ',
+        //                         style: TextStyle(color: AppColor.redColor),
+        //                       )
+        //                     ],
+        //                   ))),
+        //               Container(
+        //                 alignment: Alignment.centerLeft,
+        //                 child: InputBox(
+        //                   inputController: _emailController,
+        //                   labelText: 'Enter your email here',
+        //                   inputType: 'email',
+        //                 ),
+        //               ),
+        //               Container(
+        //                   alignment: Alignment.centerLeft,
+        //                   margin: const EdgeInsets.only(top: 15),
+        //                   padding: const EdgeInsets.only(left: 15),
+        //                   child: RichText(
+        //                       text: const TextSpan(
+        //                     text: 'Mobile Number',
+        //                     style: TextStyle(
+        //                       fontSize: 16,
+        //                       fontWeight: FontWeight.w600,
+        //                       color: Colors.black,
+        //                     ),
+        //                     children: [
+        //                       TextSpan(
+        //                         text: ' * ',
+        //                         style: TextStyle(color: AppColor.redColor),
+        //                       )
+        //                     ],
+        //                   ))),
+        //               Container(
+        //                 alignment: Alignment.centerLeft,
+        //                 child: InputBox(
+        //                   inputController: _mobileNumberController,
+        //                   labelText: 'Enter your mobile name',
+        //                   inputType: 'phone',
+        //                   phone: true,
+        //                 ),
+        //               ),
+        //               Container(
+        //                   alignment: Alignment.centerLeft,
+        //                   margin: const EdgeInsets.only(top: 15),
+        //                   padding: const EdgeInsets.only(left: 15),
+        //                   child: RichText(
+        //                       text: const TextSpan(
+        //                     text: 'Password',
+        //                     style: TextStyle(
+        //                       fontSize: 16,
+        //                       fontWeight: FontWeight.w600,
+        //                       color: Colors.black,
+        //                     ),
+        //                     children: [
+        //                       TextSpan(
+        //                         text: ' * ',
+        //                         style: TextStyle(color: AppColor.redColor),
+        //                       )
+        //                     ],
+        //                   ))),
+        //               Container(
+        //                 alignment: Alignment.centerLeft,
+        //                 child: InputBox(
+        //                     inputController: _passwordController,
+        //                     labelText: 'Enter your password here',
+        //                     inputType: 'password'),
+        //               ),
+        //               Row(
+        //                 children: [
+        //                   const Padding(
+        //                       padding: EdgeInsets.only(top: 20, bottom: 20)),
+        //                   Checkbox(
+        //                     value: checked,
+        //                     onChanged: (newValue) {
+        //                       setState(() {
+        //                         checked = newValue!;
+        //                       });
+        //                     },
+        //                     activeColor: checked
+        //                         ? AppColor.primaryColor
+        //                         : AppColor.whiteColor,
+        //                   ),
+        //                   Expanded(
+        //                     child: RichText(
+        //                       text: TextSpan(
+        //                         text: 'I agree to your',
+        //                         style: const TextStyle(
+        //                           fontSize: 14,
+        //                           fontWeight: FontWeight.w400,
+        //                           color: AppColor.blackColor,
+        //                         ),
+        //                         children: [
+        //                           TextSpan(
+        //                             text: ' privacy policy ',
+        //                             style: const TextStyle(
+        //                                 color: AppColor.primaryColor),
+        //                             recognizer: TapGestureRecognizer()
+        //                               ..onTap = () {
+        //                                 showDialog(
+        //                                   context: context,
+        //                                   builder: (BuildContext context) {
+        //                                     return AlertDialog(
+        //                                       insetPadding: EdgeInsets.symmetric(
+        //                                         vertical: MediaQuery.of(context)
+        //                                                 .size
+        //                                                 .height *
+        //                                             0.22,
+        //                                         horizontal: MediaQuery.of(context)
+        //                                                 .size
+        //                                                 .width *
+        //                                             0.1,
+        //                                       ),
+        //                                       backgroundColor:
+        //                                           AppColor.navBackgroundColor,
+        //                                       contentPadding: EdgeInsets.zero,
+        //                                       content: Column(
+        //                                         mainAxisSize: MainAxisSize.min,
+        //                                         crossAxisAlignment:
+        //                                             CrossAxisAlignment.stretch,
+        //                                         children: [
+        //                                           const Padding(
+        //                                             padding: EdgeInsets.symmetric(
+        //                                                 vertical: 16,
+        //                                                 horizontal: 24),
+        //                                             child: Text(
+        //                                               "Privacy Policy",
+        //                                               style: TextStyle(
+        //                                                   fontSize: 22,
+        //                                                   fontWeight:
+        //                                                       FontWeight.bold),
+        //                                             ),
+        //                                           ),
+        //                                           Expanded(
+        //                                             child: SingleChildScrollView(
+        //                                               child: StreamBuilder<
+        //                                                   QuerySnapshot>(
+        //                                                 stream: fetchStream(
+        //                                                         'privacyPolicySub')
+        //                                                     .snapshots(),
+        //                                                 builder:
+        //                                                     (context, snapShot) {
+        //                                                   if (!snapShot.hasData) {
+        //                                                     return const Padding(
+        //                                                       padding: EdgeInsets
+        //                                                           .symmetric(
+        //                                                               vertical:
+        //                                                                   5),
+        //                                                       child: Center(
+        //                                                         child:
+        //                                                             CircularProgressIndicator(
+        //                                                           color: AppColor
+        //                                                               .primaryColor,
+        //                                                           strokeWidth: 3,
+        //                                                         ),
+        //                                                       ),
+        //                                                     );
+        //                                                   } else {
+        //                                                     return Column(
+        //                                                       crossAxisAlignment:
+        //                                                           CrossAxisAlignment
+        //                                                               .start,
+        //                                                       children: [
+        //                                                         for (var policyItem
+        //                                                             in snapShot
+        //                                                                 .data!
+        //                                                                 .docs)
+        //                                                           Column(
+        //                                                             crossAxisAlignment:
+        //                                                                 CrossAxisAlignment
+        //                                                                     .start,
+        //                                                             children: [
+        //                                                               Container(
+        //                                                                 padding: const EdgeInsets
+        //                                                                     .symmetric(
+        //                                                                     horizontal:
+        //                                                                         15,
+        //                                                                     vertical:
+        //                                                                         10),
+        //                                                                 child:
+        //                                                                     Text(
+        //                                                                   policyItem['description'] ??
+        //                                                                       '',
+        //                                                                   style: const TextStyle(
+        //                                                                       color:
+        //                                                                           AppColor.blackColor),
+        //                                                                 ),
+        //                                                               ),
+        //                                                               StreamBuilder<
+        //                                                                   QuerySnapshot>(
+        //                                                                 stream: fetchStream(
+        //                                                                         'privacyPolicy')
+        //                                                                     .snapshots(),
+        //                                                                 builder:
+        //                                                                     (context,
+        //                                                                         snapshot) {
+        //                                                                   if (!snapshot
+        //                                                                       .hasData) {
+        //                                                                     return Container();
+        //                                                                   } else {
+        //                                                                     final briefPolicyDataList = snapshot
+        //                                                                         .data!
+        //                                                                         .docs;
+        //                                                                     return buildPrivacyPolicySubUI(
+        //                                                                         briefPolicyDataList);
+        //                                                                   }
+        //                                                                 },
+        //                                                               ),
+        //                                                               Container(
+        //                                                                 padding: const EdgeInsets
+        //                                                                     .symmetric(
+        //                                                                     vertical:
+        //                                                                         3,
+        //                                                                     horizontal:
+        //                                                                         15),
+        //                                                                 child:
+        //                                                                     Row(
+        //                                                                   children: [
+        //                                                                     Expanded(
+        //                                                                       child:
+        //                                                                           RichText(
+        //                                                                         softWrap: true,
+        //                                                                         text: TextSpan(
+        //                                                                           text: policyItem['subTitle'] ?? '',
+        //                                                                           style: const TextStyle(
+        //                                                                             fontSize: 12,
+        //                                                                             fontWeight: FontWeight.w600,
+        //                                                                             color: AppColor.blackColor,
+        //                                                                           ),
+        //                                                                           children: [
+        //                                                                             TextSpan(
+        //                                                                               text: ' - ${policyItem['SubDescription'] ?? ''}',
+        //                                                                               style: const TextStyle(
+        //                                                                                 fontSize: 12,
+        //                                                                                 fontWeight: FontWeight.w400,
+        //                                                                               ),
+        //                                                                             ),
+        //                                                                           ],
+        //                                                                         ),
+        //                                                                       ),
+        //                                                                     ),
+        //                                                                   ],
+        //                                                                 ),
+        //                                                               ),
+        //                                                               Container(
+        //                                                                 padding: const EdgeInsets
+        //                                                                     .symmetric(
+        //                                                                     vertical:
+        //                                                                         5,
+        //                                                                     horizontal:
+        //                                                                         15),
+        //                                                                 child:
+        //                                                                     Text(
+        //                                                                   policyItem['description2'] ??
+        //                                                                       '',
+        //                                                                   style: const TextStyle(
+        //                                                                       fontSize:
+        //                                                                           12,
+        //                                                                       color:
+        //                                                                           AppColor.blackColor),
+        //                                                                 ),
+        //                                                               )
+        //                                                             ],
+        //                                                           ),
+        //                                                       ],
+        //                                                     );
+        //                                                   }
+        //                                                 },
+        //                                               ),
+        //                                             ),
+        //                                           ),
+        //                                           TextButton(
+        //                                             onPressed: () {
+        //                                               Navigator.of(context).pop();
+        //                                             },
+        //                                             child: const Text("Close",
+        //                                                 style: TextStyle(
+        //                                                     color: AppColor
+        //                                                         .primaryColor)),
+        //                                           ),
+        //                                         ],
+        //                                       ),
+        //                                     );
+        //                                   },
+        //                                 );
+        //                               },
+        //                           ),
+        //                           const TextSpan(text: 'and'),
+        //                           TextSpan(
+        //                             text: ' terms & conditions. ',
+        //                             style: const TextStyle(
+        //                                 color: AppColor.primaryColor),
+        //                             recognizer: TapGestureRecognizer()
+        //                               ..onTap = () {
+        //                                 showDialog(
+        //                                   context: context,
+        //                                   builder: (BuildContext context) {
+        //                                     return AlertDialog(
+        //                                       insetPadding: EdgeInsets.symmetric(
+        //                                         vertical: MediaQuery.of(context)
+        //                                                 .size
+        //                                                 .height *
+        //                                             0.22,
+        //                                         horizontal: MediaQuery.of(context)
+        //                                                 .size
+        //                                                 .width *
+        //                                             0.1,
+        //                                       ),
+        //                                       backgroundColor:
+        //                                           AppColor.navBackgroundColor,
+        //                                       contentPadding: EdgeInsets.zero,
+        //                                       content: Column(
+        //                                         mainAxisSize: MainAxisSize.min,
+        //                                         crossAxisAlignment:
+        //                                             CrossAxisAlignment.stretch,
+        //                                         children: [
+        //                                           const Padding(
+        //                                             padding: EdgeInsets.symmetric(
+        //                                                 vertical: 16,
+        //                                                 horizontal: 24),
+        //                                             child: Text(
+        //                                               "Terms & Conditions",
+        //                                               style: TextStyle(
+        //                                                   fontSize: 22,
+        //                                                   fontWeight:
+        //                                                       FontWeight.bold),
+        //                                             ),
+        //                                           ),
+        //                                           Expanded(
+        //                                             child: SingleChildScrollView(
+        //                                               child: StreamBuilder<
+        //                                                   QuerySnapshot>(
+        //                                                 stream: fetchStream(
+        //                                                         'Terms&Conditions')
+        //                                                     .snapshots(),
+        //                                                 builder:
+        //                                                     (context, snapShot) {
+        //                                                   if (!snapShot.hasData) {
+        //                                                     return const Center(
+        //                                                       child:
+        //                                                           CircularProgressIndicator(
+        //                                                         color: AppColor
+        //                                                             .primaryColor,
+        //                                                       ),
+        //                                                     );
+        //                                                   } else {
+        //                                                     return Column(
+        //                                                       crossAxisAlignment:
+        //                                                           CrossAxisAlignment
+        //                                                               .start,
+        //                                                       children: [
+        //                                                         for (var termsItem
+        //                                                             in snapShot
+        //                                                                 .data!
+        //                                                                 .docs)
+        //                                                           Column(
+        //                                                             crossAxisAlignment:
+        //                                                                 CrossAxisAlignment
+        //                                                                     .start,
+        //                                                             children: [
+        //                                                               Container(
+        //                                                                 padding: const EdgeInsets
+        //                                                                     .symmetric(
+        //                                                                     horizontal:
+        //                                                                         15,
+        //                                                                     vertical:
+        //                                                                         10),
+        //                                                                 child:
+        //                                                                     Text(
+        //                                                                   termsItem['description'] ??
+        //                                                                       '',
+        //                                                                   style: const TextStyle(
+        //                                                                       color:
+        //                                                                           AppColor.blackColor),
+        //                                                                 ),
+        //                                                               ),
+        //                                                               buildTermsPolicySubUI(
+        //                                                                   termsItem['Norms'] ??
+        //                                                                       [])
+        //                                                             ],
+        //                                                           ),
+        //                                                       ],
+        //                                                     );
+        //                                                   }
+        //                                                 },
+        //                                               ),
+        //                                             ),
+        //                                           ),
+        //                                           TextButton(
+        //                                             onPressed: () {
+        //                                               Navigator.of(context).pop();
+        //                                             },
+        //                                             child: const Text("Close",
+        //                                                 style: TextStyle(
+        //                                                     color: AppColor
+        //                                                         .primaryColor)),
+        //                                           ),
+        //                                         ],
+        //                                       ),
+        //                                     );
+        //                                   },
+        //                                 );
+        //                               },
+        //                           ),
+        //                         ],
+        //                       ),
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //       ),
+        //       GestureDetector(
+        //         onTap: () =>
+        //             Navigator.of(context).pushNamed(RoutePaths.loginRoute),
+        //         child: Container(
+        //           alignment: Alignment.center,
+        //           padding: const EdgeInsets.only(top: 4, bottom: 10),
+        //           child: const Text(
+        //             "Return to SignIn",
+        //             style: TextStyle(
+        //               fontSize: 16,
+        //               fontWeight: FontWeight.w600,
+        //               color: Color.fromRGBO(2, 60, 167, 1),
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //       Container(
+        //           alignment: Alignment.center,
+        //           padding: const EdgeInsets.only(top: 20, bottom: 20),
+        //           child: ButtonBox(
+        //               buttonText: 'Sign up',
+        //               fillColor: true,
+        //               onPressed: () {
+        //                 networkController.isConnected.value
+        //                     ? isButtonEnabled
+        //                         ? _handleSignUp()
+        //                         : null
+        //                     : null;
+        //               }
+        //               // () {
+        //               //   networkController.isConnected.value
+        //               //       ? _handleSignUp()
+        //               //       : null;
+        //               // },
+        //               // enabled: checked,
+        //               // opacityColor: !checked,
+        //               )),
+
+        //     ],
+        //   ),
+        //   // Column(
+        //   //   crossAxisAlignment: CrossAxisAlignment.stretch,
+        //   //   children: [
+        //   //      ],
+        //   // ),
+        //   if (isLoading) const CircularProgress()
+        // ]),
+
+        );
   }
 }
