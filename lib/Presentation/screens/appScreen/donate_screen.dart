@@ -33,6 +33,7 @@ class _DonateScreenState extends State<DonateScreen> {
   String locationId = '';
   // var stripe = StripePayment();
   StripePayment? stripe;
+  bool isDonateClicked = false;
 
   @override
   void initState() {
@@ -320,26 +321,32 @@ class _DonateScreenState extends State<DonateScreen> {
                         ignoring: !enable,
                         child: InkWell(
                           onTap: () async {
-                            StripeResponseModel result = await stripe!
-                                .stripeMakePayment(
-                                    amount: (totalCost * 100).toString(),
-                                    currency: "AUD");
-                            if (result.isSuccess) {
-                              firebaseDataTrans(result.response);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(result.message),
-                                      backgroundColor: Colors.green));
-                              Future.delayed(const Duration(seconds: 2), () {
-                                Navigator.of(context)
-                                    .pushNamed(RoutePaths.donateSuccessRoute);
-                              });
-                            } else {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text(result.message),
-                                backgroundColor: Colors.redAccent,
-                              ));
+                            /// flag is used to prevent multiple time calling
+                            if(!isDonateClicked){
+                              isDonateClicked = true;
+                              StripeResponseModel result = await stripe!
+                                  .stripeMakePayment(
+                                  amount: (totalCost * 100).toString(),
+                                  currency: "AUD");
+                              if (result.isSuccess) {
+                                firebaseDataTrans(result.response);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(result.message),
+                                        backgroundColor: Colors.green));
+                                Future.delayed(const Duration(seconds: 2), () {
+                                  Navigator.of(context)
+                                      .pushNamed(RoutePaths.donateSuccessRoute);
+                                });
+                                isDonateClicked = false;
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(result.message),
+                                  backgroundColor: Colors.redAccent,
+                                ));
+                                isDonateClicked = false;
+                              }
                             }
                             /*Navigator.of(context)
                           .pushNamed(RoutePaths.donateSuccessRoute)*/

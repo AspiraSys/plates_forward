@@ -214,7 +214,7 @@ class SignUpScreenState extends State<SignUpScreen>
 
     if (isEmailExists) {
       setState(() {
-        errorText = 'The email address is already in use';
+        errorText = 'The Email ID is already registered';
         isLoading = false;
         isButtonEnabled = true;
       });
@@ -709,15 +709,22 @@ class SignUpScreenState extends State<SignUpScreen>
                                 color: Colors.red,
                               ),
                             ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Text(
-                                errorText,
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500),
+                            Expanded(
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      //softWrap: false,
+                                      errorText,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  )
+                                ],
                               ),
                             )
                           ],
