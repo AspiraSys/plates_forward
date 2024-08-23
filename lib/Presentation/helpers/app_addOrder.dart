@@ -56,13 +56,12 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
     num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
 
     UserActivityData userActivityData = UserActivityData(
-      id: result.order?.id ?? '',
-      locationId: result.order?.locationId ?? '',
-      createdAt: result.order?.createdAt ?? '',
-      totalAmount: totalAmount,
-      lineItems: lineItems,
-      type: 0
-    );
+        id: result.order?.id ?? '',
+        locationId: result.order?.locationId ?? '',
+        createdAt: result.order?.createdAt ?? '',
+        totalAmount: totalAmount,
+        lineItems: lineItems,
+        type: 0);
 
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -131,9 +130,7 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
           ),
         );
         return;
-      }
-      
-      else {
+      } else {
         final String userUid = user.uid;
         final CollectionReference userTransactionCollection =
             FirebaseFirestore.instance.collection('userTransaction');
@@ -235,16 +232,6 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
     setState(() {
       _orderController.text = receiptValue;
     });
-    // showDialog(
-    //   barrierDismissible: false,
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return ScannerDialog(
-    //       image: FileImage(File(image.path)),
-    //       recognizedText: recognizedText.text,
-    //     );
-    //   },
-    // );
   }
 
   String extractReceiptValue(String text) {
@@ -330,13 +317,6 @@ class _AddOrderDialogState extends State<AddOrderDialog> {
                           width: 30,
                           height: 30,
                         )),
-
-                    // Image.asset(ImageAssets.scannerIcon, width: 30, height: 30,)
-                    // const Icon(
-                    //   Icons.camera_sharp,
-                    //   color: AppColor.primaryColor,
-                    //   size: 35,
-                    // ),
                   ),
                 ),
               ],

@@ -37,9 +37,6 @@ class LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
-    // Check authentication state when the widget initializes
-    // checkAuthState();
-    // fetchStripe();
   }
 
   @override
@@ -86,13 +83,21 @@ class LoginScreenState extends State<LoginScreen>
 
       // ignore: unnecessary_null_comparison
       if (userCredential != null) {
+        final User? user = FirebaseAuth.instance.currentUser;
+        if (user != null && !user.emailVerified) {
+          // If the email is not verified, sign out the user and show an error message
+          await FirebaseAuth.instance.signOut();
+          setState(() {
+            errorText = 'Your Email address is not verfied';
+            isLoading = false;
+          });
+          return;
+        }
+
         if (res is SearchUserModel && res.customers.isNotEmpty) {
-          // if(customerId.isEmpty){
-          //       print('--> check empty fields $customerId');
-          // } else {
+      
           String customerId = res.customers[0].id;
 
-          print('--> check customerID $customerId');
           Get.find<UserController>().setUserSquareId(customerId);
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('customerID', customerId);
@@ -101,11 +106,7 @@ class LoginScreenState extends State<LoginScreen>
         } else {
           // ignore: use_build_context_synchronously
           _showCreateSquareIdDialog(context);
-          // String customerId = res.customers[0].id;
-          // print('--> check empty fields $res');
-          // setState(() {
-          //   errorText = 'Something went wrong with Square POS.';
-          // });
+        
         }
       }
     } catch (e) {
@@ -176,18 +177,17 @@ class LoginScreenState extends State<LoginScreen>
 
       if (resp is CustomerResponse && resp.id.isNotEmpty) {
         print("Customer created ID: ${resp.id}");
-          String newCustomerId = resp.id;
-                Get.find<UserController>().setUserSquareId(newCustomerId);
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.setString('customerID', newCustomerId);
+        String newCustomerId = resp.id;
+        Get.find<UserController>().setUserSquareId(newCustomerId);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('customerID', newCustomerId);
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               backgroundColor: AppColor.navBackgroundColor,
               title: const Text('Square ID Created'),
-              content: const Text(
-                  'Successfully created a Square ID.'),
+              content: const Text('Successfully created a Square ID.'),
               actions: <Widget>[
                 TextButton(
                   child: const Text(
@@ -213,170 +213,6 @@ class LoginScreenState extends State<LoginScreen>
       });
     }
   }
-
-
-  // Future<void> createNewSquareId() async {
-  //   String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-  //   if (userId != null) {
-  //     DocumentSnapshot<Map<String, dynamic>> userDetails =
-  //         await FirebaseFirestore.instance
-  //             .collection('userSignup')
-  //             .doc(userId)
-  //             .get();
-  //     final String fullName =
-  //         "${userDetails['firstName']} ${userDetails['lastName']}";
-  //     final String givenName = fullName;
-  //     final resp = await square.createUser(
-  //       emailAddress: CreateUserRequest(
-  //           emailAddress: _emailController.text, givenName: givenName),
-  //     );
-      
-  //     if(resp.containsKey('id')){
-  //             print("----> $resp");
-  //              print("area point");
-  //               print("----> ${resp['id']}");
-  //     }else{
-  //       print("in elser point of view");
-  //     }
-  //     print("----> $resp");
-  //     print("----> ${resp['id']}");
-
-  //     // if (res != null && res is Map<String, dynamic> && res.containsKey('id')) {
-  //     //   print('Customer created ID: ${res['id']}');
-
-  //     //   // Show success dialog and redirect to login
-  //     //   showDialog(
-  //     //     context: context,
-  //     //     builder: (BuildContext context) {
-  //     //       return AlertDialog(
-  //     //         backgroundColor: AppColor.navBackgroundColor,
-  //     //         title: const Text('Square ID Created'),
-  //     //         content: const Text(
-  //     //             'Successfully created a Square ID. Please log in.'),
-  //     //         actions: <Widget>[
-  //     //           TextButton(
-  //     //             child: const Text(
-  //     //               'OK',
-  //     //               style: TextStyle(color: AppColor.primaryColor),
-  //     //             ),
-  //     //             onPressed: () {
-  //     //               _handleSignIn();
-  //     //               // Navigator.of(context).pop();
-  //     //               // Navigator.of(context)
-  //     //               //     .pushReplacementNamed(RoutePaths.loginRoute);
-  //     //             },
-  //     //           ),
-  //     //         ],
-  //     //       );
-  //     //     },
-  //     //   );
-  //     // } else {
-  //     //   print('Failed to create Square ID');
-  //     //   setState(() {
-  //     //     errorText = 'Failed to create Square ID. Please try again.';
-  //     //   });
-  //     // }
-
-  //     //   if (res is SearchUserModel && res.customers.isNotEmpty) {
-  //     //     String newCustomerId = res.customers[0].id;
-  //     //     Get.find<UserController>().setUserSquareId(newCustomerId);
-  //     //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     //     await prefs.setString('customerID', newCustomerId);
-  //     //     print('customer create ID $newCustomerId');
-  //     //     // Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
-  //     //   } else {
-  //     //      print('in else area create ID');
-  //     //     // setState(() {
-  //     //     //   errorText = 'Failed to create Square ID. Please try again.';
-  //     //     // });
-  //     //   }
-  //     // } else {
-  //     //   setState(() {
-  //     //     errorText = 'User is not authenticated.';
-  //     //   });
-  //     // if (res != null && res is Map && res['errors'] != null) {
-  //     //   // Handling the error from Square POS
-  //     //   setState(() {
-  //     //     errorText = 'Something went wrong with Square POS';
-  //     //     isLoading = false;
-  //     //   });
-  //     //   return;
-  //     // } else {
-  //     //   String newCustomerId = res['id'];
-  //     //   print('in else area create ID $newCustomerId');
-  //     //   Get.find<UserController>().setUserSquareId(newCustomerId);
-  //     //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     //   await prefs.setString('customerID', newCustomerId);
-  //     //   print('customer create ID $newCustomerId');
-  //     //   // Optionally navigate to another screen here
-  //     //   // Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
-  //     // }
-  //     // if (res != null && res is Map<String, dynamic> && res.containsKey('id')) {
-  //     //     String newCustomerId = res['id'];
-  //     //     Get.find<UserController>().setUserSquareId(newCustomerId);
-  //     //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     //     await prefs.setString('customerID', newCustomerId);
-  //     //     print('customer create ID $newCustomerId');
-  //     //     // Optionally navigate to another screen here
-  //     //     Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
-  //     //   } else {
-  //     //     print('in else area create ID');
-  //     //     setState(() {
-  //     //       errorText = 'Failed to create Square ID. Please try again.';
-  //     //     });
-  //     //   }
-  //   } else {
-  //     setState(() {
-  //       errorText = 'User is not authenticated.';
-  //     });
-  //   }
-  // }
-  // Future<void> _handleSignIn() async {
-
-  //   final String email = _emailController.text;
-  //   final res = await square.searchUser(
-  //     emailAddress: SearchUserRequest(emailAddress: email),
-  //   );
-
-  //   setState(() {
-  //     errorText = '';
-  //   });
-
-  //   if (_emailController.text == '' || _passwordController.text == "") {
-  //     setState(() {
-  //       errorText = "Please fill the fields";
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isLoading = true;
-  //     });
-  //     try {
-  //       final UserCredential userCredential =
-  //           await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //         email: _emailController.text.trim(),
-  //         password: _passwordController.text.trim(),
-  //       );
-
-  //       // ignore: unnecessary_null_comparison
-  //       if (userCredential != null) {
-  //         // ignore: use_build_context_synchronously
-  //         Navigator.of(context)
-  //             .pushReplacementNamed(RoutePaths.navigationRoute);
-  //       }
-  //     } catch (e) {
-  //       print('Error signing in: $e');
-  //       setState(() {
-  //         errorText = 'Invalid User Credentials';
-  //       });
-  //     } finally {
-  //       await Future.delayed(const Duration(seconds: 3));
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -431,14 +267,22 @@ class LoginScreenState extends State<LoginScreen>
                                 color: Colors.red,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Text(
-                                errorText,
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500),
+                            Expanded(
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      //softWrap: false,
+                                      errorText,
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  )
+                                ],
                               ),
                             )
                           ],

@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_controller.dart';
-import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
-import 'package:plates_forward/models/user_activity.dart';
-import 'package:plates_forward/square/model/retrieve_order/retrieve_order_request.dart';
-import 'package:plates_forward/square/model/retrieve_order/retrieve_order_response.dart';
 import 'package:plates_forward/square/square_function.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
-import 'dart:io';
-
-import 'package:plates_forward/utils/app_assets.dart';
 
 class TotalOrderDialog extends StatefulWidget {
   final Function(bool) updateOrderState;
@@ -34,7 +23,6 @@ class TotalOrderDialog extends StatefulWidget {
 }
 
 class _AddOrderDialogState extends State<TotalOrderDialog> {
-
   String errorText = '';
   int selectedIndex = -1;
   bool enable = false;
@@ -45,57 +33,6 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
   void dispose() {
     super.dispose();
   }
-
-  // Future<void> saveUserTransactionData(RetrieveOrderResponse result) async {
-  //   List<ListItem> lineItems = result.order?.lineItems?.map((item) {
-  //         return ListItem(
-  //           name: item.name ?? '',
-  //           uid: item.uid ?? '',
-  //           amount: item.basePriceMoney?.amount ?? 0,
-  //           quantity: item.quantity ?? '',
-  //         );
-  //       }).toList() ??
-  //       [];
-
-  //   num totalAmount = result.order?.netAmounts?.totalMoney?.amount ?? 0;
-
-  //   UserActivityData userActivityData = UserActivityData(
-  //     id: result.order?.id ?? '',
-  //     locationId: result.order?.locationId ?? '',
-  //     createdAt: result.order?.createdAt ?? '',
-  //     totalAmount: totalAmount,
-  //     lineItems: lineItems,
-  //   );
-
-  //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //   final FirebaseAuth auth = FirebaseAuth.instance;
-
-  //   final User? user = auth.currentUser;
-  //   if (user != null) {
-  //     final String userId = user.uid;
-
-  //     await firestore.collection("userTransaction").doc(userId).set({
-  //       'userActivityData': FieldValue.arrayUnion([userActivityData.toJson()])
-  //     }, SetOptions(merge: true));
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text(
-  //           'Successfully added to Impact',
-  //           style: TextStyle(color: AppColor.whiteColor),
-  //         ),
-  //         duration: Duration(seconds: 5),
-  //       ),
-  //     );
-
-  //     Future.delayed(const Duration(seconds: 3), () {
-  //       widget.updateOrderState(false);
-  //       Navigator.pop(context);
-  //     });
-  //   } else {
-  //     print("User not authenticated");
-  //   }
-  // }
 
   Future<void> handleTotalOrder() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -109,68 +46,6 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
     final UserController userController = Get.find<UserController>();
     debugPrint('the id ${userController.userSquareId.value}');
     print('uuuu $locationId');
-    
-    // final response = await square.retrieveOrder(
-    //     orderId: RetrieveOrderRequest(orderId: orderId));
-
-    // if (_orderController.text.isEmpty) {
-    //   setState(() {
-    //     errorText = 'Invalid order ID';
-    //   });
-    //   return;
-    // } else if (response is RetrieveOrderResponse) {
-    //   if (response.errors != null) {
-    //     final errorDetail = response.errors![0].detail;
-    //     setState(() {
-    //       errorText = errorDetail!;
-    //     });
-    //     return;
-    //   } else {
-    //     final String userUid = user.uid;
-    //     final CollectionReference userTransactionCollection =
-    //         FirebaseFirestore.instance.collection('userTransaction');
-
-    //     DocumentSnapshot<Object?> userTransactionDocumentSnapshot =
-    //         await userTransactionCollection.doc(userUid).get();
-
-    //     if (userTransactionDocumentSnapshot.exists) {
-    //       Map<String, dynamic> userData =
-    //           userTransactionDocumentSnapshot.data() as Map<String, dynamic>;
-
-    //       List<Map<String, dynamic>> userActivityDataList =
-    //           (userData['userActivityData'] as List<dynamic>)
-    //               .cast<Map<String, dynamic>>()
-    //               .toList();
-    //       bool orderIdFound = false;
-    //       for (var activity in userActivityDataList) {
-    //         var idValue = activity['id'];
-    //         if (idValue == orderId) {
-    //           orderIdFound = true;
-    //           break;
-    //         }
-    //       }
-    //       if (orderIdFound) {
-    //         setState(() {
-    //           errorText = 'OrderId is already exists';
-    //         });
-    //       } else {
-    //         await saveUserTransactionData(response);
-    //         _orderController.text = '';
-    //         setState(() {
-    //           errorText = '';
-    //         });
-    //         widget.onSuccess();
-    //       }
-    //     } else {
-    //       await saveUserTransactionData(response);
-    //       _orderController.text = '';
-    //       setState(() {
-    //         errorText = '';
-    //       });
-    //       widget.onSuccess();
-    //     }
-    //   }
-    // }
   }
 
   void onVenueSelected(DocumentSnapshot selectedDocument) {
@@ -303,8 +178,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
                                                   borderRadius:
                                                       const BorderRadius.all(
                                                           Radius.circular(6)),
-                                                  color: selectedIndex ==
-                                                          index
+                                                  color: selectedIndex == index
                                                       ? AppColor.primaryColor
                                                       : AppColor.whiteColor,
                                                 ),
@@ -315,8 +189,7 @@ class _AddOrderDialogState extends State<TotalOrderDialog> {
                                                   children: [
                                                     ColorFiltered(
                                                       colorFilter: ColorFilter.mode(
-                                                          selectedIndex ==
-                                                                  index
+                                                          selectedIndex == index
                                                               ? AppColor
                                                                   .whiteColor
                                                               : AppColor

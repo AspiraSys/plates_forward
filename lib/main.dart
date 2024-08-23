@@ -34,6 +34,7 @@ void main() async {
 
   StripeKeys? stripeKeys = await fetchStripeKeys();
   Get.put(UserController());
+  Get.put(NameController());
   
   if (stripeKeys != null) {
     Stripe.publishableKey = stripeKeys.publishableKey;

@@ -232,36 +232,6 @@ class AccountDetailScreenState extends State<AccountDetailScreen> {
                       disabled: !saveText,
                     ),
                   ),
-                  // Container(
-                  //   alignment: Alignment.centerLeft,
-                  //   margin: const EdgeInsets.only(top: 25),
-                  //   padding: const EdgeInsets.only(left: 15),
-                  //   child: const Text(
-                  //     "Password",
-                  //     style: TextStyle(
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w600,
-                  //       color: Colors.black,
-                  //     ),
-                  //   ),
-                  // ),
-                  // Container(
-                  //   alignment: Alignment.centerLeft,
-                  //   child: InputBox(
-                  //     inputController: _passwordController,
-                  //     labelText: 'Enter your password here',
-                  //     inputType: 'password',
-                  //     accountDetail: true,
-                  //   ),
-                  // ),
-                  // const Padding(
-                  //   padding: EdgeInsets.only(top: 10),
-                  //   child: Text(
-                  //     'Use 8 or more characters with a mix of letters, numbers and symbols.',
-                  //     style:
-                  //         TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  //   ),
-                  // )
                 ],
               ),
             ),

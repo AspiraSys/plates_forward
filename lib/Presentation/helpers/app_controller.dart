@@ -7,3 +7,14 @@ class UserController extends GetxController {
     userSquareId.value = id;
   }
 }
+
+class NameController extends GetxController {
+  var firstName = ''.obs;
+  var lastName = ''.obs;
+
+  // A method to set user details
+  void setUserDetails({required String firstName, required String lastName}) {
+    this.firstName.value = firstName;
+    this.lastName.value = lastName;
+  }
+}

@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plates_forward/Presentation/helpers/app_bar.dart';
 import 'package:plates_forward/Presentation/helpers/app_bottom_sheet.dart';
@@ -13,6 +12,7 @@ import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
+import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -113,11 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext context) {
         return _DeleteDialog(
           key: _deleteDialogKey,
-          // deleteLoading: (bool state) {
-          //   setState(() {
-          //     isDeleteLoading = state;
-          //   });
-          // },
         );
       },
     );
@@ -137,9 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           GestureDetector(
-            onTap:
-              networkController.isConnected.value ? updateImage : null
-            ,
+            onTap: networkController.isConnected.value ? updateImage : null,
             child: Container(
                 alignment: Alignment.center,
                 margin: const EdgeInsets.only(top: 50, bottom: 24),
@@ -326,6 +319,7 @@ class _DeleteDialogState extends State<_DeleteDialog> {
   bool deleteLoading = false;
   String? _errorText;
   final TextEditingController passwordController = TextEditingController();
+  var square = SquareFunction();
 
   void setError(String error) {
     setState(() {
@@ -370,7 +364,31 @@ class _DeleteDialogState extends State<_DeleteDialog> {
         final result = await user.reauthenticateWithCredential(credential);
         if (result.user != null) {
           try {
+            // Delete user from Firebase
             await user.delete();
+
+            // Retrieve customer ID from SharedPreferences
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            final customerId = prefs.getString('customerID');
+
+            if (customerId != null) {
+              // Delete user from Square POS
+              var square = SquareFunction();
+              final squareResponse =
+                  await square.deleteUser(customerId: customerId);
+
+              if (squareResponse == true) {
+                debugPrint('Square customer deleted successfully $squareResponse');
+              } else {
+                debugPrint('Failed to delete Square customer --->: $squareResponse');
+              }
+            }
+
+            await FirebaseFirestore.instance
+                .collection('userSignup')
+                .doc(userId)
+                .delete();
+
             setState(() {
               deleteLoading = true;
             });
@@ -508,11 +526,11 @@ Future<void> handleLogOut(BuildContext context) async {
   try {
     await FirebaseAuth.instance.signOut();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('customerID');
-    
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // await prefs.remove('customerID');
+
     await Future.delayed(const Duration(seconds: 2));
-    
+
     Navigator.pushNamedAndRemoveUntil(
       // ignore: use_build_context_synchronously
       context,

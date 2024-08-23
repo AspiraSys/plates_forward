@@ -8,6 +8,8 @@ class UrlConstants {
   static const String searchUser = '/v2/customers/search';
   static const String searchOrder = '/v2/orders/search';
 
+  static const String deleteUser = '/v2/customers';
+
   static String token = '';
   static const String apiVersion = '2024-03-20';
   static const String orderId = 'pvEaMOXnwki8A9nU0GGMiBOPJe4F';

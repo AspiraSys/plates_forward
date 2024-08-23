@@ -3,6 +3,7 @@ import 'package:plates_forward/Presentation/screens/appScreen/account_detail_scr
 import 'package:plates_forward/Presentation/screens/appScreen/donate_successful_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/profile_screen.dart';
 import 'package:plates_forward/Presentation/screens/appScreen/splash_screen.dart';
+import 'package:plates_forward/Presentation/screens/auth/Wrapper_screen.dart';
 import 'package:plates_forward/Presentation/screens/auth/forget_password_screen.dart';
 import 'package:plates_forward/Presentation/screens/auth/signup_screen.dart';
 import 'package:plates_forward/navigation/navigation_screen.dart';
@@ -50,6 +51,14 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) => const DonateSuccessfulScreen(),
         );
+      case RoutePaths.wrapperRoute:
+        return MaterialPageRoute(
+          builder: (context) => const Wrapper(),
+        );
+      // case RoutePaths.emailRoute:
+      //   return MaterialPageRoute(
+      //     builder: (context) => const VerificationEmail(givenName: '',),
+      //   );
       default:
         return null;
     }

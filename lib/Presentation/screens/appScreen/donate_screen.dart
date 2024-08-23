@@ -348,8 +348,6 @@ class _DonateScreenState extends State<DonateScreen> {
                                 isDonateClicked = false;
                               }
                             }
-                            /*Navigator.of(context)
-                          .pushNamed(RoutePaths.donateSuccessRoute)*/
                           },
                           child: Container(
                             width: 176,
@@ -450,15 +448,6 @@ class _DonateScreenState extends State<DonateScreen> {
           method: 'donation',
           type: 1
         );
-        // UserActivityData userTransactionData = UserActivityData{
-
-        // id: stripeData['transactionId'],
-        // 'locationId': stripeData['locationId'],
-        // 'createdAt': stripeData['createdAt'],
-        // 'totalAmount': stripeData['totalAmount'],
-        // 'lineItems': lineItems
-        // };
-
         final FirebaseAuth auth = FirebaseAuth.instance;
 
         final User? user = auth.currentUser;
@@ -475,10 +464,6 @@ class _DonateScreenState extends State<DonateScreen> {
         } else {
           print("user is not authenticate");
         }
-        // await FirebaseFirestore.instance
-        //     .collection('userTransaction')
-        //     .doc(transactionId)
-        //     .set(userTransactionData);
       } else {
         print('Stripe transaction document does not exist');
       }

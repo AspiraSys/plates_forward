@@ -25,23 +25,6 @@ class SquareFunction {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ${UrlConstants.token}',
   };
-  // Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
-  //   http.Response? response;
-  //   try {
-  //     response = await HttpBase()
-  //         .get(
-  //             api: UrlConstants.retrieveOrderApi + orderId.orderId,
-  //             header: header)
-  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
-  //     debugPrint('error res --> ${response?.body ?? ""}');
-  //     return RetrieveOrderResponse.fromJson(json.decode(response?.body ?? ""));
-  //   } catch (error) {
-  //     return ExceptionHandlers.getExceptionString(
-  //         error,
-  //         response?.statusCode ?? 0,
-  //         UrlConstants.retrieveOrderApi + orderId.orderId);
-  //   }
-  // }
 
   Future<dynamic> retrieveOrder({required RetrieveOrderRequest orderId}) async {
     http.Response? response;
@@ -85,31 +68,6 @@ class SquareFunction {
     }
   }
 
-  // Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
-  //   http.Response? response;
-  //   String body = jsonEncode(emailAddress.toJson());
-  //   try {
-  //     response = await HttpBase()
-  //         .post(api: UrlConstants.userSearch, header: header, body: body)
-  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
-
-  //     final jsonResponse = json.decode(response?.body ?? "");
-
-  //     if (response?.statusCode == 200) {
-  //       CustomerResponse customerResponse =
-  //           CustomerResponse.fromJson(jsonResponse);
-  //       debugPrint('Parsed Customer Response: ${customerResponse.toJson()}');
-  //       return customerResponse;
-  //     } else {
-  //       debugPrint('Error response --> $jsonResponse');
-  //       return jsonResponse;
-  //     }
-  //   } catch (error) {
-  //     return ExceptionHandlers.getExceptionString(
-  //         error, response?.statusCode ?? 0, UrlConstants.createUser);
-  //   }
-  // }
-
   Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
     http.Response? response;
     String body = jsonEncode(emailAddress.toJson());
@@ -123,7 +81,8 @@ class SquareFunction {
       if (response?.statusCode == 200) {
         SearchUserModel searchUserModel =
             SearchUserModel.fromJson(jsonResponse);
-        debugPrint('Parsed Customer Response of search: ${searchUserModel.toJson()}');
+        debugPrint(
+            'Parsed Customer Response of search: ${searchUserModel.toJson()}');
         return searchUserModel;
       } else {
         debugPrint('Error response --> ${response?.body}');
@@ -136,31 +95,6 @@ class SquareFunction {
     }
   }
 
-  // Future<dynamic> searchOrders({required SearchOrderRequest customerId, required String locationId, required SearchOrderRequest startAt }) async {
-  //   http.Response? response;
-  //   String body = jsonEncode(customerId.toJson());
-  //   // debugPrint('Request body --> $body');
-  //   try {
-  //     response = await HttpBase()
-  //         .post(api: UrlConstants.searchOrder, header: header, body: body)
-  //         .timeout(const Duration(minutes: REQUEST_TIME_OUT));
-  //     final jsonResponse = json.decode(response?.body ?? "");
-
-  //     if (response?.statusCode == 200) {
-  //       // SearchUserModel searchUserModel =
-  //       //     SearchUserModel.fromJson(jsonResponse);
-  //     //  debugPrint('Parsed Customer Response: $jsonResponse');
-  //       return jsonResponse;
-  //     } else {
-  //       debugPrint('Error response --> ${response?.body}');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     debugPrint('Exception: ${error.toString()}');
-  //     return ExceptionHandlers.getExceptionString(
-  //         error, response?.statusCode ?? 0, UrlConstants.searchOrder);
-  //   }
-  // }
   Future<dynamic> searchOrders({
     required SearchOrderRequest request,
   }) async {
@@ -266,6 +200,31 @@ class SquareFunction {
     } catch (error) {
       return ExceptionHandlers.getExceptionString(
           error, response?.statusCode ?? 0, UrlConstants.createPaymentApi);
+    }
+  }
+
+  Future<dynamic> deleteUser({required String customerId}) async {
+    http.Response? response;
+    try {
+      final String url = '${UrlConstants.deleteUser}/$customerId';
+
+      response = await HttpBase()
+          .delete(api: url, header: header)
+          .timeout(const Duration(minutes: REQUEST_TIME_OUT));
+
+      final jsonResponse = json.decode(response?.body ?? "");
+
+      if (response?.statusCode == 200) {
+        debugPrint(
+            'Customer deleted successfully from Square POS. $jsonResponse');
+        return true;
+      } else {
+        debugPrint('Failed to delete Square customer: $jsonResponse');
+        return false;
+      }
+    } catch (error) {
+      return ExceptionHandlers.getExceptionString(
+          error, response?.statusCode ?? 0, UrlConstants.deleteUser);
     }
   }
 }

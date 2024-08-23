@@ -109,8 +109,9 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Text(
-                                method == 'donation' ? 
-                                '${title.toString()} Donation' : '${title.toString()} Social',
+                                method == 'donation'
+                                    ? '${title.toString()} Donation'
+                                    : '${title.toString()} Social',
                                 style: const TextStyle(
                                     color: AppColor.whiteColor,
                                     fontSize: 16,
@@ -452,13 +453,6 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                             color: AppColor.whiteColor,
                                             fontWeight: FontWeight.w600),
                                       ),
-                                      // Text(
-                                      //   'A\$ ${(donationOrder['amount'])}',
-                                      //   style: const TextStyle(
-                                      //       fontSize: 14,
-                                      //       color: AppColor.whiteColor,
-                                      //       fontWeight: FontWeight.w600),
-                                      // ),
                                       Text(
                                         'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
                                         style: const TextStyle(

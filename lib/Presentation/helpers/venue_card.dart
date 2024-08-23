@@ -123,18 +123,6 @@ class VenueCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Container(
-                          //   width: MediaQuery.of(context).size.width * .5,
-                          //   padding: const EdgeInsets.only(top: 10),
-                          //   child: Text(
-                          //     '~ ${chefName.toUpperCase()}',
-                          //     style: const TextStyle(
-                          //         fontWeight: FontWeight.w500,
-                          //         fontSize: 12,
-                          //         color: AppColor.blackColor),
-                          //     textAlign: TextAlign.left,
-                          //   ),
-                          // ),
                           GestureDetector(
                             onTap: () async {
                               if (await canLaunch(websiteLink)) {

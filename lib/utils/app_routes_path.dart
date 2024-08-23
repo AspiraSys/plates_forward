@@ -8,4 +8,6 @@ class RoutePaths {
   static const String accountDetailRoute = "/accountDetail";
   static const String venueDetailRoute = "/venuesDetail";
   static const String donateSuccessRoute = "/donateSuccess";
+  static const String wrapperRoute = "/wrapper";
+  static const String emailRoute = "/email";
 }

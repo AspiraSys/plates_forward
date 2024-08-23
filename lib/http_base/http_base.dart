@@ -26,4 +26,16 @@ class HttpBase {
     var response = await client.post(url, headers: header, body: body);
     return response;
   }
+  
+  // /DELETE
+ Future<dynamic> delete({
+    required String
+        api, // This will be the specific API path, e.g., "/customers/{customer_id}"
+    Map<String, String>? header,
+  }) async {
+    var url = Uri.parse(UrlConstants.baseUrl + api);
+    var response = await client.delete(url, headers: header);
+    return response;
+  }
+
 }
