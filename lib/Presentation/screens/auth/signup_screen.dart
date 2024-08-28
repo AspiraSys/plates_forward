@@ -281,7 +281,7 @@ class SignUpScreenState extends State<SignUpScreen>
       mobileNumber: int.parse(_mobileNumberController.text.trim()),
       email: _emailController.text.trim(),
       // squareCustomerId: _emailController.text.trim(),
-      // profilePicture: imagesUrl,
+      profilePicture: imagesUrl,
     );
 
     Map<String, dynamic> userDataJson = userData.toJson();

@@ -9,8 +9,11 @@ import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/Utils/app_routes_path.dart';
 import 'package:plates_forward/square/model/create_user/create_user_request.dart';
 import 'package:plates_forward/square/model/create_user/create_user_response.dart';
+import 'package:plates_forward/square/model/search_user/search_user_request.dart';
+import 'package:plates_forward/square/model/search_user/search_user_response.dart';
 import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_assets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VerificationEmail extends StatefulWidget {
   const VerificationEmail({
@@ -28,6 +31,7 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
 
   bool _isButtonEnabled = false;
   Timer? _buttonTimer;
+  int _secondsRemaining = 60;
 
   @override
   void initState() {
@@ -44,15 +48,29 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
   }
 
   void _startButtonTimer() {
+    _buttonTimer?.cancel();
+
     setState(() {
       _isButtonEnabled = false;
+      _secondsRemaining = 60;
     });
 
-    _buttonTimer?.cancel();
-    _buttonTimer = Timer(const Duration(seconds: 10), () {
+    // _buttonTimer = Timer(const Duration(seconds: 60), () {
+    //   setState(() {
+    //     _isButtonEnabled = true;
+    //   });
+    // });
+    _buttonTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _isButtonEnabled = true;
+        _secondsRemaining--;
       });
+
+      if (_secondsRemaining <= 0) {
+        setState(() {
+          _isButtonEnabled = true;
+          timer.cancel(); // Stop the timer
+        });
+      }
     });
   }
 
@@ -66,13 +84,61 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
   }
 
   Future<void> triggerSquareFunctionality(email, names) async {
-    final CustomerResponse? customerResponse = await square.createUser(
-      emailAddress: CreateUserRequest(emailAddress: email, givenName: names),
-    );
+    try {
+      // Step 1: Search for the user in Square POS by email address
+      final searchResponse = await square.searchUser(
+        emailAddress: SearchUserRequest(emailAddress: email),
+      );
 
-    if (customerResponse != null) {
-      final String customerId = customerResponse.id;
+      String? customerId;
+      if(searchResponse is SearchUserModel && searchResponse.customers.isNotEmpty){
+        customerId = searchResponse.customers[0].id;
+         Get.find<UserController>().setUserSquareId(customerId);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('customerID', customerId);
+      }else{
+         final CustomerResponse? customerResponse = await square.createUser(
+          emailAddress:
+              CreateUserRequest(emailAddress: email, givenName: names),
+        );
 
+      if (customerResponse != null) {
+        customerId = customerResponse.id;
+      } else {
+        print('Failed to create user in Square POS.');
+        return;
+      }
+      }
+      // Step 2: Check the search response and handle accordingly
+      // if (searchResponse != null && searchResponse is SearchUserModel) {
+      //   if (searchResponse.customers.isNotEmpty) {
+      //     // Customer exists, get the customer ID
+      //     customerId = searchResponse.customers[0].id;
+      //   } else {
+      //     // Customer does not exist, create a new one
+      //     final CustomerResponse? customerResponse = await square.createUser(
+      //       emailAddress:
+      //           CreateUserRequest(emailAddress: email, givenName: names),
+      //     );
+
+      //     if (customerResponse != null) {
+      //       customerId = customerResponse.id;
+      //     } else {
+      //       print('Failed to create user in Square POS.');
+      //       return;
+      //     }
+      //   }
+      // } else if (searchResponse is Map && searchResponse['errors'] != null) {
+      //   print(
+      //       'Something went wrong with Square POS: ${searchResponse['errors']}');
+      //   return;
+      // } else {
+      //   print('Unexpected response from Square POS: $searchResponse');
+      //   return;
+      // }
+
+      // Step 3: Store the customer ID in Firestore if it exists
+      if (customerId.isNotEmpty) {
       final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
       if (userId != null) {
@@ -86,17 +152,109 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
       } else {
         print('User ID is null.');
       }
-    } else {
-      print('Failed to create user in Square POS.');
+      }else{
+         print('empty');
+      }
+    } catch (e) {
+      print('An error occurred while triggering Square functionality: $e');
     }
   }
 
+//   Future<void> triggerSquareFunctionality(email, names) async {
+//     //  final res = await square.searchUser(
+//     //   emailAddress: SearchUserRequest(emailAddress: email),
+//     // );
+
+// // if (res != null && res is Map && res['errors'] != null) {
+// //       setState(() {
+// //         errorText = 'Something went wrong with Square POS';
+// //       });
+// //       return;
+// //     }
+
+//     // if (res is SearchUserModel && res.customers.isNotEmpty) {
+//     //   String customerId = res.customers[0].id;
+
+//     //   Get.find<UserController>().setUserSquareId(customerId);
+//     //   SharedPreferences prefs = await SharedPreferences.getInstance();
+//     //   await prefs.setString('customerID', customerId);
+//     //   Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
+//     // } else {
+//     //   // ignore: use_build_context_synchronously
+//     //   _showCreateSquareIdDialog(context);
+//     // }
+//     final CustomerResponse? customerResponse = await square.createUser(
+//       emailAddress: CreateUserRequest(emailAddress: email, givenName: names),
+//     );
+
+//     if (customerResponse != null) {
+//       final String customerId = customerResponse.id;
+
+//       final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+//       if (userId != null) {
+//         await FirebaseFirestore.instance
+//             .collection('MasterUserData')
+//             .doc(userId)
+//             .set({'squareCustomerId': customerId}, SetOptions(merge: true));
+
+//         print(
+//             'Successfully stored Square customer ID in Firestore: $customerId');
+//       } else {
+//         print('User ID is null.');
+//       }
+//     } else {
+//       print('Failed to create user in Square POS.');
+//     }
+//   }
+
   void _noOp() {}
+
+  Future<void> _resendVerificationEmail() async {
+    final NetworkController networkController = Get.find<NetworkController>();
+
+    if (!_isButtonEnabled) return; // Prevent multiple taps
+
+    setState(() {
+      _isButtonEnabled = false; // Disable the button immediately after tap
+    });
+
+    try {
+      if (networkController.isConnected.value) {
+        await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Verification email resent!'),
+          ),
+        );
+        _startButtonTimer(); // Start the timer after the email is sent
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No internet connection!'),
+          ),
+        );
+        setState(() {
+          _isButtonEnabled = true; // Re-enable the button on failure
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Failed to send verification email, kindly try it after some time'),
+        ),
+      );
+      setState(() {
+        _isButtonEnabled = true;
+      });
+    }
+  }
 
   @override
   void dispose() {
-    timer.cancel();
     _buttonTimer?.cancel();
+    timer?.cancel();
     super.dispose();
   }
 
@@ -145,29 +303,33 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
             alignment: Alignment.center,
             padding: const EdgeInsets.only(top: 30),
             child: GestureDetector(
-              onTap: _isButtonEnabled
-                  ? () async {
-                      if (networkController.isConnected.value) {
-                        await FirebaseAuth.instance.currentUser
-                            ?.sendEmailVerification();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Verification email resent!'),
-                          ),
-                        );
+              // onTap: _isButtonEnabled
+              //     ? () {
+              //         if (networkController.isConnected.value) {
+              //           FirebaseAuth.instance.currentUser
+              //               ?.sendEmailVerification();
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Text('Verification email resent!'),
+              //             ),
+              //           );
 
-                        _startButtonTimer();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('No internet connection!'),
-                          ),
-                        );
-                      }
-                    }
-                  : null,
+              //           _startButtonTimer();
+              //         } else {
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             const SnackBar(
+              //               content: Text('No internet connection!'),
+              //             ),
+              //           );
+              //         }
+              //       }
+              //     : null,
+              onTap: _isButtonEnabled ? _resendVerificationEmail : null,
               child: Text(
-                "Resend Email".toUpperCase(),
+                // "Resend Email".toUpperCase(),
+                _isButtonEnabled
+                    ? "Resend Email".toUpperCase()
+                    : "Wait $_secondsRemaining seconds",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,

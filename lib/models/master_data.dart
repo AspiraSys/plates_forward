@@ -4,8 +4,8 @@ class MasterData {
     required this.lastName,
     required this.mobileNumber,
     required this.email,
-    this.squareCustomerId
-    // this.profilePicture,
+    this.squareCustomerId,
+    this.profilePicture
   });
 
   late String firstName;
@@ -13,15 +13,15 @@ class MasterData {
   late int mobileNumber;
   late String email;
   late String? squareCustomerId;
-  // final String? profilePicture;
+  final String? profilePicture;
 
   MasterData.fromJson(Map<String, dynamic> json)
       : firstName = json['firstName'] ?? '',
         lastName = json['lastName'] ?? '',
         mobileNumber = json['mobileNumber'] ?? 0,
         email = json['email'] ?? '',
-        squareCustomerId = json['squareCustomerId'];
-  // profilePicture = json['profilePicture'];
+        squareCustomerId = json['squareCustomerId'],
+        profilePicture = json['profilePicture'];
 
   Map<String, dynamic> toJson() {
     return {
@@ -30,7 +30,7 @@ class MasterData {
       'mobileNumber': mobileNumber,
       'email': email,
       'squareCustomerId': squareCustomerId,
-      // 'profilePicture': profilePicture,
+      'profilePicture': profilePicture,
     };
   }
 }

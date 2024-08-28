@@ -95,6 +95,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               .collection('userSignup')
               .doc(userId)
               .update({'profilePicture': imagesUrl});
+          await FirebaseFirestore.instance
+              .collection('MasterUserData')
+              .doc(userId)
+              .update({'profilePicture': imagesUrl});
         }
 
         setState(() {

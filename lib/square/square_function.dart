@@ -71,7 +71,7 @@ class SquareFunction {
   Future<dynamic> searchUser({required SearchUserRequest emailAddress}) async {
     http.Response? response;
     String body = jsonEncode(emailAddress.toJson());
-    // debugPrint('Request body --> $body');
+    debugPrint('Request body --> $body');
     try {
       response = await HttpBase()
           .post(api: UrlConstants.searchUser, header: header, body: body)

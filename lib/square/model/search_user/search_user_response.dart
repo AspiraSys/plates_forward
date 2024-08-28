@@ -21,9 +21,9 @@ class Customer {
   String id;
   final DateTime createdAt;
   final DateTime updatedAt;
-  String givenName;
-  String emailAddress;
-  String creationSource;
+  String? givenName;
+  String? emailAddress;
+  String? creationSource;
   int version;
 
   Customer({
@@ -38,7 +38,7 @@ class Customer {
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      id: json['id'],
+      id: json['id'] ?? '',
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       givenName: json['given_name'],

@@ -47,10 +47,6 @@ class LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleSignIn() async {
-    final String email = _emailController.text;
-    final res = await square.searchUser(
-      emailAddress: SearchUserRequest(emailAddress: email),
-    );
 
     setState(() {
       errorText = '';
@@ -59,13 +55,6 @@ class LoginScreenState extends State<LoginScreen>
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         errorText = "Please fill the fields";
-      });
-      return;
-    }
-
-    if (res != null && res is Map && res['errors'] != null) {
-      setState(() {
-        errorText = 'Something went wrong with Square POS';
       });
       return;
     }
@@ -85,7 +74,6 @@ class LoginScreenState extends State<LoginScreen>
       if (userCredential != null) {
         final User? user = FirebaseAuth.instance.currentUser;
         if (user != null && !user.emailVerified) {
-          // If the email is not verified, sign out the user and show an error message
           await FirebaseAuth.instance.signOut();
           setState(() {
             errorText = 'Your Email address is not verfied';
@@ -94,20 +82,20 @@ class LoginScreenState extends State<LoginScreen>
           return;
         }
 
-        if (res is SearchUserModel && res.customers.isNotEmpty) {
+        // if (res is SearchUserModel && res.customers.isNotEmpty) {
       
-          String customerId = res.customers[0].id;
+        //   String customerId = res.customers[0].id;
 
-          Get.find<UserController>().setUserSquareId(customerId);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('customerID', customerId);
-          Navigator.of(context)
-              .pushReplacementNamed(RoutePaths.navigationRoute);
-        } else {
-          // ignore: use_build_context_synchronously
-          _showCreateSquareIdDialog(context);
+        //   Get.find<UserController>().setUserSquareId(customerId);
+        //   SharedPreferences prefs = await SharedPreferences.getInstance();
+        //   await prefs.setString('customerID', customerId);
+        Navigator.of(context)
+            .pushReplacementNamed(RoutePaths.navigationRoute);
+        // } else {
+        //   // ignore: use_build_context_synchronously
+        //   _showCreateSquareIdDialog(context);
         
-        }
+        // }
       }
     } catch (e) {
       print('Error signing in: $e');

@@ -22,11 +22,12 @@ class _SplashScreenWithDelayState extends State<SplashScreenWithDelay> {
   void initState() {
     super.initState();
     user = auth.currentUser;
+    moveToNext(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    moveToNext(context);
+    // moveToNext(context);
     return Scaffold(
       body: Container(
         height: double.infinity,
@@ -49,8 +50,18 @@ class _SplashScreenWithDelayState extends State<SplashScreenWithDelay> {
 
   void moveToNext(BuildContext context) {
     Timer(const Duration(seconds: 6), () {
+      // if (user != null) {
+      //   Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
+      // } else {
+      //   Navigator.of(context).pushReplacementNamed(RoutePaths.loginRoute);
+      // }
       if (user != null) {
-        Navigator.of(context).pushReplacementNamed(RoutePaths.navigationRoute);
+        if (user!.emailVerified) {
+          Navigator.of(context)
+              .pushReplacementNamed(RoutePaths.navigationRoute);
+        } else {
+          Navigator.of(context).pushReplacementNamed(RoutePaths.loginRoute);
+        }
       } else {
         Navigator.of(context).pushReplacementNamed(RoutePaths.loginRoute);
       }

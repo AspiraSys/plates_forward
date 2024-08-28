@@ -69,10 +69,12 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Plate It Forward',
-      theme: ThemeData(primaryColor: AppColor.primaryColor),
+      theme: ThemeData(primaryColor: AppColor.primaryColor,  visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      onGenerateRoute: AppRouter.navigateRoute,
       initialRoute: RoutePaths.splashRoute,
       // home: NavigationScreen() ,
-      onGenerateRoute: AppRouter.navigateRoute,
+     
     );
   }
 }
