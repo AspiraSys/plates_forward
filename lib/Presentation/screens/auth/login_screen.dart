@@ -13,6 +13,7 @@ import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
 import 'package:plates_forward/square/model/create_user/create_user_request.dart';
 import 'package:plates_forward/square/model/create_user/create_user_response.dart';
 import 'package:plates_forward/square/model/search_user/search_user_request.dart';
+// import 'package:plates_forward/square/model/search_user/search_user_request.dart';
 import 'package:plates_forward/square/model/search_user/search_user_response.dart';
 import 'package:plates_forward/square/square_function.dart';
 import 'package:plates_forward/utils/app_routes_path.dart';
@@ -47,7 +48,6 @@ class LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleSignIn() async {
-
     setState(() {
       errorText = '';
     });
@@ -82,20 +82,23 @@ class LoginScreenState extends State<LoginScreen>
           return;
         }
 
-        // if (res is SearchUserModel && res.customers.isNotEmpty) {
-      
-        //   String customerId = res.customers[0].id;
+        final res = await square.searchUser(
+          emailAddress:
+              SearchUserRequest(emailAddress: _emailController.text.trim()),
+        );
 
-        //   Get.find<UserController>().setUserSquareId(customerId);
-        //   SharedPreferences prefs = await SharedPreferences.getInstance();
-        //   await prefs.setString('customerID', customerId);
-        Navigator.of(context)
-            .pushReplacementNamed(RoutePaths.navigationRoute);
-        // } else {
-        //   // ignore: use_build_context_synchronously
-        //   _showCreateSquareIdDialog(context);
-        
-        // }
+        if (res is SearchUserModel && res.customers.isNotEmpty) {
+          String customerId = res.customers[0].id;
+// Get.find<UserController>().setUserSquareId(customerId);
+          //   SharedPreferences prefs = await SharedPreferences.getInstance();
+          //   await prefs.setString('customerID', customerId);
+          Get.find<UserController>().setUserSquareId(customerId);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          print("in cccc $customerId");
+          await prefs.setString('customerID', customerId);
+           Navigator.of(context)
+              .pushReplacementNamed(RoutePaths.navigationRoute);
+        }
       }
     } catch (e) {
       print('Error signing in: $e');

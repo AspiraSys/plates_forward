@@ -146,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> handleTotal() async {
     await _loadCustomerId();
+    print('in customerId $customerId');
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
 

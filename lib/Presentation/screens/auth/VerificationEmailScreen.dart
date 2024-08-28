@@ -93,9 +93,9 @@ class _VerificationEmailScreens extends State<VerificationEmail> {
       String? customerId;
       if(searchResponse is SearchUserModel && searchResponse.customers.isNotEmpty){
         customerId = searchResponse.customers[0].id;
-         Get.find<UserController>().setUserSquareId(customerId);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('customerID', customerId);
+        //  Get.find<UserController>().setUserSquareId(customerId);
+        //   SharedPreferences prefs = await SharedPreferences.getInstance();
+        //   await prefs.setString('customerID', customerId);
       }else{
          final CustomerResponse? customerResponse = await square.createUser(
           emailAddress:

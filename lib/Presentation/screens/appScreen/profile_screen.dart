@@ -396,6 +396,9 @@ class _DeleteDialogState extends State<_DeleteDialog> {
             setState(() {
               deleteLoading = true;
             });
+
+            await prefs.remove('customerID');
+
             await Future.delayed(const Duration(seconds: 2));
             Navigator.pushNamedAndRemoveUntil(
               context,
@@ -530,8 +533,8 @@ Future<void> handleLogOut(BuildContext context) async {
   try {
     await FirebaseAuth.instance.signOut();
 
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.remove('customerID');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('customerID');
 
     await Future.delayed(const Duration(seconds: 2));
 
