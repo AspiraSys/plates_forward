@@ -291,7 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       context: context,
                       builder: (BuildContext context) {
                         return BottomSheets(
-                            title: 'LogOut',
+                            title: 'Logout',
                             buttonText: 'Confirm',
                             content:
                                 'Are you sure you want to log out of your account?',
@@ -478,7 +478,7 @@ class _DeleteDialogState extends State<_DeleteDialog> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: InputBox(
-                    labelText: 'Enter password',
+                    labelText: 'Enter your password',
                     inputType: 'password',
                     inputController: passwordController,
                   ),

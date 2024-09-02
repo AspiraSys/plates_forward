@@ -58,7 +58,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
           final orders = ordering['lineItems'];
           final method = ordering['method'];
 
-          print('--> ${ordering['method']}');
+          // print('--> ${ordering['lineItems']}');
 
           return Container(
             margin: const EdgeInsets.symmetric(vertical: 5),
@@ -98,46 +98,114 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                           )
                         ],
                       )),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 6),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                method == 'donation'
-                                    ? '${title.toString()} Donation'
-                                    : '${title.toString()} Social',
-                                style: const TextStyle(
-                                    color: AppColor.whiteColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Icon(
-                                  Icons.circle_rounded,
-                                  color: AppColor.whiteColor,
-                                  size: 4,
+                  Container(
+                   width: MediaQuery.of(context).size.width * 0.52,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Row(
+                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  method == 'donation'
+                                      ? '${title.toString()} Donation'
+                                      : '${title.toString()} Social',
+                                  style: const TextStyle(
+                                      color: AppColor.whiteColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                              ),
-                              Text(
-                                date,
-                                style: const TextStyle(
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 4),
+                                  child: Icon(
+                                    Icons.circle_rounded,
                                     color: AppColor.whiteColor,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: 1),
-                              ),
-                            ],
+                                    size: 4,
+                                  ),
+                                ),
+                                Text(
+                                  date,
+                                  style: const TextStyle(
+                                      color: AppColor.whiteColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                      letterSpacing: 1),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        if (orders != null && method == 'donation')
-                          for (var donationOrder in orders)
+                          if (orders != null && method == 'donation')
+                            for (var donationOrder in orders)
+                              Row(
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                        color: AppColor.whiteColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: 1),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 2),
+                                    child: Icon(
+                                      Icons.circle_rounded,
+                                      color: AppColor.whiteColor,
+                                      size: 4,
+                                    ),
+                                  ),
+                                  RichText(
+                                      text: TextSpan(
+                                          text:
+                                              int.parse(donationOrder['quantity'])
+                                                  .toString(),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.whiteColor,
+                                          ),
+                                          children: const <TextSpan>[
+                                        TextSpan(
+                                            text: ' Meals',
+                                            style: TextStyle(
+                                                color: AppColor.whiteColor,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: 1)),
+                                      ])),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 4),
+                                    child: Icon(
+                                      Icons.circle_rounded,
+                                      color: AppColor.whiteColor,
+                                      size: 4,
+                                    ),
+                                  ),
+                                  RichText(
+                                      text: TextSpan(
+                                          text: 'Total ',
+                                          style: const TextStyle(
+                                              color: AppColor.whiteColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400,
+                                              letterSpacing: 1),
+                                          children: <TextSpan>[
+                                        TextSpan(
+                                            text:
+                                                'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}0',
+                                            style: const TextStyle(
+                                                color: AppColor.whiteColor,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                letterSpacing: 1)),
+                                      ])),
+                                ],
+                              )
+                          else
                             Row(
                               children: [
                                 Text(
@@ -148,83 +216,18 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                       fontWeight: FontWeight.w400,
                                       letterSpacing: 1),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 4),
-                                  child: Icon(
-                                    Icons.circle_rounded,
-                                    color: AppColor.whiteColor,
-                                    size: 4,
-                                  ),
+                                Text(
+                                  ' , $title2',
+                                  style: const TextStyle(
+                                      color: AppColor.whiteColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      letterSpacing: 1),
                                 ),
-                                RichText(
-                                    text: TextSpan(
-                                        text:
-                                            int.parse(donationOrder['quantity'])
-                                                .toString(),
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColor.whiteColor,
-                                        ),
-                                        children: const <TextSpan>[
-                                      TextSpan(
-                                          text: ' Meals',
-                                          style: TextStyle(
-                                              color: AppColor.whiteColor,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400,
-                                              letterSpacing: 1)),
-                                    ])),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 4),
-                                  child: Icon(
-                                    Icons.circle_rounded,
-                                    color: AppColor.whiteColor,
-                                    size: 4,
-                                  ),
-                                ),
-                                RichText(
-                                    text: TextSpan(
-                                        text: 'Total ',
-                                        style: const TextStyle(
-                                            color: AppColor.whiteColor,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            letterSpacing: 1),
-                                        children: <TextSpan>[
-                                      TextSpan(
-                                          text:
-                                              'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
-                                          style: const TextStyle(
-                                              color: AppColor.whiteColor,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 1)),
-                                    ])),
                               ],
                             )
-                        else
-                          Row(
-                            children: [
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                    color: AppColor.whiteColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: 1),
-                              ),
-                              Text(
-                                ' , $title2',
-                                style: const TextStyle(
-                                    color: AppColor.whiteColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: 1),
-                              ),
-                            ],
-                          )
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
@@ -446,15 +449,21 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        '${donationOrder['name'].toString()}',
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: AppColor.whiteColor,
-                                            fontWeight: FontWeight.w600),
+                                      Container(
+                                        width:
+                                          MediaQuery.of(context).size.width *
+                                                0.55,
+                                        child: Text(
+                                          '${donationOrder['name'].toString()} * ${int.parse(donationOrder['quantity'])}',
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              color: AppColor.whiteColor,
+                                              fontWeight: FontWeight.w600),
+                                        ),
                                       ),
                                       Text(
-                                        'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}',
+                                        // 'A\$ ${(donationOrder['amount'] * int.parse(donationOrder['quantity'])).toString()}.00',
+                                        'A\$ ${(donationOrder['amount'])}.00',
                                         style: const TextStyle(
                                             fontSize: 14,
                                             color: AppColor.whiteColor,
@@ -478,7 +487,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                                       fontWeight: FontWeight.w600),
                                 ),
                                 Text(
-                                  'A\$ ${ordering['totalAmount'].toString()}',
+                                  'A\$ ${ordering['totalAmount'].toString()}.00',
                                   style: const TextStyle(
                                       fontSize: 14,
                                       color: AppColor.whiteColor,
@@ -500,7 +509,7 @@ class _ExpansionTileState extends State<ExpansionTiles> {
                       const Padding(
                         padding: EdgeInsets.only(bottom: 15),
                         child: Text(
-                          "You Donated Meals",
+                          "You Donated Meals to",
                           style: TextStyle(
                               color: AppColor.whiteColor,
                               fontSize: 14,

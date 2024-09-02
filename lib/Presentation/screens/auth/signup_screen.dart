@@ -768,7 +768,7 @@ class SignUpScreenState extends State<SignUpScreen>
                 alignment: Alignment.centerLeft,
                 child: InputBox(
                   inputController: _mobileNumberController,
-                  labelText: 'Enter your mobile name',
+                  labelText: 'Enter your mobile number',
                   inputType: 'phone',
                   phone: true,
                 ),
@@ -1138,7 +1138,7 @@ class SignUpScreenState extends State<SignUpScreen>
                   alignment: Alignment.center,
                   padding: const EdgeInsets.only(top: 4, bottom: 10),
                   child: const Text(
-                    "Return to SignIn",
+                    "Return to Sign In",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    handleTotal();
     checkAndPrintMatchingData().then((_) {
       setState(() {
         isLoading = false;
@@ -416,6 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Future<void> refreshData() async {
       await Future.delayed(const Duration(seconds: 2));
       await checkAndPrintMatchingData();
+      await handleTotal();
     }
 
     return Container(

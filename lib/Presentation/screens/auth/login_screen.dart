@@ -7,6 +7,7 @@ import 'package:plates_forward/Presentation/helpers/app_buttons.dart';
 import 'package:plates_forward/Presentation/helpers/app_circular.dart';
 import 'package:plates_forward/Presentation/helpers/app_controller.dart';
 import 'package:plates_forward/Presentation/helpers/app_network_message.dart';
+import 'package:plates_forward/Presentation/screens/auth/VerificationEmailScreen.dart';
 import 'package:plates_forward/Utils/app_assets.dart';
 import 'package:plates_forward/Utils/app_colors.dart';
 import 'package:plates_forward/Presentation/helpers/app_input_box.dart';
@@ -35,6 +36,9 @@ class LoginScreenState extends State<LoginScreen>
 
   String errorText = '';
   bool isLoading = false;
+  bool showResendEmailButton = false;
+  bool isResendingEmail = false;
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +82,7 @@ class LoginScreenState extends State<LoginScreen>
           setState(() {
             errorText = 'Your Email address is not verfied';
             isLoading = false;
+            showResendEmailButton = true;
           });
           return;
         }
@@ -370,6 +375,29 @@ class LoginScreenState extends State<LoginScreen>
                       _handleSignUp();
                     },
                   )),
+                  // showResendEmailButton ?
+          //         GestureDetector(
+          //       onTap: () => Navigator.of(context).pushReplacement(
+          //   MaterialPageRoute(
+          //     builder: (context) => const VerificationEmail(
+          //       // emailAddress: _emailController.text.trim(),
+          //     ),
+          //   ),
+          // ),
+                // child: Container(
+                //   alignment: Alignment.center,
+                //   padding: const EdgeInsets.only(top: 24),
+                //   child: const Text(
+                //     "Resend verification email",
+                //     style: TextStyle(
+                //       fontSize: 16,
+                //       fontWeight: FontWeight.w600,
+                //       color: Color.fromRGBO(2, 60, 167, 1),
+                //     ),
+                //   ),
+                // ),
+              // ) 
+              // : const SizedBox()
             ],
           ),
           if (isLoading) const CircularProgress()
